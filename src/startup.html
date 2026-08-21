@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>DeepSeek Harness</title>
+    <title>U-DSH</title>
     <style>
       :root {
         color-scheme: light dark;
@@ -57,6 +57,14 @@
         background: var(--startup-track);
       }
 
+      #status {
+        max-width: 440px;
+        margin: 18px 24px 0;
+        color: rgba(0, 0, 0, 0.58);
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
       .progress::after {
         width: 52px;
         height: 100%;
@@ -94,6 +102,10 @@
           --startup-indicator: rgba(255, 255, 255, 0.88);
         }
 
+        #status {
+          color: rgba(255, 255, 255, 0.62);
+        }
+
         .mark img {
           filter: invert(1);
         }
@@ -103,14 +115,19 @@
   <body>
     <main data-startup-screen>
       <div class="mark">
-        <img src="../assets/trayTemplate@2x.png" alt="DeepSeek Harness" />
+        <img src="../assets/trayTemplate@2x.png" alt="U-DSH" />
       </div>
       <div class="progress" id="progress" aria-label="正在启动"></div>
+      <p id="status">正在启动 DeepSeek Harness 本地服务…</p>
     </main>
     <script>
+      window.udshSetStatus = (message) => {
+        document.querySelector("#status").textContent = message;
+      };
       if (!navigator.language.toLowerCase().startsWith("zh")) {
         document.documentElement.lang = "en";
         document.querySelector("#progress").setAttribute("aria-label", "Starting");
+        window.udshSetStatus("Starting the local DeepSeek Harness service…");
       }
     </script>
   </body>

@@ -1,0 +1,98 @@
+[
+  {
+    "action_id": "kernel.check_updates",
+    "surface": "gui",
+    "request_execution_id": "evidence-gui-kernel.check_updates",
+    "core_execution_id": "evidence-gui-kernel.check_updates"
+  },
+  {
+    "action_id": "kernel.status",
+    "surface": "gui",
+    "request_execution_id": "evidence-gui-kernel.status",
+    "core_execution_id": "evidence-gui-kernel.status"
+  },
+  {
+    "action_id": "wallet.ensure",
+    "surface": "gui",
+    "request_execution_id": "evidence-gui-wallet.ensure",
+    "core_execution_id": "evidence-gui-wallet.ensure"
+  },
+  {
+    "action_id": "wallet.key.adopt",
+    "surface": "gui",
+    "request_execution_id": "evidence-gui-wallet.key.adopt",
+    "core_execution_id": "evidence-gui-wallet.key.adopt"
+  },
+  {
+    "action_id": "wallet.key.copy",
+    "surface": "gui",
+    "request_execution_id": "evidence-gui-wallet.key.copy",
+    "core_execution_id": "evidence-gui-wallet.key.copy"
+  },
+  {
+    "action_id": "wallet.key.rotate",
+    "surface": "gui",
+    "request_execution_id": "evidence-gui-wallet.key.rotate",
+    "core_execution_id": "evidence-gui-wallet.key.rotate"
+  },
+  {
+    "action_id": "wallet.reset_local",
+    "surface": "gui",
+    "request_execution_id": "evidence-gui-wallet.reset_local",
+    "core_execution_id": "evidence-gui-wallet.reset_local"
+  },
+  {
+    "action_id": "wallet.status",
+    "surface": "gui",
+    "request_execution_id": "evidence-gui-wallet.status",
+    "core_execution_id": "evidence-gui-wallet.status"
+  },
+  {
+    "action_id": "kernel.check_updates",
+    "surface": "cli",
+    "request_execution_id": "evidence-cli-kernel.check_updates",
+    "core_execution_id": "evidence-cli-kernel.check_updates"
+  },
+  {
+    "action_id": "kernel.status",
+    "surface": "cli",
+    "request_execution_id": "evidence-cli-kernel.status",
+    "core_execution_id": "evidence-cli-kernel.status"
+  },
+  {
+    "action_id": "wallet.ensure",
+    "surface": "cli",
+    "request_execution_id": "evidence-cli-wallet.ensure",
+    "core_execution_id": "evidence-cli-wallet.ensure"
+  },
+  {
+    "action_id": "wallet.key.adopt",
+    "surface": "cli",
+    "request_execution_id": "evidence-cli-wallet.key.adopt",
+    "core_execution_id": "evidence-cli-wallet.key.adopt"
+  },
+  {
+    "action_id": "wallet.key.copy",
+    "surface": "cli",
+    "request_execution_id": "evidence-cli-wallet.key.copy",
+    "core_execution_id": "evidence-cli-wallet.key.copy"
+  },
+  {
+    "action_id": "wallet.key.rotate",
+    "surface": "cli",
+    "request_execution_id": "evidence-cli-wallet.key.rotate",
+    "core_execution_id": "evidence-cli-wallet.key.rotate"
+  },
+  {
+    "action_id": "wallet.reset_local",
+    "surface": "cli",
+    "request_execution_id": "evidence-cli-wallet.reset_local",
+    "core_execution_id": "evidence-cli-wallet.reset_local"
+  },
+  {
+    "action_id": "wallet.status",
+    "surface": "cli",
+    "request_execution_id": "evidence-cli-wallet.status",
+    "core_execution_id": "evidence-cli-wallet.status"
+  }
+]

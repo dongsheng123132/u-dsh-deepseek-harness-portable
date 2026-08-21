@@ -1,0 +1,58 @@
+{
+  "name": "action-parity",
+  "version": "0.7.0",
+  "description": "Open standard and validator for one action across GUI, CLI, MCP, automation, and AI.",
+  "keywords": [
+    "actionparity",
+    "action-parity",
+    "shadowcore",
+    "影核",
+    "action-core",
+    "agent-native",
+    "gui-cli-parity",
+    "mcp",
+    "conformance"
+  ],
+  "type": "module",
+  "private": false,
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "workspaces": [
+    "sdk/node",
+    "examples/node-registry"
+  ],
+  "bin": {
+    "action-parity": "./bin/action-parity.mjs"
+  },
+  "files": [
+    "bin/",
+    "src/",
+    "schema/",
+    "skills/",
+    "SPEC.md",
+    "docs/VERSIONING.md",
+    "LICENSE",
+    "README.md",
+    "README.zh-CN.md"
+  ],
+  "scripts": {
+    "check": "npm test && npm run test:rust && npm run validate && npm run check:generated && npm run check:agent-skills && npm run check:links",
+    "check:agent-skills": "node scripts/sync-agent-skills.mjs --check",
+    "check:generated": "node scripts/generate-rust-example.mjs --check && node scripts/generate-node-example.mjs --check",
+    "check:links": "node scripts/check-links.mjs",
+    "check:release": "node scripts/check-release.mjs",
+    "validate": "node bin/action-parity.mjs validate examples/minimal/action-parity.json && node bin/action-parity.mjs validate examples/u-king/action-parity.json && node bin/action-parity.mjs validate examples/node-registry/generated/action-parity.json",
+    "report": "node bin/action-parity.mjs report examples/u-king/action-parity.json",
+    "generate:rust-example": "node scripts/generate-rust-example.mjs",
+    "generate:node-example": "node scripts/generate-node-example.mjs",
+    "verify:node-example": "node bin/action-parity.mjs verify examples/node-registry/generated/action-parity.json --plan examples/node-registry/generated/action-parity.verify.json",
+    "sync:agent-skills": "node scripts/sync-agent-skills.mjs",
+    "test": "node --test test/cli.test.mjs test/validator.test.mjs test/verifier.test.mjs test/project.test.mjs test/generator.test.mjs test/typescript.test.mjs test/doctor.test.mjs test/sdk-core.test.mjs test/sdk-surfaces.test.mjs",
+    "test:rust": "cargo test --workspace"
+  },
+  "dependencies": {
+    "ajv": "^8.17.1"
+  }
+}

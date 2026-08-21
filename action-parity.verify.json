@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "generator": {
+    "command": ["node", "src/cli.js", "export"],
+    "timeout_ms": 120000
+  },
+  "tests": [
+    {
+      "ref": "test/action-parity.test.js",
+      "command": ["node", "--test", "test/action-parity.test.js"],
+      "observations": "generated/parity-observations.json",
+      "timeout_ms": 180000
+    }
+  ],
+  "artifacts": [
+    "src/action-core.js",
+    "src/cli.js",
+    "src/wallet-preload.cjs",
+    "src/wallet.html"
+  ]
+}

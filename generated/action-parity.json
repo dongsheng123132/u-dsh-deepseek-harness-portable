@@ -1,0 +1,564 @@
+{
+  "$schema": "https://raw.githubusercontent.com/dongsheng123132/action-parity/v0.5.0/schema/action-parity.schema.json",
+  "actions": [
+    {
+      "bindings": [
+        {
+          "surface": "cli",
+          "target": "u-dsh kernel.check_updates --json",
+          "test": "test/action-parity.test.js"
+        },
+        {
+          "surface": "gui",
+          "target": "data-action-id=kernel.check_updates",
+          "test": "test/action-parity.test.js"
+        }
+      ],
+      "description": "只读查询 npm stable 标签，不自动安装或切换未经验证的内核。",
+      "effects": {
+        "audit_required": false,
+        "class": "read",
+        "confirmation": "never",
+        "reversible": true,
+        "risk": "low"
+      },
+      "execution": {
+        "cancellable": false,
+        "headless": true,
+        "headless_evidence": "node --test test/action-parity.test.js",
+        "idempotent": true,
+        "timeout_ms": 20000
+      },
+      "id": "kernel.check_updates",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "coreExecutionId": {
+            "type": "string"
+          },
+          "current": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "latest": {
+            "type": "string"
+          },
+          "pinned": {
+            "type": "string"
+          },
+          "updateAvailable": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "current",
+          "pinned",
+          "latest",
+          "updateAvailable",
+          "coreExecutionId"
+        ],
+        "type": "object"
+      },
+      "title": "检查 DSH 内核更新"
+    },
+    {
+      "bindings": [
+        {
+          "surface": "cli",
+          "target": "u-dsh kernel.status --json",
+          "test": "test/action-parity.test.js"
+        },
+        {
+          "surface": "gui",
+          "target": "data-action-id=kernel.status",
+          "test": "test/action-parity.test.js"
+        }
+      ],
+      "description": "读取本机 Node/DSH 缓存版本和 U 盘数据目录。",
+      "effects": {
+        "audit_required": false,
+        "class": "read",
+        "confirmation": "never",
+        "reversible": true,
+        "risk": "low"
+      },
+      "execution": {
+        "cancellable": false,
+        "headless": true,
+        "headless_evidence": "node --test test/action-parity.test.js",
+        "idempotent": true,
+        "timeout_ms": 5000
+      },
+      "id": "kernel.status",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "activeVersion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "cacheDir": {
+            "type": "string"
+          },
+          "coreExecutionId": {
+            "type": "string"
+          },
+          "dataDir": {
+            "type": "string"
+          },
+          "installedVersions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "nodeReady": {
+            "type": "boolean"
+          },
+          "nodeVersion": {
+            "type": "string"
+          },
+          "pinnedVersion": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "nodeVersion",
+          "nodeReady",
+          "pinnedVersion",
+          "activeVersion",
+          "installedVersions",
+          "cacheDir",
+          "dataDir",
+          "coreExecutionId"
+        ],
+        "type": "object"
+      },
+      "title": "读取 DSH 内核状态"
+    },
+    {
+      "bindings": [
+        {
+          "surface": "cli",
+          "target": "u-dsh wallet.ensure --json",
+          "test": "test/action-parity.test.js"
+        },
+        {
+          "surface": "gui",
+          "target": "data-action-id=wallet.ensure",
+          "test": "test/action-parity.test.js"
+        }
+      ],
+      "description": "恢复未完成操作，必要时申领随机 Key，并写入 DSH 配置。",
+      "effects": {
+        "audit_required": true,
+        "class": "external",
+        "confirmation": "conditional",
+        "reversible": true,
+        "risk": "low"
+      },
+      "execution": {
+        "cancellable": false,
+        "headless": true,
+        "headless_evidence": "node --test test/action-parity.test.js",
+        "idempotent": true,
+        "timeout_ms": 30000
+      },
+      "id": "wallet.ensure",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "available": {
+            "type": "boolean"
+          },
+          "configured": {
+            "type": "boolean"
+          },
+          "coreExecutionId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "available",
+          "configured",
+          "coreExecutionId"
+        ],
+        "type": "object"
+      },
+      "title": "收敛设备钱包"
+    },
+    {
+      "bindings": [
+        {
+          "surface": "cli",
+          "target": "u-dsh wallet.key.adopt --json",
+          "test": "test/action-parity.test.js"
+        },
+        {
+          "surface": "gui",
+          "target": "data-action-id=wallet.key.adopt",
+          "test": "test/action-parity.test.js"
+        }
+      ],
+      "description": "只读验证已有 Key，成功后写入 U 盘钱包和 DSH 配置。",
+      "effects": {
+        "audit_required": true,
+        "class": "write",
+        "confirmation": "never",
+        "reversible": true,
+        "risk": "medium"
+      },
+      "execution": {
+        "cancellable": false,
+        "headless": true,
+        "headless_evidence": "node --test test/action-parity.test.js",
+        "idempotent": false,
+        "timeout_ms": 30000
+      },
+      "id": "wallet.key.adopt",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "apiKey": {
+            "description": "Secret. CLI callers must use --input-json - or @file; argv flags are refused.",
+            "minLength": 8,
+            "type": "string",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "apiKey"
+        ],
+        "type": "object"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "apiKeyMasked": {
+            "type": "string"
+          },
+          "coreExecutionId": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "apiKeyMasked",
+          "coreExecutionId"
+        ],
+        "type": "object"
+      },
+      "title": "启用已有设备钱包 Key"
+    },
+    {
+      "bindings": [
+        {
+          "surface": "cli",
+          "target": "u-dsh wallet.key.copy --json",
+          "test": "test/action-parity.test.js"
+        },
+        {
+          "surface": "gui",
+          "target": "data-action-id=wallet.key.copy",
+          "test": "test/action-parity.test.js"
+        }
+      ],
+      "description": "在主进程内把当前 Key 写入系统剪贴板，Key 不进入渲染器。",
+      "effects": {
+        "audit_required": false,
+        "class": "read",
+        "confirmation": "never",
+        "reversible": true,
+        "risk": "low"
+      },
+      "execution": {
+        "cancellable": false,
+        "headless": true,
+        "headless_evidence": "node --test test/action-parity.test.js",
+        "idempotent": true,
+        "timeout_ms": 5000
+      },
+      "id": "wallet.key.copy",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "coreExecutionId": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "coreExecutionId"
+        ],
+        "type": "object"
+      },
+      "title": "复制设备钱包 Key"
+    },
+    {
+      "bindings": [
+        {
+          "surface": "cli",
+          "target": "u-dsh wallet.key.rotate --json",
+          "test": "test/action-parity.test.js"
+        },
+        {
+          "surface": "gui",
+          "target": "data-action-id=wallet.key.rotate",
+          "test": "test/action-parity.test.js"
+        }
+      ],
+      "description": "生成并验证新 Key，提交后旧 Key 失效，钱包余额不变。",
+      "effects": {
+        "audit_required": true,
+        "class": "financial",
+        "confirmation": "always",
+        "reversible": false,
+        "risk": "high"
+      },
+      "execution": {
+        "cancellable": false,
+        "headless": true,
+        "headless_evidence": "node --test test/action-parity.test.js",
+        "idempotent": false,
+        "timeout_ms": 30000
+      },
+      "id": "wallet.key.rotate",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "apiKeyMasked": {
+            "type": "string"
+          },
+          "coreExecutionId": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "apiKeyMasked",
+          "coreExecutionId"
+        ],
+        "type": "object"
+      },
+      "title": "更换设备钱包 Key"
+    },
+    {
+      "bindings": [
+        {
+          "surface": "cli",
+          "target": "u-dsh wallet.reset_local --json",
+          "test": "test/action-parity.test.js"
+        },
+        {
+          "surface": "gui",
+          "target": "data-action-id=wallet.reset_local",
+          "test": "test/action-parity.test.js"
+        }
+      ],
+      "description": "先清除 DSH 消费端配置，再清 U 盘本地钱包；不会删除服务端钱包和余额。",
+      "effects": {
+        "audit_required": true,
+        "class": "destructive",
+        "confirmation": "always",
+        "reversible": false,
+        "risk": "high"
+      },
+      "execution": {
+        "cancellable": false,
+        "headless": true,
+        "headless_evidence": "node --test test/action-parity.test.js",
+        "idempotent": false,
+        "timeout_ms": 30000
+      },
+      "id": "wallet.reset_local",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "apiKeyMasked": {
+            "type": "string"
+          },
+          "coreExecutionId": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "apiKeyMasked",
+          "coreExecutionId"
+        ],
+        "type": "object"
+      },
+      "title": "移除本机设备钱包"
+    },
+    {
+      "bindings": [
+        {
+          "surface": "cli",
+          "target": "u-dsh wallet.status --json",
+          "test": "test/action-parity.test.js"
+        },
+        {
+          "surface": "gui",
+          "target": "data-action-id=wallet.status",
+          "test": "test/action-parity.test.js"
+        }
+      ],
+      "description": "读取脱敏 Key、余额和待完成操作，不返回原始 Key。",
+      "effects": {
+        "audit_required": false,
+        "class": "read",
+        "confirmation": "never",
+        "reversible": true,
+        "risk": "low"
+      },
+      "execution": {
+        "cancellable": false,
+        "headless": true,
+        "headless_evidence": "node --test test/action-parity.test.js",
+        "idempotent": true,
+        "timeout_ms": 25000
+      },
+      "id": "wallet.status",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "refreshBalance": {
+            "default": false,
+            "type": "boolean"
+          }
+        },
+        "type": "object"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "apiKeyMasked": {
+            "type": "string"
+          },
+          "available": {
+            "type": "boolean"
+          },
+          "balanceAvailable": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "balanceError": {
+            "type": "string"
+          },
+          "coreExecutionId": {
+            "type": "string"
+          },
+          "pending": {
+            "type": "boolean"
+          },
+          "pendingKind": {
+            "type": "string"
+          },
+          "walletId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "available",
+          "apiKeyMasked",
+          "walletId",
+          "pending",
+          "pendingKind",
+          "balanceAvailable",
+          "balanceError",
+          "coreExecutionId"
+        ],
+        "type": "object"
+      },
+      "title": "读取设备钱包状态"
+    }
+  ],
+  "application": {
+    "description": "Portable DeepSeek Harness with Xiapan Cloud device wallet.",
+    "id": "org.uclaw.udsh",
+    "name": "U-DSH",
+    "source": "https://github.com/dongsheng123132/u-dsh",
+    "version": "0.1.0"
+  },
+  "generated_from": {
+    "generator": "action-parity-sdk/0.7.0",
+    "revision": "src/action-core.js"
+  },
+  "spec_version": "0.5.0",
+  "surfaces": [
+    {
+      "id": "cli",
+      "kind": "cli",
+      "reachability": "external",
+      "required_for_parity": true,
+      "test_driver": "node --test"
+    },
+    {
+      "id": "gui",
+      "kind": "gui",
+      "reachability": "in-process",
+      "required_for_parity": true,
+      "test_driver": "node --test"
+    }
+  ]
+}

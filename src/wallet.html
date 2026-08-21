@@ -1,0 +1,210 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>U-DSH 设备钱包</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        font-family: Inter, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+        --bg: #f5f7fb;
+        --panel: #ffffff;
+        --text: #172033;
+        --muted: #68738a;
+        --line: #e3e8f2;
+        --primary: #2563eb;
+        --primary-hover: #1d4ed8;
+        --soft: #eef4ff;
+        --danger: #b42318;
+        --danger-bg: #fff3f2;
+        --success: #067647;
+        --shadow: 0 18px 46px rgba(31, 45, 78, 0.10);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0c111d;
+          --panel: #161d2b;
+          --text: #f1f5fb;
+          --muted: #9aa6bb;
+          --line: #2a3447;
+          --primary: #6ea8fe;
+          --primary-hover: #8bb9ff;
+          --soft: #1c2b47;
+          --danger: #ff8a80;
+          --danger-bg: #351d23;
+          --success: #5fd6a0;
+          --shadow: 0 18px 46px rgba(0, 0, 0, 0.30);
+        }
+      }
+      * { box-sizing: border-box; }
+      body { margin: 0; background: var(--bg); color: var(--text); }
+      main { width: min(100%, 620px); margin: 0 auto; padding: 28px 24px 40px; }
+      header { margin-bottom: 18px; }
+      h1 { margin: 0; font-size: 28px; font-weight: 650; letter-spacing: -0.04em; }
+      header p, .hint { color: var(--muted); line-height: 1.55; }
+      header p { margin: 8px 0 0; }
+      .card { background: var(--panel); border: 1px solid var(--line); border-radius: 18px; padding: 20px; box-shadow: var(--shadow); }
+      .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+      .between { justify-content: space-between; }
+      .label { color: var(--muted); font-size: 13px; }
+      .key { margin-top: 6px; font: 600 15px ui-monospace, SFMono-Regular, Consolas, monospace; word-break: break-all; }
+      .badge { border-radius: 999px; padding: 5px 9px; background: var(--soft); color: var(--primary); font-size: 12px; font-weight: 650; }
+      .balance { margin: 18px 0; padding: 14px; border-radius: 13px; background: var(--soft); }
+      .balance strong { display: block; margin-top: 3px; font-size: 23px; letter-spacing: -0.03em; }
+      button { border: 1px solid var(--line); border-radius: 10px; padding: 9px 13px; background: var(--panel); color: var(--text); font: inherit; font-weight: 600; cursor: pointer; }
+      button:hover { border-color: var(--primary); color: var(--primary); }
+      button:disabled { opacity: .52; cursor: wait; }
+      button.primary { color: white; border-color: var(--primary); background: var(--primary); }
+      button.primary:hover { color: white; background: var(--primary-hover); }
+      button.danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 38%, transparent); background: var(--danger-bg); }
+      hr { border: 0; border-top: 1px solid var(--line); margin: 22px 0; }
+      h2 { margin: 0 0 7px; font-size: 16px; }
+      .hint { margin: 0 0 12px; font-size: 13px; }
+      .input-row { display: grid; grid-template-columns: 1fr auto; gap: 8px; }
+      input[type="password"] { width: 100%; min-width: 0; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--bg); color: var(--text); font: 14px ui-monospace, SFMono-Regular, Consolas, monospace; outline: none; }
+      input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 16%, transparent); }
+      .danger-zone { border: 1px solid color-mix(in srgb, var(--danger) 35%, var(--line)); border-radius: 14px; padding: 15px; background: var(--danger-bg); }
+      .check { display: flex; gap: 8px; align-items: flex-start; margin: 12px 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+      #message { min-height: 22px; margin: 14px 2px 0; color: var(--success); font-size: 13px; }
+      #message.error { color: var(--danger); }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <h1>设备钱包</h1>
+        <p>免登录使用虾盘云。Key 就是你的钱包，请复制到安全的地方自行备份。</p>
+      </header>
+      <section class="card">
+        <div class="row between">
+          <div>
+            <div class="label">当前 Key</div>
+            <div class="key" id="key">正在读取…</div>
+          </div>
+          <span class="badge" id="state">检查中</span>
+        </div>
+        <div class="balance">
+          <span class="label">可用额度</span>
+          <strong id="balance">—</strong>
+        </div>
+        <div class="row">
+          <button class="primary" id="recharge">一键充值</button>
+          <button id="retry" data-action-id="wallet.ensure">联网重试</button>
+          <button id="refresh" data-action-id="wallet.status">刷新余额</button>
+          <button id="copy" data-action-id="wallet.key.copy">复制 Key</button>
+          <button id="rotate" data-action-id="wallet.key.rotate">换一把</button>
+        </div>
+
+        <hr />
+        <h2>填入已有 Key</h2>
+        <p class="hint">换电脑或重装后，把备份的 Key 填回来，原钱包余额会一起回来。</p>
+        <div class="input-row">
+          <input id="adopt-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-…" />
+          <button id="paste">粘贴</button>
+        </div>
+        <button class="primary" id="adopt" data-action-id="wallet.key.adopt" style="margin-top: 9px">验证并启用</button>
+
+        <hr />
+        <h2>DSH 内核</h2>
+        <p class="hint">内核在本机缓存运行，配置、会话和钱包仍保存在 U 盘。升级失败会保留上一个可用版本。</p>
+        <div class="balance">
+          <span class="label">当前 / 固定版本</span>
+          <strong id="kernel-version">正在读取…</strong>
+        </div>
+        <div class="row">
+          <button id="kernel-refresh" data-action-id="kernel.status">刷新内核状态</button>
+          <button id="kernel-check" data-action-id="kernel.check_updates">检查官方更新</button>
+        </div>
+
+        <hr />
+        <div class="danger-zone">
+          <h2>移除本机钱包</h2>
+          <p class="hint">只清这台 U-DSH，不会删除服务端钱包，也不会销毁旧余额。随后会创建一个余额为 0 的新钱包。</p>
+          <label class="check"><input id="backed-up" type="checkbox" />我已经复制并安全备份当前 Key，理解旧余额不会自动转入新钱包。</label>
+          <button class="danger" id="reset" data-action-id="wallet.reset_local" disabled>移除本机钱包</button>
+        </div>
+        <div id="message" role="status" aria-live="polite"></div>
+      </section>
+    </main>
+    <script>
+      const api = window.uDshWallet
+      const elements = {
+        key: document.querySelector('#key'), state: document.querySelector('#state'),
+        balance: document.querySelector('#balance'), message: document.querySelector('#message'),
+        input: document.querySelector('#adopt-key'), reset: document.querySelector('#reset'),
+        backedUp: document.querySelector('#backed-up'), kernelVersion: document.querySelector('#kernel-version'),
+      }
+      const buttons = [...document.querySelectorAll('button')]
+      const setBusy = (busy) => buttons.forEach((button) => { button.disabled = busy || (button === elements.reset && !elements.backedUp.checked) })
+      const showMessage = (text, error = false) => {
+        elements.message.textContent = text || ''
+        elements.message.classList.toggle('error', error)
+      }
+      const unwrap = async (promise) => {
+        const result = await promise
+        if (!result?.ok) throw new Error(result?.error || '操作失败')
+        return result.value
+      }
+      const formatTokens = (value) => Number.isFinite(value) ? `${new Intl.NumberFormat('zh-CN').format(value)} tokens` : '—'
+      async function load(refreshBalance = false) {
+        const status = await unwrap(api.status(refreshBalance))
+        elements.key.textContent = status.apiKeyMasked || '尚未获取（联网后自动创建）'
+        elements.state.textContent = status.pending ? '操作待收尾' : status.available ? '已连接' : '离线可启动'
+        if (status.balanceError) elements.balance.textContent = status.balanceError
+        else if (status.balanceAvailable !== null) elements.balance.textContent = formatTokens(status.balanceAvailable)
+        else elements.balance.textContent = '点击“刷新余额”查询'
+      }
+      async function loadKernel() {
+        const status = await unwrap(api.kernelStatus())
+        elements.kernelVersion.textContent = `${status.activeVersion || '未启动'} / ${status.pinnedVersion}`
+        return status
+      }
+      async function run(action, success, reload = true) {
+        setBusy(true); showMessage('')
+        try {
+          const value = await action()
+          showMessage(value?.message || success || '完成')
+          if (reload) await load(true)
+          return value
+        } catch (error) {
+          showMessage(error.message || String(error), true)
+        } finally { setBusy(false) }
+      }
+      document.querySelector('#refresh').addEventListener('click', () => run(() => load(true), '', false))
+      document.querySelector('#retry').addEventListener('click', () => run(() => unwrap(api.retry())))
+      document.querySelector('#recharge').addEventListener('click', () => run(() => unwrap(api.recharge()), '', false))
+      document.querySelector('#copy').addEventListener('click', () => run(() => unwrap(api.copyKey()), '', false))
+      document.querySelector('#paste').addEventListener('click', () => run(async () => {
+        elements.input.value = await unwrap(api.pasteKey())
+        elements.input.focus()
+        return { message: '已粘贴，请点击“验证并启用”' }
+      }, '', false))
+      document.querySelector('#adopt').addEventListener('click', () => run(async () => {
+        const value = await unwrap(api.adopt(elements.input.value))
+        elements.input.value = ''
+        return value
+      }))
+      document.querySelector('#kernel-refresh').addEventListener('click', () => run(async () => {
+        await loadKernel()
+        return { message: '内核状态已刷新' }
+      }, '', false))
+      document.querySelector('#kernel-check').addEventListener('click', () => run(async () => {
+        const value = await unwrap(api.checkKernelUpdates())
+        return {
+          message: value.updateAvailable
+            ? `官方已有 ${value.latest}；当前 U-DSH 固定在 ${value.pinned}，请先完成兼容验证再跟版。`
+            : `当前固定版本 ${value.pinned} 已是 stable 最新版。`,
+        }
+      }, '', false))
+      document.querySelector('#rotate').addEventListener('click', () => {
+        void run(() => unwrap(api.rotate()))
+      })
+      elements.backedUp.addEventListener('change', () => { elements.reset.disabled = !elements.backedUp.checked })
+      elements.reset.addEventListener('click', () => {
+        void run(() => unwrap(api.resetLocal())).then(() => { elements.backedUp.checked = false; elements.reset.disabled = true })
+      })
+      Promise.all([load(true), loadKernel()]).catch((error) => showMessage(error.message || String(error), true))
+    </script>
+  </body>
+</html>

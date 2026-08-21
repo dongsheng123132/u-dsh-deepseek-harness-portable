@@ -1,0 +1,21 @@
+{
+  "$schema": "vendor/action-parity-tool/schema/action-parity.agent-profile.schema.json",
+  "format": "action-parity.agent-profile/v1",
+  "manifest": "generated/action-parity.json",
+  "registry": {
+    "export": ["node", "src/cli.js", "export"],
+    "source_paths": ["src/action-core.js"]
+  },
+  "generated_paths": [
+    "generated/action-parity.json",
+    "generated/action-client.ts",
+    "generated/cli-help.json",
+    "generated/mcp-tools.json",
+    "generated/registry-bundle.json"
+  ],
+  "commands": {
+    "generate": ["npm", "run", "action-parity:generate"],
+    "generate_check": ["npm", "run", "action-parity:check-generated"],
+    "verify": ["npm", "run", "action-parity:verify"]
+  }
+}

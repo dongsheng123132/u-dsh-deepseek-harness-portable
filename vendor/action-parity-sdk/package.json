@@ -1,0 +1,59 @@
+{
+  "name": "action-parity-sdk",
+  "version": "0.7.0",
+  "description": "Action Core SDK for Node, Electron, and TypeScript. Register a business Action once; derive CLI, MCP, IPC, HTTP, and the ActionParity Manifest from it.",
+  "keywords": [
+    "actionparity",
+    "action-parity",
+    "shadowcore",
+    "影核",
+    "action-core",
+    "agent-native",
+    "mcp",
+    "electron",
+    "cli"
+  ],
+  "type": "module",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dongsheng123132/action-parity.git",
+    "directory": "sdk/node"
+  },
+  "homepage": "https://github.com/dongsheng123132/action-parity/tree/main/sdk/node",
+  "types": "./types/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./types/index.d.ts",
+      "import": "./src/index.mjs"
+    },
+    "./cli": {
+      "types": "./types/cli.d.ts",
+      "import": "./src/cli.mjs"
+    },
+    "./mcp": {
+      "types": "./types/mcp.d.ts",
+      "import": "./src/mcp.mjs"
+    },
+    "./electron": {
+      "types": "./types/electron.d.ts",
+      "import": "./src/electron.mjs"
+    },
+    "./http": {
+      "types": "./types/http.d.ts",
+      "import": "./src/http.mjs"
+    }
+  },
+  "files": [
+    "src/",
+    "types/",
+    "README.md"
+  ],
+  "dependencies": {},
+  "scripts": {
+    "test": "node --test test"
+  }
+}

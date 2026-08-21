@@ -1,32 +1,28 @@
 {
-  "name": "deepseek-harness-desktop",
-  "version": "0.3.5",
-  "description": "An unofficial desktop wrapper for DeepSeek Harness.",
+  "name": "u-dsh",
+  "version": "0.1.0",
+  "description": "U-DSH portable DeepSeek Harness desktop with Xiapan Cloud device wallet.",
   "type": "module",
   "main": "src/main.js",
-  "author": {
-    "name": "Steven",
-    "email": "96154058+steven-kid@users.noreply.github.com"
-  },
+  "author": "U-Claw Team",
   "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/steven-kid/deepseek-harness-desktop.git"
-  },
-  "homepage": "https://deepseek-harness-desktop.vercel.app",
-  "bugs": {
-    "url": "https://github.com/steven-kid/deepseek-harness-desktop/issues"
+  "private": true,
+  "bin": {
+    "u-dsh": "src/cli.js"
   },
   "scripts": {
     "start": "electron .",
     "test": "node --test test/*.test.js",
-    "postinstall": "node scripts/prepare-dependencies.mjs",
-    "prepare:windows": "node scripts/prepare-dependencies.mjs && npm run build:win-launcher",
+    "action-parity:generate": "node scripts/generate-action-parity.mjs",
+    "action-parity:check-generated": "node scripts/generate-action-parity.mjs --check",
+    "action-parity:verify": "node node_modules/action-parity/bin/action-parity.mjs verify generated/action-parity.json --plan action-parity.verify.json --json",
+    "prepare:windows": "npm run build:win-launcher",
     "build:win-launcher": "powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File scripts/build-windows-launcher.ps1",
     "test:win-console": "node scripts/test-windows-hidden-console.mjs",
     "smoke:packaged": "node scripts/smoke-packaged.mjs",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
+    "dist:portable": "npm run prepare:windows && electron-builder --win zip --x64 --publish never",
     "dist:mac": "npm run dist:mac:arm64",
     "dist:mac:arm64": "electron-builder --mac dmg zip --arm64 --publish never",
     "dist:mac:x64": "electron-builder --mac dmg zip --x64 --publish never",
@@ -34,36 +30,19 @@
     "dist:linux": "electron-builder --linux AppImage deb --x64 --publish never"
   },
   "dependencies": {
-    "@deepseek-ai/cordis-plugin-group": "1.0.1",
-    "@deepseek-ai/dsh": "0.1.0-rc.6",
-    "@deepseek-ai/dsh-anonymous-user-id": "0.1.0-rc.6",
-    "@deepseek-ai/dsh-atomic-write": "0.1.0-rc.6",
-    "@deepseek-ai/dsh-bash-local": "0.1.0-rc.6",
-    "@deepseek-ai/dsh-code-runtime": "0.1.0-rc.6",
-    "@deepseek-ai/dsh-compaction": "0.1.0-rc.6",
-    "@deepseek-ai/dsh-fs": "0.1.0-rc.6",
-    "@deepseek-ai/dsh-invariants": "0.1.0-rc.6",
-    "@deepseek-ai/dsh-output-retention": "0.1.0-rc.6",
-    "@deepseek-ai/dsh-sandbox": "0.1.0-rc.6",
-    "@deepseek-ai/dsh-scope": "0.1.0-rc.6",
-    "@deepseek-ai/dsh-session-telemetry": "0.1.0-rc.6",
-    "@deepseek-ai/dsh-session-title-llm": "0.1.0-rc.6",
-    "@deepseek-ai/dsh-shell": "0.1.0-rc.6",
-    "@deepseek-ai/dsh-spill": "0.1.0-rc.6",
-    "@deepseek-ai/dsh-subagent-in-process-driver": "0.1.0-rc.6",
-    "@deepseek-ai/dsh-subprocess": "0.1.0-rc.6",
-    "@deepseek-ai/dsh-timeout": "0.1.0-rc.6",
-    "@deepseek-ai/dsh-workflow": "0.1.0-rc.6"
+    "action-parity-sdk": "file:vendor/action-parity-sdk",
+    "yaml": "2.8.1"
   },
   "devDependencies": {
+    "action-parity": "file:vendor/action-parity-tool",
     "electron": "43.4.0",
     "electron-builder": "26.0.12"
   },
   "build": {
     "afterSign": "scripts/after-pack.cjs",
-    "appId": "io.github.steven-kid.deepseek-harness-desktop",
-    "productName": "DeepSeek Harness",
-    "artifactName": "DeepSeek-Harness-Desktop-${version}-${arch}.${ext}",
+    "appId": "org.uclaw.udsh",
+    "productName": "U-DSH",
+    "artifactName": "U-DSH-${version}-${os}-${arch}.${ext}",
     "asar": false,
     "files": [
       "src/**/*",
@@ -72,10 +51,10 @@
       "assets/tray.png",
       "assets/trayTemplate.png",
       "assets/trayTemplate@2x.png",
-      "assets/dsh-node.exe",
       "assets/windows-hidden-console.exe",
       "package.json",
       "LICENSE",
+      "NOTICE.md",
       "third-party-licenses/**/*",
       "node_modules/**/*"
     ],
@@ -106,7 +85,7 @@
     },
     "win": {
       "icon": "assets/icon.ico",
-      "artifactName": "DeepSeek-Harness-Desktop-${version}-windows-${arch}.${ext}",
+      "artifactName": "U-DSH-${version}-windows-${arch}.${ext}",
       "target": [
         {
           "target": "nsis",
@@ -132,8 +111,8 @@
     "linux": {
       "icon": "assets/icon.png",
       "category": "Development",
-      "executableName": "deepseek-harness",
-      "artifactName": "DeepSeek-Harness-Desktop-${version}-linux-${arch}.${ext}",
+      "executableName": "u-dsh",
+      "artifactName": "U-DSH-${version}-linux-${arch}.${ext}",
       "target": [
         {
           "target": "AppImage",
@@ -150,7 +129,7 @@
       ]
     },
     "dmg": {
-      "title": "DeepSeek Harness Desktop ${version}",
+      "title": "U-DSH ${version}",
       "backgroundColor": "#f5f7fb",
       "window": {
         "width": 540,

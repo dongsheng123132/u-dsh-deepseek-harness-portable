@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://action-parity.org/schema/action-parity.agent-profile.schema.json",
+  "title": "ActionParity Agent Profile",
+  "description": "Small project discovery contract for coding agents. It points to executable commands instead of repeating the ActionParity specification.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "format",
+    "manifest",
+    "registry",
+    "generated_paths",
+    "commands"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "format": {
+      "const": "action-parity.agent-profile/v1"
+    },
+    "manifest": {
+      "type": "string",
+      "minLength": 1
+    },
+    "registry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["export"],
+      "properties": {
+        "export": {
+          "$ref": "#/$defs/command"
+        },
+        "source_paths": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "generated_paths": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "commands": {
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/command"
+      },
+      "required": ["generate", "generate_check", "verify"],
+      "properties": {
+        "generate": {
+          "$ref": "#/$defs/command"
+        },
+        "generate_check": {
+          "$ref": "#/$defs/command"
+        },
+        "verify": {
+          "$ref": "#/$defs/command"
+        },
+        "verify_changed": {
+          "$ref": "#/$defs/command"
+        },
+        "compat": {
+          "$ref": "#/$defs/command"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "command": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

@@ -1,11 +1,8 @@
 import { spawn } from 'node:child_process'
-import { fileURLToPath, pathToFileURL } from 'node:url'
+import { existsSync } from 'node:fs'
+import { fileURLToPath } from 'node:url'
 
 const READY_PATTERN = /^dsh web: (http:\/\/127\.0\.0\.1:\d+)\b/m
-
-export function resolveDshEntry() {
-  return unpackedPath(fileURLToPath(import.meta.resolve('@deepseek-ai/dsh/lib/bin.js')))
-}
 
 export function unpackedPath(path) {
   return path.replace(/([/\\])app\.asar([/\\])/, '$1app.asar.unpacked$2')
@@ -21,10 +18,6 @@ export function resolveWindowsPickerPatch() {
 
 export function resolveWindowsHiddenConsoleLauncher() {
   return fileURLToPath(new URL('../assets/windows-hidden-console.exe', import.meta.url))
-}
-
-export function resolveWindowsNodeExecutable() {
-  return fileURLToPath(new URL('../assets/dsh-node.exe', import.meta.url))
 }
 
 export function buildDshArgs(entry, {
@@ -46,36 +39,41 @@ export function buildDshArgs(entry, {
 
 export function buildDshCommand({
   electronExecutable,
-  entry = resolveDshEntry(),
+  entry,
+  nodeExecutable,
   platform = process.platform,
   windowsLauncher = resolveWindowsHiddenConsoleLauncher(),
-  windowsNodeExecutable = resolveWindowsNodeExecutable(),
 } = {}) {
-  if (!electronExecutable) {
-    throw new Error('electronExecutable is required')
-  }
+  if (!entry) throw new Error('entry is required')
 
   const args = buildDshArgs(entry, { platform })
-  return platform === 'win32'
-    ? { command: windowsLauncher, args: [windowsNodeExecutable, ...args] }
-    : { command: electronExecutable, args }
+  if (platform === 'win32') {
+    if (!nodeExecutable) throw new Error('nodeExecutable is required on Windows')
+    return windowsLauncher && existsSync(windowsLauncher)
+      ? { command: windowsLauncher, args: [nodeExecutable, ...args] }
+      : { command: nodeExecutable, args }
+  }
+  if (nodeExecutable) return { command: nodeExecutable, args }
+  if (!electronExecutable) throw new Error('electronExecutable is required without a Node runtime')
+  return { command: electronExecutable, args }
 }
 
 export function startDshService({
   electronExecutable,
-  entry = resolveDshEntry(),
+  entry,
+  nodeExecutable,
   environment = process.env,
   platform = process.platform,
   timeoutMs = 60_000,
+  cwd,
   windowsLauncher = resolveWindowsHiddenConsoleLauncher(),
-  windowsNodeExecutable = resolveWindowsNodeExecutable(),
 } = {}) {
   const { command, args } = buildDshCommand({
     electronExecutable,
     entry,
+    nodeExecutable,
     platform,
     windowsLauncher,
-    windowsNodeExecutable,
   })
 
   const child = spawn(command, args, {
@@ -83,6 +81,8 @@ export function startDshService({
       ...environment,
       ...(platform === 'win32' ? {} : { ELECTRON_RUN_AS_NODE: '1' }),
     },
+    cwd,
+    windowsHide: true,
     stdio: ['ignore', 'pipe', 'pipe'],
   })
 
@@ -126,8 +126,4 @@ export function startDshService({
   }
 
   return { child, ready, stop }
-}
-
-export function dshEntryUrl() {
-  return pathToFileURL(resolveDshEntry()).href
 }

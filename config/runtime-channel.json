@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "channel": "stable",
+  "node": {
+    "version": "24.19.0",
+    "platform": "win-x64",
+    "archive": "node-v24.19.0-win-x64.zip",
+    "url": "https://nodejs.org/dist/v24.19.0/node-v24.19.0-win-x64.zip",
+    "sha256": "57f71ab3652e797d84acddc79c81cc9ff1c6ddb2a1974cdb83f00fee9bff4c73"
+  },
+  "dsh": {
+    "package": "@deepseek-ai/dsh",
+    "version": "0.1.0-rc.7",
+    "registry": "https://registry.npmjs.org/"
+  }
+}

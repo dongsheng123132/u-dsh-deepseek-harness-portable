@@ -8,3 +8,4 @@ output/
 assets/dsh-node.exe
 assets/windows-hidden-console.exe
 third-party-licenses/nodejs-LICENSE
+.u-dsh-dev/
