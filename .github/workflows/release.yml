@@ -1,47 +1,13 @@
-name: Release
+name: Verify Windows portable release
 
 on:
-  push:
-    tags:
-      - 'v*'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
-  macos:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - runner: macos-15
-            arch: arm64
-            script: dist:mac:arm64
-          - runner: macos-15-intel
-            arch: x64
-            script: dist:mac:x64
-    runs-on: ${{ matrix.runner }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-      - run: npm ci
-      - run: npm test
-      - run: npm run ${{ matrix.script }}
-        env:
-          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
-      - run: npm run smoke:packaged
-      - uses: actions/upload-artifact@v4
-        with:
-          name: macos-${{ matrix.arch }}
-          path: |
-            dist/*.dmg
-            dist/*.zip
-
-  windows:
+  windows-portable:
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
@@ -50,58 +16,16 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - run: npm run prepare:windows
       - run: npm test
+      - run: npm run action-parity:check-generated
+      - run: npm run action-parity:verify
+      - run: npm run prepare:windows
       - run: npm run test:win-console
-      - run: npm run dist:win
+      - run: npm run dist:portable
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
       - run: npm run smoke:packaged
       - uses: actions/upload-artifact@v4
         with:
-          name: windows
-          path: |
-            dist/*.exe
-            dist/*windows*.zip
-
-  linux:
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-      - run: npm ci
-      - run: npm test
-      - run: npm run dist:linux
-      - run: npm run smoke:packaged
-      - uses: actions/upload-artifact@v4
-        with:
-          name: linux-x64
-          path: |
-            dist/*.AppImage
-            dist/*.deb
-
-  release:
-    if: startsWith(github.ref, 'refs/tags/')
-    needs:
-      - macos
-      - windows
-      - linux
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: '*'
-          merge-multiple: true
-          path: dist
-      - uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            dist/*.dmg
-            dist/*.zip
-            dist/*.exe
-            dist/*.AppImage
-            dist/*.deb
-          generate_release_notes: true
+          name: u-dsh-portable-windows-x64
+          path: dist/U-DSH-DeepSeek-Harness-Portable-*-Windows-x64.zip
