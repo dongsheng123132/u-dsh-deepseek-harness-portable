@@ -276,8 +276,15 @@ export function createKernelManager({
     if (env.UDSH_DSH_PACKAGE_ROOT?.trim()) packageCandidates.push(env.UDSH_DSH_PACKAGE_ROOT.trim())
     const nodeDir = path.dirname(node.nodeExecutable)
     packageCandidates.push(path.join(nodeDir, 'node_modules', ...packageName.split('/')))
+    const delimiter = platform === 'win32' ? ';' : path.delimiter
+    for (const entry of String(env.PATH || '').split(delimiter).filter(Boolean)) {
+      packageCandidates.push(path.join(entry, 'node_modules', ...packageName.split('/')))
+    }
     if (env.NPM_CONFIG_PREFIX?.trim()) {
       packageCandidates.push(path.join(env.NPM_CONFIG_PREFIX.trim(), 'node_modules', ...packageName.split('/')))
+    }
+    if (env.APPDATA?.trim()) {
+      packageCandidates.push(path.join(env.APPDATA.trim(), 'npm', 'node_modules', ...packageName.split('/')))
     }
     for (const packageRoot of unique(packageCandidates)) {
       try {
