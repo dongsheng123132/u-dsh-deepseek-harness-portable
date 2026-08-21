@@ -40,3 +40,30 @@ test('DSH config keeps the secret in credentials and preserves unrelated setting
     await rm(root, { recursive: true, force: true })
   }
 })
+
+test('Xiapan wallet does not replace an existing non-Xiapan default provider', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'u-dsh-provider-test-'))
+  try {
+    await writeFile(path.join(root, 'settings.yaml'), [
+      'agent-default-model:',
+      '  provider: deepseek-official',
+      '  model: deepseek-chat',
+      '',
+    ].join('\n'))
+    const manager = createDshConfigManager({
+      dshHome: root,
+      endpoints: { apiBase: 'https://api.test/v1' },
+      fetch: async () => new Response(JSON.stringify({ data: [{ id: 'xiapan-model' }] }), { status: 200 }),
+    })
+
+    await manager.applyKey('sk-secret-123456')
+    const settings = parse(await readFile(manager.settingsPath, 'utf8'))
+    assert.deepEqual(settings['agent-default-model'], {
+      provider: 'deepseek-official',
+      model: 'deepseek-chat',
+    })
+    assert.equal(Boolean(settings['llm-pi-ai'].providers[XIAPAN_PROVIDER_ID]), true)
+  } finally {
+    await rm(root, { recursive: true, force: true })
+  }
+})

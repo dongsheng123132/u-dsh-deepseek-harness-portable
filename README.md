@@ -24,6 +24,8 @@ Kernel installation uses staging, package identity/version/entry/required-peer v
 
 The first online launch requests a random Xiapan Cloud key, stores wallet state on the USB drive, and configures DSH through one `.credentials.yaml`/`settings.yaml` adapter. The wallet UI supports balance checks, copy, recharge, verified key adoption, two-phase key rotation, and local-only wallet removal.
 
+Xiapan Cloud is the ready-to-use default for new users, not an exclusive provider. The official DSH provider settings remain available for DeepSeek's official API or other OpenAI-compatible services, and an existing non-Xiapan default provider is never overwritten.
+
 Storage corruption, a read-only USB drive, or temporary network failure does not block DSH startup. Administrative secrets and balance authority must remain server-side because all client code is inspectable.
 
 ## Machine interface (ActionParity)
