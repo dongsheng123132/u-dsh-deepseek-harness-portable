@@ -49,6 +49,12 @@ function systemNodeCandidates({ env, platform }) {
       candidates.push(path.join(env.LOCALAPPDATA, 'nvm', 'node.exe'))
       candidates.push(path.join(env.LOCALAPPDATA, 'nvm', 'current', 'node.exe'))
     }
+    // U-King/U-Claw installs a shared Node runtime here.  It is a valid
+    // system runtime for U-DSH and must be reused before downloading the
+    // pinned portable archive again.
+    if (env.USERPROFILE) {
+      candidates.push(path.join(env.USERPROFILE, '.uking', 'runtime', 'node', 'node.exe'))
+    }
   }
   return unique(candidates)
 }
