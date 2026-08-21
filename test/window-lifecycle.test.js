@@ -20,7 +20,7 @@ test('tray menu exposes main window, wallet, hide, and quit actions', () => {
   })
 
   assert.deepEqual(menu.map(({ label, type }) => label ?? type), [
-    '打开 U-DSH',
+    '打开 U-DSH Portable',
     '设备钱包',
     '隐藏窗口',
     'separator',
@@ -44,7 +44,7 @@ test('tray menu falls back to English labels', () => {
   })
 
   assert.deepEqual(menu.map(({ label, type }) => label ?? type), [
-    'Open U-DSH',
+    'Open U-DSH Portable',
     'Device Wallet',
     'Hide Window',
     'separator',

@@ -25,10 +25,10 @@ export function buildActionRegistry({ wallet, kernel, copyCurrentKey } = {}) {
   const registry = createRegistry({
     application: {
       id: 'org.uclaw.udsh',
-      name: 'U-DSH',
+      name: 'U-DSH Portable',
       version: packageJson.version,
       description: 'Portable DeepSeek Harness with Xiapan Cloud device wallet.',
-      source: 'https://github.com/dongsheng123132/u-dsh',
+      source: 'https://github.com/dongsheng123132/u-dsh-deepseek-harness-portable',
     },
     generatorRevision: 'src/action-core.js',
     cli: { invocation: 'u-dsh <action-id> [--flag value] --json' },

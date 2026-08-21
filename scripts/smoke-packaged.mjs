@@ -14,7 +14,7 @@ if (process.platform !== 'win32') throw new Error('U-DSH packaged smoke currentl
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const appDir = process.env.PACKAGED_APP_DIR ?? path.join(root, 'dist', 'win-unpacked')
-const executable = path.join(appDir, 'U-DSH.exe')
+const executable = path.join(appDir, 'U-DSH Portable.exe')
 const cli = path.join(appDir, 'U-DSH-CLI.cmd')
 const resourcesRoot = path.join(appDir, 'resources', 'app')
 const launcher = path.join(resourcesRoot, 'assets', 'windows-hidden-console.exe')

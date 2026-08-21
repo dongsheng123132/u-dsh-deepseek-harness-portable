@@ -383,8 +383,8 @@
   "application": {
     "description": "Portable DeepSeek Harness with Xiapan Cloud device wallet.",
     "id": "org.uclaw.udsh",
-    "name": "U-DSH",
-    "source": "https://github.com/dongsheng123132/u-dsh",
+    "name": "U-DSH Portable",
+    "source": "https://github.com/dongsheng123132/u-dsh-deepseek-harness-portable",
     "version": "0.1.0"
   },
   "format": "action-parity.cli-help/v1",

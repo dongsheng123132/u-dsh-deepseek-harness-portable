@@ -2,8 +2,8 @@ apiVersion: shadowfork.io/v1alpha1
 kind: DerivationContract
 
 project:
-  name: u-dsh
-  repository: https://github.com/dongsheng123132/u-dsh
+  name: u-dsh-deepseek-harness-portable
+  repository: https://github.com/dongsheng123132/u-dsh-deepseek-harness-portable
   derivationLevel: L3
 
 identity:

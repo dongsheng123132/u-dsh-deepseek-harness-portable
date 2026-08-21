@@ -1,6 +1,6 @@
-# U-DSH notices
+# U-DSH Portable notices
 
-U-DSH is an unofficial U-series portable distribution of DeepSeek Harness.
+U-DSH Portable is an unofficial U-series portable distribution of DeepSeek Harness.
 It is not affiliated with or endorsed by DeepSeek.
 
 The desktop host started from the MIT-licensed
@@ -9,7 +9,7 @@ license terms in `LICENSE`. The official `@deepseek-ai/dsh` runtime is downloade
 into a versioned host cache and remains independently replaceable; its MIT license
 is preserved under `third-party-licenses/`.
 
-U-DSH adds portable data isolation, the Xiapan Cloud device wallet, automatic
+U-DSH Portable adds portable data isolation, the Xiapan Cloud device wallet, automatic
 OpenAI-compatible provider configuration, and Chinese wallet management UI.
 
 The vendored ActionParity SDK/tooling is derived from

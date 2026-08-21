@@ -1,7 +1,7 @@
 {
   "name": "u-dsh",
   "version": "0.1.0",
-  "description": "U-DSH portable DeepSeek Harness desktop with Xiapan Cloud device wallet.",
+  "description": "U-DSH Portable — DeepSeek Harness USB portable edition for Windows with Xiapan Cloud device wallet.",
   "type": "module",
   "main": "src/main.js",
   "author": "U-Claw Team",
@@ -42,8 +42,8 @@
   "build": {
     "afterPack": "scripts/after-pack.cjs",
     "appId": "org.uclaw.udsh",
-    "productName": "U-DSH",
-    "artifactName": "U-DSH-${version}-${os}-${arch}.${ext}",
+    "productName": "U-DSH Portable",
+    "artifactName": "U-DSH-DeepSeek-Harness-Portable-${version}-${os}-${arch}.${ext}",
     "asar": false,
     "files": [
       "src/**/*",
@@ -86,7 +86,7 @@
     },
     "win": {
       "icon": "assets/icon.ico",
-      "artifactName": "U-DSH-${version}-windows-${arch}.${ext}",
+      "artifactName": "U-DSH-DeepSeek-Harness-Portable-${version}-Windows-${arch}.${ext}",
       "target": [
         {
           "target": "nsis",
@@ -113,7 +113,7 @@
       "icon": "assets/icon.png",
       "category": "Development",
       "executableName": "u-dsh",
-      "artifactName": "U-DSH-${version}-linux-${arch}.${ext}",
+      "artifactName": "U-DSH-DeepSeek-Harness-Portable-${version}-Linux-${arch}.${ext}",
       "target": [
         {
           "target": "AppImage",
@@ -130,7 +130,7 @@
       ]
     },
     "dmg": {
-      "title": "U-DSH ${version}",
+      "title": "U-DSH Portable ${version}",
       "backgroundColor": "#f5f7fb",
       "window": {
         "width": 540,

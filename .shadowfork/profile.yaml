@@ -2,8 +2,8 @@ apiVersion: shadowfork.io/v1alpha1
 kind: ShadowProfile
 
 metadata:
-  name: u-dsh
-  displayName: U-DSH
+  name: u-dsh-deepseek-harness-portable
+  displayName: U-DSH Portable
 
 upstream:
   repository: https://github.com/steven-kid/deepseek-harness-desktop
@@ -42,7 +42,7 @@ customizations:
     severity: critical
     file: package.json
     path: $.build.productName
-    value: U-DSH
+    value: U-DSH Portable
 
   - id: portable.data-boundary
     kind: add-file

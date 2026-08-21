@@ -1,6 +1,6 @@
-# U-DSH
+# U-DSH Portable｜DeepSeek Harness U盘便携版
 
-U-DSH 是面向 Windows U 盘的 DeepSeek Harness 便携版：复用官方 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 和社区 [deepseek-harness-desktop](https://github.com/steven-kid/deepseek-harness-desktop)，只增加便携数据边界、版本化内核管理、虾盘云设备钱包和无界面动作接口。
+**U-DSH Portable** 是面向 Windows U 盘的 DeepSeek Harness 便携版：复用官方 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 和社区 [deepseek-harness-desktop](https://github.com/steven-kid/deepseek-harness-desktop)，只增加便携数据边界、版本化内核管理、虾盘云设备钱包和无界面动作接口。
 
 > 当前是 Windows x64 首版。它不是 DeepSeek 官方产品，也不会修改 DSH Web UI 或复制 DSH 的业务实现。
 
@@ -63,7 +63,7 @@ npm run shadowfork:contract
 npm run dist:portable
 ```
 
-生成物在 `dist/U-DSH-<版本>-windows-x64.zip`。首次启动需要网络，Node 下载包会先做 SHA-256 校验。
+生成物在 `dist/U-DSH-DeepSeek-Harness-Portable-<版本>-Windows-x64.zip`。首次启动需要网络，Node 下载包会先做 SHA-256 校验。
 
 ## 方便继续 fork
 

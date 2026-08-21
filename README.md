@@ -1,8 +1,8 @@
-# U-DSH
+# U-DSH Portable — DeepSeek Harness USB Portable Edition
 
-U-DSH is a Windows USB-portable distribution of DeepSeek Harness. It reuses the official [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) and the community [deepseek-harness-desktop](https://github.com/steven-kid/deepseek-harness-desktop), adding only portable storage boundaries, a versioned kernel manager, the Xiapan Cloud device wallet, and a headless action interface.
+**U-DSH Portable** is a Windows USB-portable distribution of DeepSeek Harness. It reuses the official [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) and the community [deepseek-harness-desktop](https://github.com/steven-kid/deepseek-harness-desktop), adding only portable storage boundaries, a versioned kernel manager, the Xiapan Cloud device wallet, and a headless action interface.
 
-> The first release targets Windows x64. U-DSH is unofficial and does not modify the DSH Web UI or duplicate its business logic.
+> The first release targets Windows x64. U-DSH Portable is unofficial and does not modify the DSH Web UI or duplicate its business logic.
 
 [简体中文](README.zh-CN.md)
 
@@ -58,7 +58,7 @@ npm run shadowfork:contract
 npm run dist:portable
 ```
 
-The result is `dist/U-DSH-<version>-windows-x64.zip`. First launch requires network access and verifies the Node archive with SHA-256.
+The result is `dist/U-DSH-DeepSeek-Harness-Portable-<version>-Windows-x64.zip`. First launch requires network access and verifies the Node archive with SHA-256.
 
 ## Forking with ShadowFork
 

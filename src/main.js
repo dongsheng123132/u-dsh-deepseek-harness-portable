@@ -24,7 +24,7 @@ import { resolveUclawEndpoints } from './uclaw-endpoints.js'
 import { createWindowOptions } from './window-options.js'
 import { createTrayMenuTemplate, shouldHideWindowOnClose } from './window-lifecycle.js'
 
-const APP_NAME = 'U-DSH'
+const APP_NAME = 'U-DSH Portable'
 const STARTUP_PAGE = fileURLToPath(new URL('./startup.html', import.meta.url))
 const WALLET_PAGE = fileURLToPath(new URL('./wallet.html', import.meta.url))
 const WALLET_PRELOAD = fileURLToPath(new URL('./wallet-preload.cjs', import.meta.url))
@@ -82,7 +82,7 @@ async function showWalletWindow() {
     minWidth: 520,
     minHeight: 620,
     show: false,
-    title: 'U-DSH 设备钱包',
+    title: 'U-DSH Portable 设备钱包',
     autoHideMenuBar: true,
     backgroundColor: nativeTheme.shouldUseDarkColors ? '#111827' : '#f5f7fb',
     webPreferences: {

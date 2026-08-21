@@ -13,7 +13,7 @@ export function createTrayMenuTemplate({
 
   return [
     {
-      label: isChinese ? '打开 U-DSH' : 'Open U-DSH',
+      label: isChinese ? '打开 U-DSH Portable' : 'Open U-DSH Portable',
       click: showWindow,
     },
     {
