@@ -16,7 +16,7 @@ DSH is evolving quickly, so U-DSH keeps durable USB data separate from high-chur
 | `U-DSH/data/u-dsh-state/device-wallet.json` | Five-field wallet transaction state | Yes |
 | `%LOCALAPPDATA%/U-DSH/` | Electron cache, Node, DSH versions, npm cache, and logs | No |
 
-On first use on a PC, U-DSH downloads and verifies a pinned Node runtime, then installs the pinned official DSH package into the host cache; this can take several minutes depending on network and disk speed. Subsequent launches reuse it. [`config/runtime-channel.json`](config/runtime-channel.json) is the single version source. A regional mirror may accelerate downloads, while root-package integrity is still checked against official npm metadata.
+On first use on a PC, U-DSH first probes an existing supported Node runtime (PATH, common Windows locations, and U-King/EchoBird-style runtime directories) and an existing global `@deepseek-ai/dsh` at the pinned version. If both are valid, it reuses them and makes no download. Only missing or incompatible components are downloaded and verified into the host cache. [`config/runtime-channel.json`](config/runtime-channel.json) is the single version source. A regional mirror may accelerate downloads, while root-package integrity is still checked against official npm metadata.
 
 Kernel installation uses staging, package identity/version/entry/required-peer validation, bounded subprocess timeouts, registry fallback, atomic rename, and an activation pointer. Previously installed versions remain available for fallback. Update checking reports npm tags but never replaces the active kernel without validation.
 

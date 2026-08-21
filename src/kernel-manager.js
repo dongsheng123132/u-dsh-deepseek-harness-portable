@@ -15,6 +15,68 @@ function assertChild(root, candidate) {
   }
 }
 
+function parseVersion(value) {
+  const match = /v?(\d+)\.(\d+)\.(\d+)/.exec(String(value ?? ''))
+  return match ? [Number(match[1]), Number(match[2]), Number(match[3])] : null
+}
+
+function compareVersions(left, right) {
+  for (let index = 0; index < 3; index += 1) {
+    if (left[index] !== right[index]) return left[index] - right[index]
+  }
+  return 0
+}
+
+function supportedNodeVersion(version, channel) {
+  const actual = parseVersion(version)
+  const minimum = parseVersion(channel.node.minimumVersion || '22.12.0')
+  return Boolean(actual && minimum && compareVersions(actual, minimum) >= 0)
+}
+
+function unique(values) {
+  return [...new Set(values.filter(Boolean).map((value) => path.resolve(value)))]
+}
+
+function systemNodeCandidates({ env, platform }) {
+  const delimiter = platform === 'win32' ? ';' : path.delimiter
+  const entries = String(env.PATH || '').split(delimiter).filter(Boolean)
+  const candidates = []
+  if (env.UDSH_NODE_EXECUTABLE?.trim()) candidates.push(env.UDSH_NODE_EXECUTABLE.trim())
+  for (const entry of entries) candidates.push(path.join(entry, platform === 'win32' ? 'node.exe' : 'node'))
+  if (platform === 'win32') {
+    if (env.ProgramFiles) candidates.push(path.join(env.ProgramFiles, 'nodejs', 'node.exe'))
+    if (env.LOCALAPPDATA) {
+      candidates.push(path.join(env.LOCALAPPDATA, 'nvm', 'node.exe'))
+      candidates.push(path.join(env.LOCALAPPDATA, 'nvm', 'current', 'node.exe'))
+    }
+  }
+  return unique(candidates)
+}
+
+async function discoverSystemNode({ env, platform, channel, runner }) {
+  if (platform !== 'win32' && platform !== 'darwin' && platform !== 'linux') return null
+  for (const executable of systemNodeCandidates({ env, platform })) {
+    if (!existsSync(executable)) continue
+    try {
+      const result = await runner(executable, ['--version'], { timeoutMs: 5_000 })
+      const version = parseVersion(result.stdout)?.join('.')
+      if (!supportedNodeVersion(version, channel)) continue
+      const nodeDir = path.dirname(executable)
+      const npmCli = path.join(nodeDir, 'node_modules', 'npm', 'bin', 'npm-cli.js')
+      return {
+        nodeExecutable: executable,
+        npmCli: existsSync(npmCli) ? npmCli : null,
+        version,
+        source: 'system',
+        reused: true,
+      }
+    } catch {
+      // PATH 里可能残留已卸载的 Node，继续探测下一个候选。
+    }
+  }
+  return null
+}
+
 async function sha256(filename) {
   const hash = createHash('sha256')
   await new Promise((resolve, reject) => {
@@ -178,12 +240,20 @@ async function validateDshAt(root, packageName, version, nodeExecutable, expecte
  * 来自社区桌面壳的共同做法：壳不修改 DSH，把官方包安装在版本目录中。
  * U-DSH 追加了临时目录、身份校验、原子激活和旧版本保留。
  */
-export function createKernelManager({ paths, channel, fetchImpl = fetch, runner = run } = {}) {
+export function createKernelManager({
+  paths,
+  channel,
+  fetchImpl = fetch,
+  runner = run,
+  env = process.env,
+  platform = process.platform,
+} = {}) {
   if (!paths || !channel) throw new Error('paths 和 channel 是必填项')
 
   const nodeRoot = path.join(paths.nodeVersionsDir, `v${channel.node.version}-${channel.node.platform}`)
   const nodeExecutable = path.join(nodeRoot, 'node.exe')
   const npmCli = path.join(nodeRoot, 'node_modules', 'npm', 'bin', 'npm-cli.js')
+  let resolvedNodeRuntime
 
   function dshRoot(version) {
     if (!EXACT_VERSION.test(version)) throw new Error(`DSH 版本无效：${version}`)
@@ -194,9 +264,40 @@ export function createKernelManager({ paths, channel, fetchImpl = fetch, runner 
     return validateDshAt(dshRoot(version), channel.dsh.package, version, nodeExecutable)
   }
 
+  async function discoverSystemDsh(node) {
+    const packageName = channel.dsh.package
+    const packageCandidates = []
+    if (env.UDSH_DSH_PACKAGE_ROOT?.trim()) packageCandidates.push(env.UDSH_DSH_PACKAGE_ROOT.trim())
+    const nodeDir = path.dirname(node.nodeExecutable)
+    packageCandidates.push(path.join(nodeDir, 'node_modules', ...packageName.split('/')))
+    if (env.NPM_CONFIG_PREFIX?.trim()) {
+      packageCandidates.push(path.join(env.NPM_CONFIG_PREFIX.trim(), 'node_modules', ...packageName.split('/')))
+    }
+    for (const packageRoot of unique(packageCandidates)) {
+      try {
+        const manifest = JSON.parse(await readFile(path.join(packageRoot, 'package.json'), 'utf8'))
+        if (manifest.name !== packageName || manifest.version !== channel.dsh.version) continue
+        const globalRoot = path.dirname(path.dirname(path.dirname(packageRoot)))
+        return await validateDshAt(globalRoot, packageName, channel.dsh.version, node.nodeExecutable)
+      } catch {
+        // 候选目录不存在、版本不对或依赖不完整，继续走下一个候选。
+      }
+    }
+    return null
+  }
+
   async function ensureNode(onProgress = () => {}) {
-    if (existsSync(nodeExecutable) && existsSync(npmCli)) return { nodeExecutable, npmCli, reused: true }
-    if (process.platform !== 'win32' || process.arch !== 'x64') {
+    if (resolvedNodeRuntime) return resolvedNodeRuntime
+    if (existsSync(nodeExecutable) && existsSync(npmCli)) {
+      resolvedNodeRuntime = { nodeExecutable, npmCli, reused: true, source: 'portable' }
+      return resolvedNodeRuntime
+    }
+    const system = await discoverSystemNode({ env, platform, channel, runner })
+    if (system) {
+      resolvedNodeRuntime = system
+      return resolvedNodeRuntime
+    }
+    if (platform !== 'win32' || process.arch !== 'x64') {
       throw new Error('当前首版内核引导仅支持 Windows x64')
     }
 
@@ -230,7 +331,8 @@ export function createKernelManager({ paths, channel, fetchImpl = fetch, runner 
     } finally {
       if (existsSync(staging)) await rm(staging, { recursive: true, force: true })
     }
-    return { nodeExecutable, npmCli, reused: false }
+    resolvedNodeRuntime = { nodeExecutable, npmCli, reused: false, source: 'downloaded' }
+    return resolvedNodeRuntime
   }
 
   async function registryMetadata() {
@@ -274,6 +376,8 @@ export function createKernelManager({ paths, channel, fetchImpl = fetch, runner 
     try { return await resolveDsh(version) } catch { /* 未安装或不完整，继续安装。 */ }
 
     const node = await ensureNode(onProgress)
+    const systemDsh = await discoverSystemDsh(node)
+    if (systemDsh) return systemDsh
     const metadata = await registryMetadata()
     const publishedAt = metadata?.time?.[version]
     if (!metadata?.versions?.[version] || !publishedAt) throw new Error(`官方 npm 中不存在 DSH ${version}`)
@@ -397,9 +501,10 @@ export function createKernelManager({ paths, channel, fetchImpl = fetch, runner 
 
   async function status() {
     const installed = await listInstalled()
+    const system = await discoverSystemNode({ env, platform, channel, runner })
     return {
-      nodeVersion: channel.node.version,
-      nodeReady: existsSync(nodeExecutable) && existsSync(npmCli),
+      nodeVersion: system?.version || channel.node.version,
+      nodeReady: Boolean(system || (existsSync(nodeExecutable) && existsSync(npmCli))),
       pinnedVersion: channel.dsh.version,
       activeVersion: await activeVersion(),
       installedVersions: installed.map(({ version }) => version),
