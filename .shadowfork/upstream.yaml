@@ -1,0 +1,66 @@
+apiVersion: shadowfork.io/v1alpha1
+kind: DerivationContract
+
+project:
+  name: u-dsh
+  repository: https://github.com/dongsheng123132/u-dsh
+  derivationLevel: L3
+
+identity:
+  - file: package.json
+    path: $.name
+    note: fork 应换成自己的内部包名
+  - file: package.json
+    path: $.description
+    note: 产品定位与上游致谢要准确
+  - file: package.json
+    path: $.build.appId
+    note: 必须更换，否则会与 U-DSH 共用 Electron 数据目录和单实例身份
+  - file: package.json
+    path: $.build.productName
+    note: 用户可见产品名
+  - file: package.json
+    path: $.build.artifactName
+    note: 发布产物名
+
+protected:
+  - file: src/device-wallet.js
+    reason: 五字段事务状态机、单飞 ensure、两阶段 rotate 和 consumer-first reset 是钱包安全边界；只改文案也不要全局替换状态/协议字符串。
+  - file: src/dsh-config.js
+    reason: 这里维护设备钱包 Key 到官方 DSH credentials/settings 的单一同步路径；复制实现会造成 Key 漂移。
+  - file: src/dsh-service.js
+    reason: 127.0.0.1、随机端口、就绪行解析和子进程退出处理是本地服务安全与生命周期协议。
+  - file: config/runtime-channel.json
+    reason: Node URL 与 SHA-256、DSH 固定版本是一组经过验证的发布单元；升级必须一起做首次启动和回退验证。
+  - glob: generated/**
+    reason: ActionParity 派生产物；手改会让 GUI/CLI 清单与动作核心漂移，必须运行 npm run action-parity:generate。
+  - glob: vendor/action-parity-*/**
+    reason: 固定到单一上游提交的第三方副本；升级时原子替换整个目录并保留 Apache-2.0 许可证。
+
+extensionPoints:
+  - file: config/runtime-channel.json
+    kind: config-override
+    note: fork 可维护自己的已验证 Node/DSH 固定版本和镜像，但必须同步 SHA-256
+  - file: src/action-core.js
+    kind: api-surface
+    note: 新业务动作在 Registry 注册一次，再生成 GUI/CLI/MCP 清单
+  - dir: src/extensions/
+    kind: plugin-dir
+    note: 预留给 fork 的纯新增扩展；U-DSH 上游不占用此目录
+  - file: src/wallet.html
+    kind: theme
+    note: 可换视觉和文案；业务行为仍走 data-action-id 与 Action Core
+
+attribution:
+  - files: ["LICENSE", "NOTICE.md", "vendor/*/LICENSE"]
+    toggle: null
+    note: 法定许可证与上游归因，不提供关闭开关
+
+license:
+  spdx: MIT
+  preserveCopyright:
+    - "Copyright (c) 2026 Steven"
+  trademark: U-DSH、虾盘及 Logo 不随 MIT 自动授权；fork 应更换品牌，不得暗示 DeepSeek 或 U-Claw 官方背书。
+  derivativeRequirements:
+    - 保留 LICENSE、NOTICE.md 和 vendored 组件许可证
+    - README 中显著致谢 steven-kid/deepseek-harness-desktop 与 deepseek-ai/deepseek-harness

@@ -22,6 +22,7 @@ export function resolvePortablePaths({
   platform = process.platform,
 } = {}) {
   const portableOverride = env.UDSH_PORTABLE_ROOT?.trim()
+  const packagedLike = isPackaged || Boolean(portableOverride)
   const portableRoot = portableOverride
     ? path.resolve(portableOverride)
     : isPackaged
@@ -30,7 +31,7 @@ export function resolvePortablePaths({
   const hostOverride = env.UDSH_HOST_ROOT?.trim()
   const hostRoot = hostOverride
     ? path.resolve(hostOverride)
-    : isPackaged
+    : packagedLike
       ? defaultHostRoot(env, platform)
       : path.join(cwd, '.u-dsh-dev', 'host')
   const dataDir = path.join(portableRoot, 'data')

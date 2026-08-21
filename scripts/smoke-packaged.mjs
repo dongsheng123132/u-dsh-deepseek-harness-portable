@@ -1,166 +1,92 @@
-import { cpSync, mkdtempSync, rmSync } from 'node:fs'
 import { once } from 'node:events'
+import { existsSync } from 'node:fs'
+import { mkdtemp, rm } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { spawnSync } from 'node:child_process'
 import { startDshService } from '../src/dsh-service.js'
+import { createKernelManager } from '../src/kernel-manager.js'
+import { preparePortablePaths, resolvePortablePaths } from '../src/portable-paths.js'
+import { loadRuntimeChannel } from '../src/runtime-channel.js'
+
+if (process.platform !== 'win32') throw new Error('U-DSH packaged smoke currently targets Windows x64')
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
-const defaultAppPath = process.platform === 'win32'
-  ? path.join(root, 'dist', 'win-unpacked', 'DeepSeek Harness.exe')
-  : process.platform === 'linux'
-    ? path.join(root, 'dist', 'linux-unpacked', 'deepseek-harness')
-    : path.join(root, 'dist', process.arch === 'x64' ? 'mac' : 'mac-arm64', 'DeepSeek Harness.app')
-const appPath = process.env.PACKAGED_APP_PATH ?? defaultAppPath
-const electronExecutable = process.platform === 'win32' || process.platform === 'linux'
-  ? appPath
-  : path.join(appPath, 'Contents', 'MacOS', 'DeepSeek Harness')
-const packagedResourcesRoot = process.platform === 'win32' || process.platform === 'linux'
-  ? path.join(path.dirname(appPath), 'resources', 'app')
-  : path.join(appPath, 'Contents', 'Resources', 'app')
-const temporaryRoot = process.env.PACKAGED_APP_PATH ? undefined : mkdtempSync(path.join(os.tmpdir(), 'dsh-packaged-smoke-'))
-const resourcesRoot = temporaryRoot === undefined
-  ? packagedResourcesRoot
-  : path.join(temporaryRoot, 'app')
+const appDir = process.env.PACKAGED_APP_DIR ?? path.join(root, 'dist', 'win-unpacked')
+const executable = path.join(appDir, 'U-DSH.exe')
+const cli = path.join(appDir, 'U-DSH-CLI.cmd')
+const resourcesRoot = path.join(appDir, 'resources', 'app')
+const launcher = path.join(resourcesRoot, 'assets', 'windows-hidden-console.exe')
 
-if (temporaryRoot !== undefined) {
-  cpSync(packagedResourcesRoot, resourcesRoot, { recursive: true })
+for (const required of [executable, cli, launcher, path.join(resourcesRoot, 'config', 'runtime-channel.json')]) {
+  if (!existsSync(required)) throw new Error(`packaged file is missing: ${required}`)
+}
+if (existsSync(path.join(resourcesRoot, 'node_modules', '@deepseek-ai', 'dsh'))) {
+  throw new Error('thin-shell invariant failed: packaged app contains @deepseek-ai/dsh')
 }
 
-const windowsNodeExecutable = path.join(resourcesRoot, 'assets', 'dsh-node.exe')
-
-function verifyPackagedWindowsNodePty() {
-  if (process.platform !== 'win32') return
-
-  const nodePtyPath = path.join(resourcesRoot, 'node_modules', 'node-pty')
-  const script = `
-const path = require('node:path')
-const { loadNativeModule } = require(path.join(${JSON.stringify(nodePtyPath)}, 'lib', 'utils.js'))
-const loaded = ['conpty', 'conpty_console_list', 'pty'].map((name) => {
-  const result = loadNativeModule(name)
-  return name + '=' + result.dir
-})
-process.stdout.write('PACKAGED_NODE_PTY_OK ' + loaded.join(','))
-`
-  const result = spawnSync(windowsNodeExecutable, ['-e', script], {
-    cwd: resourcesRoot,
-    encoding: 'utf8',
-    timeout: 15_000,
-  })
-  const output = `${result.stdout ?? ''}${result.stderr ?? ''}`.trim()
-  if (result.error) throw result.error
-  if (result.status !== 0 || !output.includes('PACKAGED_NODE_PTY_OK')) {
-    throw new Error(
-      `Packaged Node runtime could not load node-pty (status ${String(result.status)}): ${output}`,
-    )
-  }
-  console.log(`packaged node-pty smoke: ${output}`)
-}
-
-function verifyPackagedWindowsAclSandbox() {
-  if (process.platform !== 'win32') return
-
-  const workspace = path.join(resourcesRoot, 'smoke-acl-workspace')
-  const tempRoot = path.join(resourcesRoot, 'smoke-acl-temp')
-  const runner = path.join(
-    resourcesRoot,
-    'node_modules',
-    '@deepseek-ai',
-    'dsh-sandbox-windows-acl',
-    'lib',
-    'runner.js',
-  )
-  const script = `
-const { mkdirSync, rmSync } = require('node:fs')
-const { spawnSync } = require('node:child_process')
-const workspace = ${JSON.stringify(workspace)}
-const tempRoot = ${JSON.stringify(tempRoot)}
-mkdirSync(workspace)
-mkdirSync(tempRoot)
-try {
-  const result = spawnSync(
-    process.execPath,
-    [
-      ${JSON.stringify(runner)},
-      '--workspace', workspace,
-      '--temp', tempRoot,
-      '--mode', 'read-only',
-      '--',
-      'C:/Windows/System32/WindowsPowerShell/v1.0/powershell.exe',
-      '-NoLogo', '-NoProfile', '-NonInteractive',
-      '-Command', 'Write-Output PACKAGED_ACL_POWERSHELL_OK',
-    ],
-    { encoding: 'utf8' },
-  )
-  process.stdout.write((result.stdout ?? '') + (result.stderr ?? ''))
-  process.exitCode = result.status ?? 1
-} finally {
-  rmSync(workspace, { recursive: true, force: true })
-  rmSync(tempRoot, { recursive: true, force: true })
-}
-`
-  const launcher = path.join(resourcesRoot, 'assets', 'windows-hidden-console.exe')
-  const result = spawnSync(launcher, [windowsNodeExecutable, '-e', script], {
-    cwd: resourcesRoot,
-    encoding: 'utf8',
-    timeout: 60_000,
-  })
-  const output = `${result.stdout ?? ''}${result.stderr ?? ''}`.trim()
-  if (result.error) throw result.error
-  if (result.status !== 0 || !output.includes('PACKAGED_ACL_POWERSHELL_OK')) {
-    throw new Error(
-      `Packaged Windows ACL sandbox could not start PowerShell (status ${String(result.status)}): ${output}`,
-    )
-  }
-  console.log(`packaged ACL sandbox smoke: ${output}`)
-}
-
-verifyPackagedWindowsNodePty()
-verifyPackagedWindowsAclSandbox()
-
-const service = startDshService({
-  electronExecutable,
-  entry: path.join(resourcesRoot, 'node_modules', '@deepseek-ai', 'dsh', 'lib', 'bin.js'),
-  windowsLauncher: path.join(resourcesRoot, 'assets', 'windows-hidden-console.exe'),
-  windowsNodeExecutable,
-  environment: {
+const temporaryRoot = await mkdtemp(path.join(os.tmpdir(), 'u-dsh-packaged-smoke-'))
+const hostRoot = process.env.UDSH_SMOKE_HOST_ROOT ?? path.join(root, '.u-dsh-dev', 'host')
+const paths = preparePortablePaths(resolvePortablePaths({
+  env: {
     ...process.env,
-    NODE_OPTIONS: '',
-    NODE_PATH: '',
+    UDSH_PORTABLE_ROOT: path.join(temporaryRoot, 'usb'),
+    UDSH_HOST_ROOT: hostRoot,
   },
-})
+  platform: 'win32',
+  isPackaged: true,
+}))
 
 try {
-  const url = await service.ready
-  const response = await fetch(url)
-  if (!response.ok) {
-    throw new Error(`Packaged DeepSeek Harness returned HTTP ${response.status}`)
+  const cliResult = spawnSync('cmd.exe', ['/d', '/c', cli, 'kernel.status', '--json'], {
+    cwd: appDir,
+    env: {
+      ...process.env,
+      UDSH_PORTABLE_ROOT: paths.portableRoot,
+      UDSH_HOST_ROOT: paths.hostRoot,
+    },
+    encoding: 'utf8',
+    timeout: 30_000,
+  })
+  if (cliResult.error) throw cliResult.error
+  if (cliResult.status !== 0 || !cliResult.stdout.includes('pinnedVersion')) {
+    throw new Error(`packaged CLI failed (${String(cliResult.status)}): ${cliResult.stderr}`)
   }
-  const html = await response.text()
-  if (!html.includes('__DSH_BOOT__')) {
-    throw new Error('Packaged DeepSeek Harness did not return its Web UI')
-  }
-  if (process.platform === 'win32' && !html.includes('@deepseek-ai/dsh-client-ui-directory-picker-browse')) {
-    throw new Error('Packaged Windows app did not mount the browse directory picker')
-  }
-  console.log(`packaged smoke: ${response.status} ${url}`)
-} finally {
-  service.stop()
-  if (service.child.exitCode === null) {
-    await once(service.child, 'exit')
-  }
-  if (temporaryRoot !== undefined) {
-    try {
-      rmSync(temporaryRoot, {
-        recursive: true,
-        force: true,
-        maxRetries: process.platform === 'win32' ? 10 : 0,
-        retryDelay: 200,
-      })
-    } catch (error) {
-      if (process.platform !== 'win32') throw error
-      console.warn(`packaged smoke cleanup skipped: ${error.message}`)
+
+  const kernel = createKernelManager({ paths, channel: loadRuntimeChannel() })
+  const { target } = await kernel.ensure(({ phase, received, total }) => {
+    const progress = total > 0 ? ` ${Math.floor(received / total * 100)}%` : ''
+    process.stdout.write(`[kernel] ${phase}${progress}\n`)
+  })
+
+  const service = startDshService({
+    entry: target.entry,
+    nodeExecutable: target.nodeExecutable,
+    windowsLauncher: launcher,
+    cwd: paths.dataDir,
+    timeoutMs: 90_000,
+    environment: {
+      ...process.env,
+      NODE_OPTIONS: '',
+      DSH_HOME: paths.dshHome,
+      DSH_TELEMETRY_DISABLED: '1',
+      DSH_DESKTOP: '1',
+    },
+  })
+  try {
+    const url = await service.ready
+    const response = await fetch(url)
+    const html = await response.text()
+    if (!response.ok || !html.includes('__DSH_BOOT__')) {
+      throw new Error(`official DSH Web UI smoke failed: HTTP ${response.status}`)
     }
+    await kernel.activate(target.version)
+    process.stdout.write(`PACKAGED_SMOKE_OK ${target.version} ${url}\n`)
+  } finally {
+    service.stop()
+    if (service.child.exitCode === null) await once(service.child, 'exit')
   }
+} finally {
+  await rm(temporaryRoot, { recursive: true, force: true, maxRetries: 10, retryDelay: 200 })
 }

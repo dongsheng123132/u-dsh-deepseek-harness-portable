@@ -1,0 +1,194 @@
+apiVersion: shadowfork.io/v1alpha1
+kind: ShadowProfile
+
+metadata:
+  name: u-dsh
+  displayName: U-DSH
+
+upstream:
+  repository: https://github.com/steven-kid/deepseek-harness-desktop
+  remote: upstream
+  baseRef: f24e2c1b687e7fe0e4cefa7beee800fe4e8ea218
+  strategy: merge
+  versionPolicy: independent
+
+license:
+  upstreamLicense: MIT
+  preserveCopyright:
+    - file: LICENSE
+      contains: "Copyright (c) 2026 Steven"
+  trademarkAck: true
+
+customizations:
+  - id: brand.package-name
+    kind: json-field
+    why: npm 包身份是 U-DSH；不沿用上游名字，避免用户误认官方产品。
+    severity: critical
+    file: package.json
+    path: $.name
+    value: u-dsh
+
+  - id: brand.app-id
+    kind: json-field
+    why: 与上游桌面壳分开本机 Electron 数据和单实例身份。
+    severity: critical
+    file: package.json
+    path: $.build.appId
+    value: org.uclaw.udsh
+
+  - id: brand.product-name
+    kind: json-field
+    why: Windows 产物、窗口和快捷方式使用 U-DSH 品牌。
+    severity: critical
+    file: package.json
+    path: $.build.productName
+    value: U-DSH
+
+  - id: portable.data-boundary
+    kind: add-file
+    why: U 盘只存钱包、配置、会话和 Skills；高频缓存与内核在本机版本目录。
+    severity: critical
+    paths:
+      - src/portable-paths.js
+      - test/portable-paths.test.js
+
+  - id: kernel.version-manager
+    kind: add-file
+    why: 官方 Node 和 DSH 独立安装、校验、原子切换并保留旧版本回退。
+    severity: critical
+    paths:
+      - config/runtime-channel.json
+      - src/runtime-channel.js
+      - src/kernel-manager.js
+      - test/kernel-manager.test.js
+
+  - id: wallet.device-wallet
+    kind: add-file
+    why: 虾盘云免登录设备钱包及官方 DSH 配置适配层；状态机是安全边界。
+    severity: critical
+    paths:
+      - src/atomic-file.js
+      - src/device-wallet.js
+      - src/dsh-config.js
+      - src/uclaw-endpoints.js
+      - src/wallet-preload.cjs
+      - src/wallet.html
+      - src/extensions/README.md
+
+  - id: actionparity.shared-core
+    kind: add-file
+    why: 钱包和内核的 GUI/CLI 共用一个 Action Core，生成物不可手改。
+    severity: critical
+    paths:
+      - action-parity.config.json
+      - action-parity.verify.json
+      - src/action-core.js
+      - src/cli.js
+      - scripts/generate-action-parity.mjs
+      - test/action-parity.test.js
+      - generated/action-parity.json
+      - generated/action-client.ts
+      - generated/cli-help.json
+      - generated/mcp-tools.json
+      - generated/parity-observations.json
+      - generated/registry-bundle.json
+
+  - id: actionparity.vendored-toolchain
+    kind: add-file
+    why: ActionParity 0.7.0 尚未发布到 npm，按 Apache-2.0 固定源提交后 vendoring。
+    severity: warn
+    paths:
+      - vendor/README.md
+      - vendor/action-parity-sdk
+      - vendor/action-parity-tool
+
+  - id: integration.electron-main
+    kind: patch
+    why: 把钱包、内核管理和 ActionParity IPC 接到上游薄桌面壳，DSH Web 本身不改。
+    severity: critical
+    files:
+      - src/main.js
+    assert:
+      - kind: file-contains
+        file: src/main.js
+        text: "createKernelManager({ paths, channel: runtimeChannel })"
+        why: 本机版本化内核仍是唯一 DSH 来源
+      - kind: file-contains
+        file: src/main.js
+        text: "attachElectronIpc(ipcMain, actionRegistry"
+        why: GUI 仍通过同一 Action Core
+      - kind: file-contains
+        file: src/main.js
+        text: "DSH_HOME: paths.dshHome"
+        why: DSH 用户数据仍明确指回 U 盘
+
+  - id: integration.dsh-launcher
+    kind: patch
+    why: 上游从包内 node_modules 启动，U-DSH 改为启动本机校验后的版本目录入口。
+    severity: critical
+    files:
+      - src/dsh-service.js
+    assert:
+      - kind: file-contains
+        file: src/dsh-service.js
+        text: "nodeExecutable"
+        why: 使用内核管理器解析出的 Node
+      - kind: file-not-contains
+        file: src/dsh-service.js
+        text: "import.meta.resolve('@deepseek-ai/dsh"
+        why: 不得偷偷退回壳内捆绑 DSH
+      - kind: file-contains
+        file: src/dsh-service.js
+        text: "'127.0.0.1'"
+        why: DSH 服务只监听本机回环
+
+  - id: integration.wallet-ui
+    kind: patch
+    why: 启动页、托盘和窗口生命周期增加设备钱包和内核状态入口。
+    severity: warn
+    files:
+      - src/startup.html
+      - src/window-lifecycle.js
+      - test/window-lifecycle.test.js
+    assert:
+      - kind: file-contains
+        file: src/startup.html
+        text: "window.udshSetStatus"
+        why: 首次内核下载有可见进度
+      - kind: file-contains
+        file: src/window-lifecycle.js
+        text: "openWallet"
+        why: 托盘钱包入口仍在
+
+  - id: dependencies.thin-shell
+    kind: patch
+    why: Electron 壳不再捆绑 DSH 依赖树，内核版本只认 runtime-channel.json。
+    severity: critical
+    files:
+      - package.json
+      - package-lock.json
+    assert:
+      - kind: file-not-contains
+        file: package-lock.json
+        text: 'node_modules/@deepseek-ai/dsh'
+        why: DSH 没有重新长回 Electron 壳
+      - kind: file-contains
+        file: package.json
+        text: '"action-parity-sdk": "file:vendor/action-parity-sdk"'
+        why: Action Core 的可复现依赖仍在
+
+  - id: legal.upstream-attribution
+    kind: add-file
+    why: 显著说明社区壳、官方 DSH 和 ActionParity 的来源及许可证。
+    severity: critical
+    path: NOTICE.md
+
+  - id: shadowfork.contracts
+    kind: add-file
+    why: 当前项目用 profile 跟随桌面壳上游，同时向未来 fork 发布可机器校验的派生契约。
+    severity: critical
+    paths:
+      - .shadowfork/profile.yaml
+      - .shadowfork/upstream.yaml
+      - .shadowfork/derivation-contract.v1alpha1.schema.json
+      - scripts/validate-shadowfork-contract.mjs

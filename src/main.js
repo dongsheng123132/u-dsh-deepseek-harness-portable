@@ -209,6 +209,8 @@ function kernelProgress(value) {
     void setStartupStatus('正在把 Node 运行环境解压到本机缓存…')
   } else if (value.phase === 'installing-dsh') {
     void setStartupStatus(`正在安装官方 DSH ${value.version} 到本机缓存…`)
+  } else if (value.phase === 'installing-dsh-peers') {
+    void setStartupStatus(`正在补齐 DSH ${value.version} 的 ${value.count} 个运行依赖…`)
   }
 }
 

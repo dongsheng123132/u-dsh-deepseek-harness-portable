@@ -2,6 +2,7 @@ import { spawn } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { createReadStream, existsSync } from 'node:fs'
 import { mkdir, open, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises'
+import { createRequire } from 'node:module'
 import path from 'node:path'
 import { writeTextAtomic } from './atomic-file.js'
 
@@ -31,13 +32,18 @@ async function download(url, destination, { fetchImpl, onProgress }) {
   if (!response.ok || !response.body) throw new Error(`下载失败：HTTP ${response.status}`)
   const total = Number(response.headers.get('content-length')) || 0
   let received = 0
+  let lastReportedPercent = -1
   const handle = await open(partial, 'w')
   let failure
   try {
     for await (const chunk of response.body) {
       await handle.write(chunk)
       received += chunk.byteLength
-      onProgress({ phase: 'downloading-node', received, total })
+      const percent = total > 0 ? Math.floor(received / total * 100) : -1
+      if (percent !== lastReportedPercent) {
+        lastReportedPercent = percent
+        onProgress({ phase: 'downloading-node', received, total })
+      }
     }
   } catch (error) {
     failure = error
@@ -51,7 +57,7 @@ async function download(url, destination, { fetchImpl, onProgress }) {
   await rename(partial, destination)
 }
 
-function run(command, args, options = {}) {
+function run(command, args, { timeoutMs = 8 * 60_000, ...options } = {}) {
   return new Promise((resolve, reject) => {
     const child = spawn(command, args, {
       shell: false,
@@ -61,14 +67,77 @@ function run(command, args, options = {}) {
     })
     let stdout = ''
     let stderr = ''
+    let settled = false
+    let timer
+    const finish = (callback, value) => {
+      if (settled) return
+      settled = true
+      clearTimeout(timer)
+      callback(value)
+    }
     child.stdout?.setEncoding('utf8').on('data', (chunk) => { stdout += chunk })
     child.stderr?.setEncoding('utf8').on('data', (chunk) => { stderr += chunk })
-    child.once('error', reject)
+    child.once('error', (error) => finish(reject, error))
     child.once('exit', (code) => {
-      if (code === 0) resolve({ stdout, stderr })
-      else reject(new Error(`${path.basename(command)} 退出码 ${code ?? 'unknown'}：${stderr.slice(-1200)}`))
+      if (code === 0) finish(resolve, { stdout, stderr })
+      else finish(reject, new Error(`${path.basename(command)} 退出码 ${code ?? 'unknown'}：${stderr.slice(-1200)}`))
     })
+    timer = setTimeout(() => {
+      child.kill('SIGTERM')
+      finish(reject, new Error(`${path.basename(command)} 超过 ${Math.ceil(timeoutMs / 1000)} 秒未完成`))
+    }, timeoutMs)
   })
+}
+
+async function removeStagingDirectories(parent, prefix) {
+  let entries = []
+  try { entries = await readdir(parent, { withFileTypes: true }) } catch (error) {
+    if (error?.code === 'ENOENT') return
+    throw error
+  }
+  for (const entry of entries) {
+    if (!entry.isDirectory() || !entry.name.startsWith(prefix)) continue
+    const target = path.join(parent, entry.name)
+    assertChild(parent, target)
+    await rm(target, { recursive: true, force: true })
+  }
+}
+
+async function topLevelPackageManifests(root) {
+  const nodeModules = path.join(root, 'node_modules')
+  const manifests = []
+  for (const entry of await readdir(nodeModules, { withFileTypes: true })) {
+    if (!entry.isDirectory() || entry.name.startsWith('.')) continue
+    if (entry.name.startsWith('@')) {
+      for (const child of await readdir(path.join(nodeModules, entry.name), { withFileTypes: true })) {
+        if (child.isDirectory() && !child.name.startsWith('.')) {
+          manifests.push(path.join(nodeModules, entry.name, child.name, 'package.json'))
+        }
+      }
+    } else {
+      manifests.push(path.join(nodeModules, entry.name, 'package.json'))
+    }
+  }
+  return manifests
+}
+
+async function missingRequiredPeers(root, dshVersion) {
+  const missing = new Map()
+  for (const manifestPath of await topLevelPackageManifests(root)) {
+    let manifest
+    try { manifest = JSON.parse(await readFile(manifestPath, 'utf8')) } catch { continue }
+    const requireFromPackage = createRequire(manifestPath)
+    for (const [name, range] of Object.entries(manifest.peerDependencies ?? {})) {
+      if (manifest.peerDependenciesMeta?.[name]?.optional) continue
+      try {
+        requireFromPackage.resolve(name)
+      } catch {
+        const spec = name.startsWith('@deepseek-ai/dsh-') ? dshVersion : range
+        missing.set(name, spec)
+      }
+    }
+  }
+  return [...missing].map(([name, spec]) => ({ name, spec }))
 }
 
 async function expandZipWindows(archive, destination, runner) {
@@ -78,7 +147,7 @@ async function expandZipWindows(archive, destination, runner) {
   })
 }
 
-async function validateDshAt(root, packageName, version, nodeExecutable) {
+async function validateDshAt(root, packageName, version, nodeExecutable, expectedIntegrity) {
   const packageRoot = path.join(root, 'node_modules', '@deepseek-ai', 'dsh')
   const manifest = JSON.parse(await readFile(path.join(packageRoot, 'package.json'), 'utf8'))
   if (manifest.name !== packageName || manifest.version !== version) {
@@ -90,6 +159,17 @@ async function validateDshAt(root, packageName, version, nodeExecutable) {
   const relative = path.relative(packageRoot, entry)
   if (relative.startsWith('..') || path.isAbsolute(relative) || !existsSync(entry)) {
     throw new Error('DSH CLI 入口越界或不存在')
+  }
+  if (expectedIntegrity) {
+    const lock = JSON.parse(await readFile(path.join(root, 'package-lock.json'), 'utf8'))
+    const actualIntegrity = lock.packages?.[`node_modules/${packageName}`]?.integrity
+    if (actualIntegrity !== expectedIntegrity) {
+      throw new Error('DSH 根包完整性与官方 registry 元数据不一致')
+    }
+  }
+  const missingPeers = await missingRequiredPeers(root, version)
+  if (missingPeers.length > 0) {
+    throw new Error(`DSH 缺少必需的 peer 依赖：${missingPeers.map(({ name }) => name).join(', ')}`)
   }
   return { version, root, entry, source: 'installed', nodeExecutable }
 }
@@ -131,6 +211,7 @@ export function createKernelManager({ paths, channel, fetchImpl = fetch, runner 
       throw new Error('Node 下载包 SHA-256 校验失败')
     }
 
+    await removeStagingDirectories(paths.nodeVersionsDir, `.install-v${channel.node.version}-`)
     const staging = path.join(paths.nodeVersionsDir, `.install-v${channel.node.version}-${Date.now()}`)
     assertChild(paths.nodeVersionsDir, staging)
     await mkdir(staging, { recursive: true })
@@ -197,6 +278,7 @@ export function createKernelManager({ paths, channel, fetchImpl = fetch, runner 
     const publishedAt = metadata?.time?.[version]
     if (!metadata?.versions?.[version] || !publishedAt) throw new Error(`官方 npm 中不存在 DSH ${version}`)
 
+    await removeStagingDirectories(paths.dshVersionsDir, `.install-${version}-`)
     const staging = path.join(paths.dshVersionsDir, `.install-${version}-${Date.now()}`)
     assertChild(paths.dshVersionsDir, staging)
     await mkdir(staging, { recursive: true })
@@ -209,24 +291,83 @@ export function createKernelManager({ paths, channel, fetchImpl = fetch, runner 
       }, null, 2)}\n`)
       // npm 的 prerelease caret 会把 rc.7 的内部包解析到 rc.8；限制到该版本发布时间窗口。
       const before = new Date(new Date(publishedAt).getTime() + 10 * 60_000).toISOString()
-      onProgress({ phase: 'installing-dsh', version })
-      await runner(node.nodeExecutable, [
-        node.npmCli,
-        'install',
-        '--no-audit',
-        '--no-fund',
-        '--prefer-online',
-        `--before=${before}`,
-        `--registry=${channel.dsh.registry}`,
-      ], {
-        cwd: staging,
-        env: {
-          ...process.env,
-          npm_config_cache: paths.npmCacheDir,
-          npm_config_update_notifier: 'false',
-        },
-      })
-      await validateDshAt(staging, channel.dsh.package, version, nodeExecutable)
+      const installRegistries = channel.dsh.installRegistries?.length
+        ? channel.dsh.installRegistries
+        : [channel.dsh.registry]
+      let installError
+      for (const registry of installRegistries) {
+        await rm(path.join(staging, 'node_modules'), { recursive: true, force: true })
+        await rm(path.join(staging, 'package-lock.json'), { force: true })
+        onProgress({ phase: 'installing-dsh', version, registry })
+        try {
+          await runner(node.nodeExecutable, [
+            node.npmCli,
+            'install',
+            '--no-audit',
+            '--no-fund',
+            '--prefer-offline',
+            '--legacy-peer-deps',
+            '--maxsockets=6',
+            '--fetch-retries=2',
+            '--fetch-timeout=60000',
+            `--before=${before}`,
+            `--registry=${registry}`,
+          ], {
+            cwd: staging,
+            timeoutMs: 4 * 60_000,
+            env: {
+              ...process.env,
+              npm_config_cache: paths.npmCacheDir,
+              npm_config_update_notifier: 'false',
+            },
+          })
+          for (let round = 0; round < 5; round += 1) {
+            const missingPeers = await missingRequiredPeers(staging, version)
+            if (missingPeers.length === 0) break
+            onProgress({
+              phase: 'installing-dsh-peers',
+              version,
+              count: missingPeers.length,
+              round: round + 1,
+            })
+            await runner(node.nodeExecutable, [
+              node.npmCli,
+              'install',
+              '--no-audit',
+              '--no-fund',
+              '--save-exact',
+              '--prefer-offline',
+              '--legacy-peer-deps',
+              '--maxsockets=6',
+              '--fetch-retries=2',
+              '--fetch-timeout=60000',
+              `--before=${before}`,
+              `--registry=${registry}`,
+              ...missingPeers.map(({ name, spec }) => `${name}@${spec}`),
+            ], {
+              cwd: staging,
+              timeoutMs: 4 * 60_000,
+              env: {
+                ...process.env,
+                npm_config_cache: paths.npmCacheDir,
+                npm_config_update_notifier: 'false',
+              },
+            })
+          }
+          const unresolvedPeers = await missingRequiredPeers(staging, version)
+          if (unresolvedPeers.length > 0) {
+            throw new Error(`DSH peer 依赖未收敛：${unresolvedPeers.map(({ name }) => name).join(', ')}`)
+          }
+          installError = null
+          break
+        } catch (error) {
+          installError = error
+        }
+      }
+      if (installError) throw installError
+      const officialIntegrity = metadata.versions[version]?.dist?.integrity
+      if (!officialIntegrity) throw new Error(`官方 npm 没有 DSH ${version} 的完整性摘要`)
+      await validateDshAt(staging, channel.dsh.package, version, nodeExecutable, officialIntegrity)
       const destination = dshRoot(version)
       if (existsSync(destination)) {
         assertChild(paths.dshVersionsDir, destination)

@@ -22,11 +22,11 @@ async function fixture() {
   return { root, paths, manager: createKernelManager({ paths, channel }) }
 }
 
-async function createInstalled(paths, version) {
+async function createInstalled(paths, version, extraManifest = {}) {
   const packageRoot = path.join(paths.dshVersionsDir, version, 'node_modules', '@deepseek-ai', 'dsh')
   await mkdir(path.join(packageRoot, 'lib'), { recursive: true })
   await writeFile(path.join(packageRoot, 'package.json'), JSON.stringify({
-    name: '@deepseek-ai/dsh', version, bin: { dsh: 'lib/bin.js' },
+    name: '@deepseek-ai/dsh', version, bin: { dsh: 'lib/bin.js' }, ...extraManifest,
   }))
   await writeFile(path.join(packageRoot, 'lib', 'bin.js'), '// fixture\n')
 }
@@ -56,6 +56,18 @@ test('kernel manager refuses a forged package identity', async () => {
     const manifest = path.join(paths.dshVersionsDir, '0.1.0-rc.7', 'node_modules', '@deepseek-ai', 'dsh', 'package.json')
     await writeFile(manifest, JSON.stringify({ name: 'not-dsh', version: '0.1.0-rc.7', bin: 'lib/bin.js' }))
     await assert.rejects(manager.resolveDsh('0.1.0-rc.7'), /身份或版本校验失败/)
+  } finally {
+    await rm(root, { recursive: true, force: true })
+  }
+})
+
+test('kernel manager refuses an installed DSH with missing required peers', async () => {
+  const { root, paths, manager } = await fixture()
+  try {
+    await createInstalled(paths, '0.1.0-rc.7', {
+      peerDependencies: { '@deepseek-ai/dsh-invariants': '^0.1.0-rc.7' },
+    })
+    await assert.rejects(manager.resolveDsh('0.1.0-rc.7'), /缺少必需的 peer 依赖/)
   } finally {
     await rm(root, { recursive: true, force: true })
   }

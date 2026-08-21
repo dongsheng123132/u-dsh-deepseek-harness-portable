@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://shadowfork.net/schema/derivation-contract.v1alpha1.json",
+  "title": "ShadowFork Derivation Contract",
+  "description": "上游作者放在 .shadowfork/upstream.yaml 的衍生契约：声明哪些是身份、哪些碰不得、从哪扩展、归因在哪。",
+  "type": "object",
+  "required": ["apiVersion", "kind"],
+  "additionalProperties": true,
+  "properties": {
+    "apiVersion": {
+      "const": "shadowfork.io/v1alpha1"
+    },
+    "kind": {
+      "const": "DerivationContract"
+    },
+    "project": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "name": { "type": "string" },
+        "repository": { "type": "string", "format": "uri" },
+        "derivationLevel": {
+          "enum": ["L1", "L2", "L3"],
+          "description": "自评级别，无认证机构。L1 可辨识 / L2 可覆盖 / L3 可契约"
+        },
+        "contact": { "type": "string" }
+      }
+    },
+    "identity": {
+      "type": "array",
+      "description": "衍生版应该修改的身份点",
+      "items": {
+        "type": "object",
+        "required": ["file"],
+        "additionalProperties": false,
+        "properties": {
+          "file": { "type": "string" },
+          "path": {
+            "type": "string",
+            "description": "JSONPath，用于 json/yaml/toml 等结构化文件"
+          },
+          "match": {
+            "type": "string",
+            "description": "正则，用于源码等非结构化文件"
+          },
+          "note": { "type": "string" }
+        },
+        "anyOf": [{ "required": ["path"] }, { "required": ["match"] }]
+      }
+    },
+    "protected": {
+      "type": "array",
+      "description": "外表像品牌、实际是协议的区域。改了会坏且通常不报错。",
+      "items": {
+        "type": "object",
+        "required": ["reason"],
+        "additionalProperties": false,
+        "properties": {
+          "file": { "type": "string" },
+          "glob": {
+            "type": "string",
+            "description": "标准 glob 语义：** 匹配任意层级含零层，* 不跨斜杠"
+          },
+          "reason": {
+            "type": "string",
+            "description": "必填。要说清『改了会发生什么』，只说『别改』的规则会被当教条绕过。"
+          }
+        },
+        "anyOf": [{ "required": ["file"] }, { "required": ["glob"] }]
+      }
+    },
+    "extensionPoints": {
+      "type": "array",
+      "description": "让衍生版用新增文件表达定制的挂载点",
+      "items": {
+        "type": "object",
+        "required": ["kind"],
+        "additionalProperties": false,
+        "properties": {
+          "file": { "type": "string" },
+          "dir": { "type": "string" },
+          "kind": {
+            "type": "string",
+            "description": "开放集合。常见：policy-hook / plugin-dir / config-override / api-surface / theme",
+            "examples": [
+              "policy-hook",
+              "plugin-dir",
+              "config-override",
+              "api-surface",
+              "theme"
+            ]
+          },
+          "note": { "type": "string" }
+        },
+        "anyOf": [{ "required": ["file"] }, { "required": ["dir"] }]
+      }
+    },
+    "attribution": {
+      "type": "array",
+      "description": "赞助/推广/aff 位。写出来是诚实条款：衍生者有权知道自己在分发什么。",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "file": { "type": "string" },
+          "files": { "type": "array", "items": { "type": "string" } },
+          "count": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "已知归因位数量"
+          },
+          "toggle": {
+            "type": ["string", "null"],
+            "description": "关闭开关名。没有开关就写 null 并在 note 说明 —— 隐瞒才是问题。"
+          },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "license": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "spdx": { "type": "string", "examples": ["MIT", "Apache-2.0", "GPL-3.0-only"] },
+        "preserveCopyright": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "禁止删除的版权行。下游工具应据此设硬闸门，不提供 --force。"
+        },
+        "trademark": {
+          "type": "string",
+          "description": "商标声明。MIT 授权代码不授权商标，这一点必须写清。"
+        },
+        "derivativeRequirements": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "对衍生版的附加要求，不得与许可证本身冲突"
+        }
+      }
+    }
+  }
+}

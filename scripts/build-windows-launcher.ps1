@@ -7,6 +7,7 @@ $testSource = Join-Path $root "test\fixtures\windows-visible-console.cs"
 $testOutput = Join-Path $env:TEMP "deepseek-harness-visible-console.exe"
 $frameworkRoot = Join-Path $env:WINDIR "Microsoft.NET\Framework64"
 $compiler = Get-ChildItem $frameworkRoot -Directory |
+  Where-Object { $_.Name -match '^v\d+(\.\d+){1,3}$' } |
   Sort-Object { [version]$_.Name.TrimStart("v") } -Descending |
   ForEach-Object { Join-Path $_.FullName "csc.exe" } |
   Where-Object { Test-Path $_ } |

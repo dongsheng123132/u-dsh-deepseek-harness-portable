@@ -16,6 +16,7 @@
     "action-parity:generate": "node scripts/generate-action-parity.mjs",
     "action-parity:check-generated": "node scripts/generate-action-parity.mjs --check",
     "action-parity:verify": "node node_modules/action-parity/bin/action-parity.mjs verify generated/action-parity.json --plan action-parity.verify.json --json",
+    "shadowfork:contract": "node scripts/validate-shadowfork-contract.mjs",
     "prepare:windows": "npm run build:win-launcher",
     "build:win-launcher": "powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File scripts/build-windows-launcher.ps1",
     "test:win-console": "node scripts/test-windows-hidden-console.mjs",
@@ -39,7 +40,7 @@
     "electron-builder": "26.0.12"
   },
   "build": {
-    "afterSign": "scripts/after-pack.cjs",
+    "afterPack": "scripts/after-pack.cjs",
     "appId": "org.uclaw.udsh",
     "productName": "U-DSH",
     "artifactName": "U-DSH-${version}-${os}-${arch}.${ext}",

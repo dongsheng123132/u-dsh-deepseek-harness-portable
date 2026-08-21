@@ -24,3 +24,16 @@ test('development paths are isolated below .u-dsh-dev', () => {
   assert.equal(paths.portableRoot, path.join('C:\\work\\u-dsh', '.u-dsh-dev', 'portable'))
   assert.equal(paths.hostRoot, path.join('C:\\work\\u-dsh', '.u-dsh-dev', 'host'))
 })
+
+test('a portable CLI override still sends caches to LOCALAPPDATA', () => {
+  const paths = resolvePortablePaths({
+    env: {
+      UDSH_PORTABLE_ROOT: 'I:\\U-DSH',
+      LOCALAPPDATA: 'C:\\Users\\tester\\AppData\\Local',
+    },
+    cwd: 'D:\\unrelated-working-directory',
+    platform: 'win32',
+  })
+  assert.equal(paths.portableRoot, path.resolve('I:\\U-DSH'))
+  assert.equal(paths.hostRoot, path.join('C:\\Users\\tester\\AppData\\Local', 'U-DSH'))
+})
