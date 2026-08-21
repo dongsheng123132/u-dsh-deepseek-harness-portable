@@ -146,7 +146,8 @@ export function createDeviceWallet({
   async function bindFresh() {
     const { response, payload } = await http.request('pay', '/device/bind', {
       method: 'POST',
-      body: { platform, channel: 'u-dsh' },
+      // 与 ClawX 新设备分支保持同一服务端形状；U-DSH 没有旧指纹钱包要迁移。
+      body: { hwHint: '', platform, channel: 'u-dsh' },
     })
     if (!response.ok || typeof payload.apiKey !== 'string') {
       throw new Error(`获取设备钱包失败：HTTP ${response.status}`)

@@ -48,8 +48,9 @@ test('concurrent ensure calls share one bind and one consumer update', async () 
   const wallet = createDeviceWallet({
     store,
     endpoints,
-    fetch: async (url) => {
+    fetch: async (url, options) => {
       assert.match(url, /\/device\/bind$/)
+      assert.deepEqual(JSON.parse(options.body), { hwHint: '', platform: process.platform, channel: 'u-dsh' })
       binds += 1
       await new Promise((resolve) => setTimeout(resolve, 10))
       return jsonResponse({ apiKey: 'sk-bound-123456', walletId: 'wallet-1' })
