@@ -86,9 +86,23 @@ M1 之后包的性质变了，但版本号和门禁没跟上，已经造成一�
 - [ ] 把 `logsDir` 接起来——静默降级至少要在磁盘上留痕，否则远程支持无从下手
 - [ ] 首启把「钱包已就绪 / 未就绪」做成第一屏的显式状态，而不是隐含假设
 
-**仍待实跑确认**：`wallet.ensure` 的 HTTP 签发链路本身通不通（是网络/服务端问题，
-还是 `applyKey` 写 DSH 配置失败）。该动作往生产虾盘云 `api.u-claw.org` 真签发设备钱包，
-属共享生产系统写入，**必须由用户明确点名授权**，不许自作主张跑。
+**2026-08-22 实跑确认（用户点名授权后）：签发链路完全正常，整条「开箱即有额度」成立。**
+
+```
+wallet.ensure  → available:true  configured:true
+wallet.status  → walletId wal_20e7…31fe   balanceAvailable: 1
+dsh-home/.credentials.yaml → XIAPAN_CLOUD_API_KEY: sk-129b…
+dsh-home/settings.yaml     → provider xiapan-cloud → https://api.u-claw.org/v1
+                             agent-default-model: MiniMax-M2.7
+```
+
+所以之前那个 `API key is invalid` **不是链路坏了，就是钱包压根没签发过**
+（那个环境里 `available:false`）。也就是说 `doEnsure()` 那次静默吞掉的是一次
+偶发失败（网络/时序），而我们**当时看不见它**。
+
+这反过来证明修法方向是对的：链路本身没问题，问题是**失败不可观测 + 不告知用户**。
+现在 `logsDir` 会记下 `[device-wallet] 首启收敛失败` 的确切原因，
+`configured:false` 会主动把钱包页递到用户面前。
 
 - [x] 实测走一遍：解压 → 双击 → 首屏 → 充值页 / AI 设置 → 发一句话 → 收到回复。
       **前 5 步通，第 6 步失败**
@@ -139,6 +153,12 @@ M1 之后包的性质变了，但版本号和门禁没跟上，已经造成一�
 - [ ] 中文保姆级图文（竞品数据：`deepseek-harness-oneclick-pack` 19★ 但 **4408 次下载**，
       靠的就是这个；技术最扎实的 `sqs404/dsh-portable` 只有 263 次）
 - [ ] 下载入口用固定文件名，让 `releases/latest/download/...` 直链跨版本稳定
+- [ ] **开源前的密钥体检**（2026-08-22 已跑一次，干净；发版前必须重跑）：
+      `git grep -nIE 'sk-[A-Za-z0-9]{16,}|admin[_-]?token|Bearer [A-Za-z0-9]{20,}'`。
+      服务端签发逻辑、dealer 私钥、虾盘云 admin token **一律不进这个仓库**——
+      商业模式的护城河是服务端，不是客户端代码。
+- [ ] `LICENSE` 的版权行现在只有上游 `Copyright (c) 2026 Steven`，
+      要补上我们自己的版权行（MIT 允许，但必须保留上游那一行）
 
 ### M6 · 发版
 
