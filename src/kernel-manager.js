@@ -378,8 +378,25 @@ export function createKernelManager({
     }
   }
 
+  // 复用本机已有 DSH 时内核不在便携目录里，activate 不能只认 dshVersionsDir，
+  // 否则服务已经起来了却在记录激活版本这一步 ENOENT。
+  async function resolveActivatable(version) {
+    try {
+      return await resolveDsh(version)
+    } catch (error) {
+      if (version !== channel.dsh.version) throw error
+      const node = resolvedNodeRuntime
+        ?? (existsSync(nodeExecutable) ? { nodeExecutable } : null)
+        ?? await discoverSystemNode({ env, platform, channel, runner })
+      if (!node) throw error
+      const system = await discoverSystemDsh(node)
+      if (!system) throw error
+      return system
+    }
+  }
+
   async function activate(version) {
-    const resolved = await resolveDsh(version)
+    const resolved = await resolveActivatable(version)
     await writeTextAtomic(paths.activeKernelFile, `${JSON.stringify({ schemaVersion: 1, dshVersion: version })}\n`)
     return resolved
   }

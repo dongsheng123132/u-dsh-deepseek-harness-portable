@@ -109,6 +109,12 @@ test('kernel manager reuses a supported system Node and existing global DSH', as
     assert.equal(result.target.version, '0.1.0-rc.7')
     assert.equal(result.target.nodeExecutable, nodeExecutable)
     assert.deepEqual(calls, [['--version']])
+
+    // 复用本机 DSH 后内核不在便携目录里，activate 仍必须记下激活版本，
+    // 否则服务已经起来了却在这一步报 ENOENT，用户看到的是“启动失败”。
+    const activated = await manager.activate(result.target.version)
+    assert.equal(activated.version, '0.1.0-rc.7')
+    assert.equal(await manager.activeVersion(), '0.1.0-rc.7')
   } finally {
     await rm(root, { recursive: true, force: true })
   }
