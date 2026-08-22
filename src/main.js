@@ -1,3 +1,4 @@
+import os from 'node:os'
 import { fileURLToPath } from 'node:url'
 import {
   app,
@@ -15,6 +16,7 @@ import { attachElectronIpc } from 'action-parity-sdk/electron'
 import { buildActionRegistry } from './action-core.js'
 import { startDshService } from './dsh-service.js'
 import { createDeviceWallet, createFileWalletStore } from './device-wallet.js'
+import { buildIssueUrl, buildReport, readLogTail } from './diagnostics.js'
 import { createDshConfigManager, XIAPAN_CREDENTIAL_REF } from './dsh-config.js'
 import { buildWalletEntryScript, isWalletOpenRequest, shouldAutoOpenWallet } from './first-run.js'
 import { createKernelManager } from './kernel-manager.js'
@@ -202,6 +204,9 @@ function createTray() {
     showWindow: () => void showMainWindow(),
     hideWindow: () => mainWindow?.hide(),
     openWallet: () => void showWalletWindow(),
+    reportProblem: () => void openProblemReport().catch((error) => {
+      logger.warn('[support] 打开问题反馈页失败', error?.message)
+    }),
     quit: () => {
       isQuitting = true
       app.quit()
@@ -209,6 +214,29 @@ function createTray() {
   })))
   tray.on('click', () => void showMainWindow())
   trayAvailable = true
+}
+
+/**
+ * 一键问题报告：把诊断信息收好、打码、开预填的 GitHub issue。
+ * 每一步都可能失败（内核挂了、钱包读不到、日志没权限），但**报告本身不许失败** ——
+ * 用户来点这个按钮的时候，通常正是别的东西已经坏了的时候。
+ */
+async function openProblemReport() {
+  const settle = async (task) => { try { return await task() } catch { return null } }
+  const [kernelStatus, walletStatus] = await Promise.all([
+    settle(() => kernel.status()),
+    settle(() => wallet.status()),
+  ])
+  const report = buildReport({
+    appVersion: app.getVersion(),
+    kernelStatus,
+    walletStatus,
+    logTail: readLogTail(paths.logsDir),
+    osRelease: os.release(),
+    logsDir: paths.logsDir,
+  })
+  logger.info('[support] 用户发起问题报告')
+  await shell.openExternal(buildIssueUrl(report))
 }
 
 /**
@@ -298,6 +326,7 @@ async function launch() {
     async openRecharge() {
       await shell.openExternal(await wallet.rechargeUrl())
     },
+    reportProblem: () => openProblemReport(),
     async copyCurrentKey() {
       const apiKey = await wallet.currentApiKey()
       if (!apiKey) throw new Error('当前没有设备钱包')

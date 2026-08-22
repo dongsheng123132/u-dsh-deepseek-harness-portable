@@ -9,6 +9,8 @@ export const ACTION = {
   KERNEL_CHECK_UPDATES: "kernel.check_updates",
   /** 读取随包 Node/DSH 内核版本和 U 盘数据目录，纯本地校验。 */
   KERNEL_STATUS: "kernel.status",
+  /** 收集版本、内核与钱包状态和日志摘要，打开预填的 GitHub issue；凭据已打码，Key 本身不进报告。 */
+  SUPPORT_REPORT_PROBLEM: "support.report_problem",
   /** 恢复未完成操作，必要时申领随机 Key，并写入 DSH 配置。 */
   WALLET_ENSURE: "wallet.ensure",
   /** 只读验证已有 Key，成功后写入 U 盘钱包和 DSH 配置。 */
@@ -30,6 +32,7 @@ export type ActionId = (typeof ACTION)[keyof typeof ACTION];
 export type ActionInputMap = {
   "kernel.check_updates": Record<string, never>;
   "kernel.status": Record<string, never>;
+  "support.report_problem": Record<string, never>;
   "wallet.ensure": Record<string, never>;
   "wallet.key.adopt": { apiKey: string; };
   "wallet.key.copy": Record<string, never>;
@@ -42,6 +45,7 @@ export type ActionInputMap = {
 export type ActionOutputMap = {
   "kernel.check_updates": { coreExecutionId: string; current: string | null; latest: string; pinned: string; updateAvailable: boolean; };
   "kernel.status": { activeVersion: string | null; cacheDir: string; coreExecutionId: string; dataDir: string; installedVersions: Array<string>; nodeReady: boolean; nodeVersion: string; pinnedVersion: string; };
+  "support.report_problem": { coreExecutionId: string; message: string; };
   "wallet.ensure": { available: boolean; configured: boolean; coreExecutionId: string; };
   "wallet.key.adopt": { apiKeyMasked: string; coreExecutionId: string; message: string; };
   "wallet.key.copy": { coreExecutionId: string; message: string; };

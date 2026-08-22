@@ -7,6 +7,7 @@ export function createTrayMenuTemplate({
   showWindow,
   hideWindow,
   openWallet,
+  reportProblem,
   quit,
 }) {
   const isChinese = locale.toLowerCase().startsWith('zh')
@@ -23,6 +24,13 @@ export function createTrayMenuTemplate({
     {
       label: isChinese ? '隐藏窗口' : 'Hide Window',
       click: hideWindow,
+    },
+    { type: 'separator' },
+    // 出问题的时候界面往往已经不好使了，托盘是最后一条还能点的路。
+    // 报告里带着日志和内核状态，省掉三轮来回问。
+    {
+      label: isChinese ? '报告问题…' : 'Report a problem…',
+      click: reportProblem,
     },
     { type: 'separator' },
     {

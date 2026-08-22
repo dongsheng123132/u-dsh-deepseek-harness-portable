@@ -118,6 +118,11 @@
         </div>
 
         <hr />
+        <h2>遇到问题</h2>
+        <p class="hint">一键生成带诊断信息的反馈（版本、内核状态、日志摘要），Key 会自动打码。</p>
+        <button id="report" data-action-id="support.report_problem">报告问题</button>
+
+        <hr />
         <div class="danger-zone">
           <h2>移除本机钱包</h2>
           <p class="hint">只清这台 U-DSH，不会删除服务端钱包，也不会销毁旧余额。随后会创建一个余额为 0 的新钱包。</p>
@@ -199,6 +204,9 @@
       }, '', false))
       document.querySelector('#rotate').addEventListener('click', () => {
         void run(() => unwrap(api.rotate()))
+      })
+      document.querySelector('#report').addEventListener('click', () => {
+        void run(() => unwrap(api.reportProblem()), '', false)
       })
       elements.backedUp.addEventListener('change', () => { elements.reset.disabled = !elements.backedUp.checked })
       elements.reset.addEventListener('click', () => {

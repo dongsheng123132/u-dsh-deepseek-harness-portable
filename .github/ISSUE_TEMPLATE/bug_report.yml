@@ -1,0 +1,76 @@
+name: 报告问题 / Bug report
+description: 用不了、报错、卡住了都来这里
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢反馈。**应用里有一键生成这份报告的按钮**：托盘图标右键 →「报告问题」，
+        它会自动填好版本、系统、内核状态和日志摘要（Key 已打码）。用那个最省事。
+
+        提之前先看一眼 [新手教程的常见问题](../blob/main/docs/新手教程.md)，
+        大部分问题（U 盘要 NTFS、解压很慢）那里已经答了。
+
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 出了什么问题
+      description: 你做了什么、看到了什么、期望是什么
+      placeholder: |
+        我双击 U-DSH Portable.exe，等了 1 分钟后弹出一个框说……
+        我以为应该直接打开界面。
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: 版本
+      description: 钱包页底部或安装包文件名里有
+      placeholder: "0.2.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: where
+    attributes:
+      label: 装在哪
+      options:
+        - U 盘 / 移动硬盘
+        - 本机硬盘
+        - 不确定
+    validations:
+      required: true
+
+  - type: dropdown
+    id: filesystem
+    attributes:
+      label: 那个盘是什么格式
+      description: "PowerShell 里跑 `Get-Volume` 可以看。注意：右键属性有时会显示过期的值"
+      options:
+        - NTFS
+        - exFAT
+        - FAT32
+        - 不知道
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 日志
+      description: |
+        用应用里的「报告问题」按钮的话，这一段会自动填好，不用管。
+
+        手动找：按 `Win + R`，输入 `%LOCALAPPDATA%\U-DSH\logs` 回车，
+        打开最新的 `u-dsh-<日期>.log`，把最后 50 行贴进来。
+        （日志放在系统缓存目录，**不跟着 U 盘走**。）
+        **贴之前自己再扫一眼有没有 `sk-` 开头的内容**，有就删掉。
+      render: text
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: 系统环境
+      placeholder: "Windows 11 家庭版 / 24H2；U 盘是 SanDisk 64G USB3.0"

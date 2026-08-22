@@ -128,6 +128,13 @@ No registry writes, no environment changes. Sessions, settings, credentials and 
 next to the executable — deleting the folder is a complete uninstall. (Electron's own window cache and
 logs go to the system cache directory and contain no credentials.)
 
+**Something broke — how do I report it? Where are the logs?**
+Right-click the tray icon -> "Report a problem", or use the button on the wallet page. It gathers
+the version, kernel status and a log excerpt (**keys redacted**) and opens a pre-filled GitHub
+issue; just add a sentence describing what happened. To read the logs yourself: `Win + R` ->
+`%LOCALAPPDATA%\U-DSH\logs`. They live in the system cache directory and do **not** travel with the USB drive
+(they contain no credentials).
+
 **Is this official?**
 No. This is an independent community distribution, not affiliated with DeepSeek.
 

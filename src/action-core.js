@@ -20,7 +20,7 @@ function normalizedWalletStatus(value) {
   }
 }
 
-export function buildActionRegistry({ wallet, kernel, copyCurrentKey, openRecharge } = {}) {
+export function buildActionRegistry({ wallet, kernel, copyCurrentKey, openRecharge, reportProblem } = {}) {
   if (!wallet || !kernel) throw new Error('wallet 和 kernel 是必填项')
   const registry = createRegistry({
     application: {
@@ -114,6 +114,20 @@ export function buildActionRegistry({ wallet, kernel, copyCurrentKey, openRechar
         if (!openRecharge) throw new Error('当前界面不支持打开系统浏览器')
         await openRecharge()
         return { message: '已打开充值页面，完成后回来点「刷新余额」', coreExecutionId: context.executionId }
+      },
+    }),
+    defineAction({
+      id: 'support.report_problem',
+      title: '报告问题',
+      description: '收集版本、内核与钱包状态和日志摘要，打开预填的 GitHub issue；凭据已打码，Key 本身不进报告。',
+      effects: { class: 'external', risk: 'low', reversible: true },
+      execution: { idempotent: true, timeout_ms: 20_000, evidence: 'node --test test/diagnostics.test.js' },
+      input: EMPTY_INPUT,
+      output: MESSAGE_OUTPUT,
+      handler: async (_input, context) => {
+        if (!reportProblem) throw new Error('当前界面不支持打开系统浏览器')
+        await reportProblem()
+        return { message: '已打开问题反馈页，诊断信息已填好（Key 已打码），补一句问题描述就能提交', coreExecutionId: context.executionId }
       },
     }),
     defineAction({

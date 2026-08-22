@@ -17,4 +17,5 @@ contextBridge.exposeInMainWorld('uDshWallet', {
   resetLocal: () => action('wallet.reset_local'),
   kernelStatus: () => action('kernel.status'),
   checkKernelUpdates: () => action('kernel.check_updates'),
+  reportProblem: () => action('support.report_problem'),
 })

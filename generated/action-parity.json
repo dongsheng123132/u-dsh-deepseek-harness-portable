@@ -162,6 +162,58 @@
       "bindings": [
         {
           "surface": "cli",
+          "target": "u-dsh support.report_problem --json",
+          "test": "test/action-parity.test.js"
+        },
+        {
+          "surface": "gui",
+          "target": "data-action-id=support.report_problem",
+          "test": "test/action-parity.test.js"
+        }
+      ],
+      "description": "收集版本、内核与钱包状态和日志摘要，打开预填的 GitHub issue；凭据已打码，Key 本身不进报告。",
+      "effects": {
+        "audit_required": true,
+        "class": "external",
+        "confirmation": "conditional",
+        "reversible": true,
+        "risk": "low"
+      },
+      "execution": {
+        "cancellable": false,
+        "headless": true,
+        "headless_evidence": "node --test test/diagnostics.test.js",
+        "idempotent": true,
+        "timeout_ms": 20000
+      },
+      "id": "support.report_problem",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "coreExecutionId": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "coreExecutionId"
+        ],
+        "type": "object"
+      },
+      "title": "报告问题"
+    },
+    {
+      "bindings": [
+        {
+          "surface": "cli",
           "target": "u-dsh wallet.ensure --json",
           "test": "test/action-parity.test.js"
         },

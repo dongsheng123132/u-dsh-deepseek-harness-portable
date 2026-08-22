@@ -12,6 +12,12 @@
     "core_execution_id": "evidence-gui-kernel.status"
   },
   {
+    "action_id": "support.report_problem",
+    "surface": "gui",
+    "request_execution_id": "evidence-gui-support.report_problem",
+    "core_execution_id": "evidence-gui-support.report_problem"
+  },
+  {
     "action_id": "wallet.ensure",
     "surface": "gui",
     "request_execution_id": "evidence-gui-wallet.ensure",
@@ -64,6 +70,12 @@
     "surface": "cli",
     "request_execution_id": "evidence-cli-kernel.status",
     "core_execution_id": "evidence-cli-kernel.status"
+  },
+  {
+    "action_id": "support.report_problem",
+    "surface": "cli",
+    "request_execution_id": "evidence-cli-support.report_problem",
+    "core_execution_id": "evidence-cli-support.report_problem"
   },
   {
     "action_id": "wallet.ensure",

@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 先看新手教程
+    url: https://github.com/dongsheng123132/u-dsh-deepseek-harness-portable/blob/main/docs/新手教程.md
+    about: U 盘要 NTFS、首次解压很慢——这类问题这里已经答了
+  - name: 已知问题
+    url: https://github.com/dongsheng123132/u-dsh-deepseek-harness-portable/blob/main/docs/ROADMAP.md
+    about: 我们已经知道、正在处理的问题清单

@@ -13,6 +13,7 @@ const walletHtml = await readFile(new URL('../src/wallet.html', import.meta.url)
 function fakeServices() {
   let copied = 0
   let opened = 0
+  let reported = 0
   const wallet = {
     status: async () => ({
       available: true,
@@ -42,6 +43,7 @@ function fakeServices() {
       kernel,
       copyCurrentKey: async () => { copied += 1 },
       openRecharge: async () => { opened += 1 },
+      reportProblem: async () => { reported += 1 },
     }),
     copied: () => copied,
   }

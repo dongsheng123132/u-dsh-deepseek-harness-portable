@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process'
+import os from 'node:os'
 import { createCliRunner } from 'action-parity-sdk/cli'
 import { buildActionRegistry } from './action-core.js'
 import { createDeviceWallet, createFileWalletStore } from './device-wallet.js'
 import { createDshConfigManager } from './dsh-config.js'
+import { buildIssueUrl, buildReport, readLogTail } from './diagnostics.js'
 import { createKernelManager } from './kernel-manager.js'
 import { preparePortablePaths, resolvePortablePaths } from './portable-paths.js'
 import { loadRuntimeChannel } from './runtime-channel.js'
@@ -37,7 +39,10 @@ async function copyCurrentKey() {
 // ActionParity：同一个动作 GUI 能做，CLI 也得能做。GUI 走 shell.openExternal，
 // 这里走各平台自带的打开器。充值 URL 含 Key，只交给系统打开器，绝不进 stdout。
 async function openRecharge() {
-  const url = await wallet.rechargeUrl()
+  await openUrl(await wallet.rechargeUrl())
+}
+
+async function openUrl(url) {
   const [command, args] = process.platform === 'win32'
     ? ['cmd.exe', ['/d', '/c', 'start', '', url]]
     : process.platform === 'darwin'
@@ -46,8 +51,24 @@ async function openRecharge() {
   await new Promise((resolve, reject) => {
     const child = spawn(command, args, { shell: false, windowsHide: true, stdio: 'ignore' })
     child.once('error', reject)
-    child.once('exit', (code) => code === 0 ? resolve() : reject(new Error(`打开充值页失败：退出码 ${code}`)))
+    child.once('exit', (code) => code === 0 ? resolve() : reject(new Error(`打开浏览器失败：退出码 ${code}`)))
   })
 }
 
-await createCliRunner(buildActionRegistry({ wallet, kernel, copyCurrentKey, openRecharge }), { name: 'u-dsh' }).main()
+async function reportProblem() {
+  const settle = async (task) => { try { return await task() } catch { return null } }
+  const [kernelStatus, walletStatus] = await Promise.all([
+    settle(() => kernel.status()),
+    settle(() => wallet.status()),
+  ])
+  await openUrl(buildIssueUrl(buildReport({
+    appVersion: process.env.npm_package_version || '',
+    kernelStatus,
+    walletStatus,
+    logTail: readLogTail(paths.logsDir),
+    osRelease: os.release(),
+    logsDir: paths.logsDir,
+  })))
+}
+
+await createCliRunner(buildActionRegistry({ wallet, kernel, copyCurrentKey, openRecharge, reportProblem }), { name: 'u-dsh' }).main()
