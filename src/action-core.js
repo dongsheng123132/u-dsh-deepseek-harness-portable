@@ -20,7 +20,7 @@ function normalizedWalletStatus(value) {
   }
 }
 
-export function buildActionRegistry({ wallet, kernel, copyCurrentKey } = {}) {
+export function buildActionRegistry({ wallet, kernel, copyCurrentKey, openRecharge } = {}) {
   if (!wallet || !kernel) throw new Error('wallet 和 kernel 是必填项')
   const registry = createRegistry({
     application: {
@@ -103,6 +103,20 @@ export function buildActionRegistry({ wallet, kernel, copyCurrentKey } = {}) {
       },
     }),
     defineAction({
+      id: 'wallet.recharge.open',
+      title: '打开设备钱包充值页',
+      description: '在系统浏览器打开当前钱包的充值页面；充值 URL 含 Key，不进入输出。',
+      effects: { class: 'external', risk: 'low', reversible: true },
+      execution: { idempotent: true, timeout_ms: 15_000, evidence: 'node --test test/action-parity.test.js' },
+      input: EMPTY_INPUT,
+      output: MESSAGE_OUTPUT,
+      handler: async (_input, context) => {
+        if (!openRecharge) throw new Error('当前界面不支持打开系统浏览器')
+        await openRecharge()
+        return { message: '已打开充值页面，完成后回来点「刷新余额」', coreExecutionId: context.executionId }
+      },
+    }),
+    defineAction({
       id: 'wallet.key.rotate',
       title: '更换设备钱包 Key',
       description: '生成并验证新 Key，提交后旧 Key 失效，钱包余额不变。',
@@ -149,7 +163,8 @@ export function buildActionRegistry({ wallet, kernel, copyCurrentKey } = {}) {
       title: '读取 DSH 内核状态',
       description: '读取随包 Node/DSH 内核版本和 U 盘数据目录，纯本地校验。',
       effects: 'read',
-      execution: { idempotent: true, timeout_ms: 5_000, evidence: 'node --test test/action-parity.test.js' },
+      // 校验会遍历整个 vendor 闭包（250+ 包）的 peer 解析，冷盘实测 10s+，5s 必超时。
+      execution: { idempotent: true, timeout_ms: 30_000, evidence: 'node --test test/action-parity.test.js' },
       input: EMPTY_INPUT,
       output: s.object({
         nodeVersion: s.string(),
