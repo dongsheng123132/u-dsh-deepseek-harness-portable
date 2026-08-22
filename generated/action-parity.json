@@ -98,7 +98,7 @@
         "headless": true,
         "headless_evidence": "node --test test/action-parity.test.js",
         "idempotent": true,
-        "timeout_ms": 5000
+        "timeout_ms": 30000
       },
       "id": "kernel.status",
       "input_schema": {
@@ -387,6 +387,58 @@
         "type": "object"
       },
       "title": "更换设备钱包 Key"
+    },
+    {
+      "bindings": [
+        {
+          "surface": "cli",
+          "target": "u-dsh wallet.recharge.open --json",
+          "test": "test/action-parity.test.js"
+        },
+        {
+          "surface": "gui",
+          "target": "data-action-id=wallet.recharge.open",
+          "test": "test/action-parity.test.js"
+        }
+      ],
+      "description": "在系统浏览器打开当前钱包的充值页面；充值 URL 含 Key，不进入输出。",
+      "effects": {
+        "audit_required": true,
+        "class": "external",
+        "confirmation": "conditional",
+        "reversible": true,
+        "risk": "low"
+      },
+      "execution": {
+        "cancellable": false,
+        "headless": true,
+        "headless_evidence": "node --test test/action-parity.test.js",
+        "idempotent": true,
+        "timeout_ms": 15000
+      },
+      "id": "wallet.recharge.open",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "coreExecutionId": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "coreExecutionId"
+        ],
+        "type": "object"
+      },
+      "title": "打开设备钱包充值页"
     },
     {
       "bindings": [

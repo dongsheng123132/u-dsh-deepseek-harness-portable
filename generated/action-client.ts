@@ -17,6 +17,8 @@ export const ACTION = {
   WALLET_KEY_COPY: "wallet.key.copy",
   /** 生成并验证新 Key，提交后旧 Key 失效，钱包余额不变。 */
   WALLET_KEY_ROTATE: "wallet.key.rotate",
+  /** 在系统浏览器打开当前钱包的充值页面；充值 URL 含 Key，不进入输出。 */
+  WALLET_RECHARGE_OPEN: "wallet.recharge.open",
   /** 先清除 DSH 消费端配置，再清 U 盘本地钱包；不会删除服务端钱包和余额。 */
   WALLET_RESET_LOCAL: "wallet.reset_local",
   /** 读取脱敏 Key、余额和待完成操作，不返回原始 Key。 */
@@ -32,6 +34,7 @@ export type ActionInputMap = {
   "wallet.key.adopt": { apiKey: string; };
   "wallet.key.copy": Record<string, never>;
   "wallet.key.rotate": Record<string, never>;
+  "wallet.recharge.open": Record<string, never>;
   "wallet.reset_local": Record<string, never>;
   "wallet.status": { refreshBalance?: boolean; };
 };
@@ -43,6 +46,7 @@ export type ActionOutputMap = {
   "wallet.key.adopt": { apiKeyMasked: string; coreExecutionId: string; message: string; };
   "wallet.key.copy": { coreExecutionId: string; message: string; };
   "wallet.key.rotate": { apiKeyMasked: string; coreExecutionId: string; message: string; };
+  "wallet.recharge.open": { coreExecutionId: string; message: string; };
   "wallet.reset_local": { apiKeyMasked: string; coreExecutionId: string; message: string; };
   "wallet.status": { apiKeyMasked: string; available: boolean; balanceAvailable: number | null; balanceError: string; coreExecutionId: string; pending: boolean; pendingKind: string; walletId: string; };
 };

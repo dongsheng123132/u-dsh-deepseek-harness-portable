@@ -274,6 +274,39 @@
       "title": "更换设备钱包 Key"
     },
     {
+      "description": "在系统浏览器打开当前钱包的充值页面；充值 URL 含 Key，不进入输出。",
+      "effects": {
+        "audit_required": true,
+        "class": "external",
+        "confirmation": "conditional",
+        "reversible": true,
+        "risk": "low"
+      },
+      "id": "wallet.recharge.open",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "coreExecutionId": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "coreExecutionId"
+        ],
+        "type": "object"
+      },
+      "title": "打开设备钱包充值页"
+    },
+    {
       "description": "先清除 DSH 消费端配置，再清 U 盘本地钱包；不会删除服务端钱包和余额。",
       "effects": {
         "audit_required": true,

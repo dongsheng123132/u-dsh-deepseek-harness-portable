@@ -12,6 +12,7 @@ const walletHtml = await readFile(new URL('../src/wallet.html', import.meta.url)
 
 function fakeServices() {
   let copied = 0
+  let opened = 0
   const wallet = {
     status: async () => ({
       available: true,
@@ -36,7 +37,12 @@ function fakeServices() {
     checkLatest: async () => ({ current: '0.1.0-rc.7', pinned: '0.1.0-rc.7', latest: '0.1.0-rc.7' }),
   }
   return {
-    registry: buildActionRegistry({ wallet, kernel, copyCurrentKey: async () => { copied += 1 } }),
+    registry: buildActionRegistry({
+      wallet,
+      kernel,
+      copyCurrentKey: async () => { copied += 1 },
+      openRecharge: async () => { opened += 1 },
+    }),
     copied: () => copied,
   }
 }

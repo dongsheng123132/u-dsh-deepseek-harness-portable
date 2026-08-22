@@ -34,4 +34,20 @@ async function copyCurrentKey() {
   })
 }
 
-await createCliRunner(buildActionRegistry({ wallet, kernel, copyCurrentKey }), { name: 'u-dsh' }).main()
+// ActionParity：同一个动作 GUI 能做，CLI 也得能做。GUI 走 shell.openExternal，
+// 这里走各平台自带的打开器。充值 URL 含 Key，只交给系统打开器，绝不进 stdout。
+async function openRecharge() {
+  const url = await wallet.rechargeUrl()
+  const [command, args] = process.platform === 'win32'
+    ? ['cmd.exe', ['/d', '/c', 'start', '', url]]
+    : process.platform === 'darwin'
+      ? ['open', [url]]
+      : ['xdg-open', [url]]
+  await new Promise((resolve, reject) => {
+    const child = spawn(command, args, { shell: false, windowsHide: true, stdio: 'ignore' })
+    child.once('error', reject)
+    child.once('exit', (code) => code === 0 ? resolve() : reject(new Error(`打开充值页失败：退出码 ${code}`)))
+  })
+}
+
+await createCliRunner(buildActionRegistry({ wallet, kernel, copyCurrentKey, openRecharge }), { name: 'u-dsh' }).main()

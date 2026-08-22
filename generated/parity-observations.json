@@ -36,6 +36,12 @@
     "core_execution_id": "evidence-gui-wallet.key.rotate"
   },
   {
+    "action_id": "wallet.recharge.open",
+    "surface": "gui",
+    "request_execution_id": "evidence-gui-wallet.recharge.open",
+    "core_execution_id": "evidence-gui-wallet.recharge.open"
+  },
+  {
     "action_id": "wallet.reset_local",
     "surface": "gui",
     "request_execution_id": "evidence-gui-wallet.reset_local",
@@ -82,6 +88,12 @@
     "surface": "cli",
     "request_execution_id": "evidence-cli-wallet.key.rotate",
     "core_execution_id": "evidence-cli-wallet.key.rotate"
+  },
+  {
+    "action_id": "wallet.recharge.open",
+    "surface": "cli",
+    "request_execution_id": "evidence-cli-wallet.recharge.open",
+    "core_execution_id": "evidence-cli-wallet.recharge.open"
   },
   {
     "action_id": "wallet.reset_local",
