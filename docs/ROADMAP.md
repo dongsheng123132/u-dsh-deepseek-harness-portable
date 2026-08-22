@@ -59,12 +59,36 @@ M1 之后包的性质变了，但版本号和门禁没跟上，已经造成一�
 `06-first-reply.png` 的文件名骗人——图里是 **🔴 本轮运行失败 · `API key is invalid` · AUTH**。
 同时 `wallet.status` 返回 `available:false`、无 walletId、无 key。
 
-**根因判断（待验证）**：首启流程**没有在用户进对话框之前把设备钱包签发出来**，
-DSH 里那个 provider（截图显示 MiniMax-M2.7）用的是别处来的陈旧 key。
-也就是说「开箱即有额度」这个我们对全部竞品的唯一优势，**当前是不成立的**。
+**根因链（读代码得出，未碰生产）**：
 
-待确认：`wallet.ensure` 签发链路本身通不通。该动作会往生产虾盘云
-（`api.u-claw.org`）真签发设备钱包，属共享生产系统写入，**必须先问用户**，不许自作主张跑。
+1. `src/main.js:266` 首启**确实**调了 `wallet.ensure()`，而且 `await` 了才起 DSH。
+   所以不是「忘了调」。
+2. `src/device-wallet.js:180` 的 `doEnsure()` 把**全部失败整个吞掉**：
+   ```js
+   } catch (error) {
+     logger.warn('[device-wallet] 首启收敛失败，DSH 仍继续启动', error?.message)
+     return { apiKey: state.apiKey, walletId: state.walletId, configured: false }
+   }
+   ```
+   设计意图是 C1「断网/只读盘/文件锁不能挡住 DSH 启动」，本身合理，
+   但**降级是静默的**：用户没有任何提示，一路走到对话框才撞 `API key is invalid`。
+3. `logger` 就是 `console`（`device-wallet.js:98`），而打包后的 GUI 没有控制台。
+   更糟的是 **`paths.logsDir` 有零个消费者**——`preparePortablePaths` 建了这个目录，
+   全仓库没有任何代码往里写。所以这次失败**在磁盘上不留任何痕迹**，
+   用户连一份能发给我们的日志都没有。
+
+**结论：「开箱即有额度」这个我们对全部 20 个竞品的唯一结构性优势，当前不成立，
+且失败不可观测。** 这是比解压慢严重得多的问题。
+
+**修法（三条都要）**：
+- [ ] `configured:false` 必须冒泡到界面：给一句人话 + 一个「重试签发」按钮，
+      不能让用户撞进 DSH 内部的 `API key is invalid`
+- [ ] 把 `logsDir` 接起来——静默降级至少要在磁盘上留痕，否则远程支持无从下手
+- [ ] 首启把「钱包已就绪 / 未就绪」做成第一屏的显式状态，而不是隐含假设
+
+**仍待实跑确认**：`wallet.ensure` 的 HTTP 签发链路本身通不通（是网络/服务端问题，
+还是 `applyKey` 写 DSH 配置失败）。该动作往生产虾盘云 `api.u-claw.org` 真签发设备钱包，
+属共享生产系统写入，**必须由用户明确点名授权**，不许自作主张跑。
 
 - [x] 实测走一遍：解压 → 双击 → 首屏 → 充值页 / AI 设置 → 发一句话 → 收到回复。
       **前 5 步通，第 6 步失败**
