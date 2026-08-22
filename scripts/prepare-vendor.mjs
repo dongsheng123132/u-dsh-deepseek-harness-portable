@@ -151,6 +151,27 @@ async function download(url, destination) {
   await rename(partial, destination)
 }
 
+/**
+ * 解压 zip：优先 Windows 10+ 自带的 bsdtar（System32\tar.exe，zip/tar 通吃），
+ * 不能用 PATH 上裸的 tar——开发机 PATH 常被 Git Bash 的 GNU tar 抢占，
+ * GNU tar 读不了 zip 还把 "C:" 前缀当远程主机名。兜底 Expand-Archive。
+ */
+async function extractZip(archive, destination) {
+  const bsdtar = path.join(process.env.SystemRoot ?? 'C:\\Windows', 'System32', 'tar.exe')
+  if (process.platform === 'win32' && existsSync(bsdtar)) {
+    await run(bsdtar, ['-xf', path.basename(archive)], { cwd: destination })
+    return
+  }
+  if (process.platform === 'win32') {
+    const script = 'Expand-Archive -LiteralPath $env:UDSH_ARCHIVE -DestinationPath $env:UDSH_DESTINATION -Force'
+    await run('powershell.exe', ['-NoLogo', '-NoProfile', '-NonInteractive', '-Command', script], {
+      env: { ...process.env, UDSH_ARCHIVE: archive, UDSH_DESTINATION: destination },
+    })
+    return
+  }
+  await run('tar', ['-xf', archive, '-C', destination])
+}
+
 // ---------------------------------------------------------------------------
 // vendor/runtime/win32-x64 —— Node 运行时
 // ---------------------------------------------------------------------------
@@ -184,8 +205,7 @@ async function prepareRuntime() {
       throw new Error(`Node 压缩包 SHA-256 校验失败：期望 ${channel.node.sha256}，实际 ${digest}`)
     }
     log('SHA-256 校验通过，解压中…')
-    // Windows 10+ 自带 bsdtar，zip/tar 一个解压器全覆盖。
-    await run('tar', ['-xf', archive, '-C', staging])
+    await extractZip(archive, staging)
     const extracted = path.join(staging, channel.node.archive.replace(/\.zip$/i, ''))
     if (!existsSync(path.join(extracted, 'node.exe'))) {
       throw new Error('Node 压缩包结构校验失败：缺少 node.exe')
