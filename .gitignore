@@ -13,5 +13,5 @@ vendor/.runtime-staging-*/
 vendor/.harness-staging-*/
 assets/dsh-node.exe
 assets/windows-hidden-console.exe
-third-party-licenses/nodejs-LICENSE
+# third-party-licenses/ 全部进 git：NOTICES.md/manifest.json 是合规凭据，不是构建产物。
 .u-dsh-dev/

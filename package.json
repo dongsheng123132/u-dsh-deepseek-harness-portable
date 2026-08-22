@@ -19,6 +19,8 @@
     "shadowfork:contract": "node scripts/validate-shadowfork-contract.mjs",
     "prepare:vendor": "node scripts/prepare-vendor.mjs",
     "vendor:check": "node scripts/prepare-vendor.mjs --check",
+    "licenses:generate": "node scripts/generate-third-party-licenses.mjs",
+    "licenses:check": "node scripts/generate-third-party-licenses.mjs --check",
     "prepare:windows": "npm run build:win-launcher",
     "build:win-launcher": "powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File scripts/build-windows-launcher.ps1",
     "test:win-console": "node scripts/test-windows-hidden-console.mjs",
