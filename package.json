@@ -27,12 +27,13 @@
     "smoke:packaged": "node scripts/smoke-packaged.mjs",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
-    "dist:portable": "npm run prepare:windows && npm run vendor:check && electron-builder --win zip --x64 --publish never",
+    "dist:portable": "npm run prepare:windows && npm run vendor:check && electron-builder --win zip --x64 --publish never && npm run dist:sfx",
     "dist:mac": "node scripts/guard-unsupported-target.mjs mac",
     "dist:mac:arm64": "node scripts/guard-unsupported-target.mjs mac",
     "dist:mac:x64": "node scripts/guard-unsupported-target.mjs mac",
     "dist:win": "npm run prepare:windows && npm run vendor:check && electron-builder --win nsis zip --x64 --publish never",
-    "dist:linux": "node scripts/guard-unsupported-target.mjs linux"
+    "dist:linux": "node scripts/guard-unsupported-target.mjs linux",
+    "dist:sfx": "node scripts/build-sfx.mjs"
   },
   "dependencies": {
     "action-parity-sdk": "file:vendor/action-parity-sdk",
