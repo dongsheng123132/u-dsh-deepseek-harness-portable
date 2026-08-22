@@ -5,6 +5,12 @@ output/
 .vercel/
 *.log
 .DS_Store
+# 构建产物：随包内核（几百 MB，由 npm run prepare:vendor 生成，不进仓库）。
+# 注意别误伤已提交的 vendor/action-parity-*，所以写精确路径。
+vendor/runtime/
+vendor/harness/
+vendor/.runtime-staging-*/
+vendor/.harness-staging-*/
 assets/dsh-node.exe
 assets/windows-hidden-console.exe
 third-party-licenses/nodejs-LICENSE

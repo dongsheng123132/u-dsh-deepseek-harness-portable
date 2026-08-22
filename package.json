@@ -17,17 +17,19 @@
     "action-parity:check-generated": "node scripts/generate-action-parity.mjs --check",
     "action-parity:verify": "node node_modules/action-parity/bin/action-parity.mjs verify generated/action-parity.json --plan action-parity.verify.json --json",
     "shadowfork:contract": "node scripts/validate-shadowfork-contract.mjs",
+    "prepare:vendor": "node scripts/prepare-vendor.mjs",
+    "vendor:check": "node scripts/prepare-vendor.mjs --check",
     "prepare:windows": "npm run build:win-launcher",
     "build:win-launcher": "powershell -NoLogo -NoProfile -ExecutionPolicy Bypass -File scripts/build-windows-launcher.ps1",
     "test:win-console": "node scripts/test-windows-hidden-console.mjs",
     "smoke:packaged": "node scripts/smoke-packaged.mjs",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
-    "dist:portable": "npm run prepare:windows && electron-builder --win zip --x64 --publish never",
+    "dist:portable": "npm run prepare:windows && npm run vendor:check && electron-builder --win zip --x64 --publish never",
     "dist:mac": "npm run dist:mac:arm64",
     "dist:mac:arm64": "electron-builder --mac dmg zip --arm64 --publish never",
     "dist:mac:x64": "electron-builder --mac dmg zip --x64 --publish never",
-    "dist:win": "npm run prepare:windows && electron-builder --win nsis zip --x64 --publish never",
+    "dist:win": "npm run prepare:windows && npm run vendor:check && electron-builder --win nsis zip --x64 --publish never",
     "dist:linux": "electron-builder --linux AppImage deb --x64 --publish never"
   },
   "dependencies": {
@@ -58,6 +60,16 @@
       "NOTICE.md",
       "third-party-licenses/**/*",
       "node_modules/**/*"
+    ],
+    "extraResources": [
+      {
+        "from": "vendor/runtime",
+        "to": "runtime"
+      },
+      {
+        "from": "vendor/harness",
+        "to": "harness"
+      }
     ],
     "directories": {
       "output": "dist",

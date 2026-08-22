@@ -201,19 +201,6 @@ async function setStartupStatus(message) {
   }
 }
 
-function kernelProgress(value) {
-  if (value.phase === 'downloading-node') {
-    const percentage = value.total > 0 ? ` ${Math.floor(value.received / value.total * 100)}%` : ''
-    void setStartupStatus(`首次准备本机 Node 运行环境${percentage}`)
-  } else if (value.phase === 'extracting-node') {
-    void setStartupStatus('正在把 Node 运行环境解压到本机缓存…')
-  } else if (value.phase === 'installing-dsh') {
-    void setStartupStatus(`正在安装官方 DSH ${value.version} 到本机缓存…`)
-  } else if (value.phase === 'installing-dsh-peers') {
-    void setStartupStatus(`正在补齐 DSH ${value.version} 的 ${value.count} 个运行依赖…`)
-  }
-}
-
 async function startResolvedKernel(resolved, environment) {
   const candidate = startDshService({
     electronExecutable: process.execPath,
@@ -277,7 +264,8 @@ async function launch() {
   registerWalletIpc()
 
   const walletReady = wallet.ensure()
-  const kernelReady = kernel.ensure(kernelProgress)
+  // 内核已随包 vendor，ensure 是纯本地校验：无网络、无安装、毫秒级。
+  const kernelReady = kernel.ensure()
 
   const environment = {
     ...process.env,
@@ -290,7 +278,7 @@ async function launch() {
   delete environment[XIAPAN_CREDENTIAL_REF]
 
   try {
-    await setStartupStatus('正在准备设备钱包和本机内核…')
+    await setStartupStatus('正在准备设备钱包和随包内核…')
     const [{ target, previous }] = await Promise.all([kernelReady, walletReady])
     const started = await startKernelWithFallback(target, previous, environment)
     service = started.service

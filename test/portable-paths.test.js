@@ -16,7 +16,12 @@ test('portable paths keep durable data on the USB root and runtime cache on the 
   assert.equal(paths.dshHome, path.join('I:\\U-DSH', 'data', 'dsh-home'))
   assert.equal(paths.walletFile, path.join('I:\\U-DSH', 'data', 'u-dsh-state', 'device-wallet.json'))
   assert.equal(paths.electronDataDir, path.join('C:\\Users\\test\\AppData\\Local\\U-DSH', 'electron'))
-  assert.equal(paths.dshVersionsDir, path.join('C:\\Users\\test\\AppData\\Local\\U-DSH', 'kernel', 'dsh'))
+  assert.equal(paths.activeKernelFile, path.join('C:\\Users\\test\\AppData\\Local\\U-DSH', 'kernel', 'active.json'))
+  // 内核已随包 vendor：不再有下载/版本/npm 缓存目录。
+  assert.equal(paths.downloadsDir, undefined)
+  assert.equal(paths.nodeVersionsDir, undefined)
+  assert.equal(paths.dshVersionsDir, undefined)
+  assert.equal(paths.npmCacheDir, undefined)
 })
 
 test('development paths are isolated below .u-dsh-dev', () => {

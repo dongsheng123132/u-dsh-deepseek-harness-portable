@@ -147,7 +147,7 @@ export function buildActionRegistry({ wallet, kernel, copyCurrentKey } = {}) {
     defineAction({
       id: 'kernel.status',
       title: '读取 DSH 内核状态',
-      description: '读取本机 Node/DSH 缓存版本和 U 盘数据目录。',
+      description: '读取随包 Node/DSH 内核版本和 U 盘数据目录，纯本地校验。',
       effects: 'read',
       execution: { idempotent: true, timeout_ms: 5_000, evidence: 'node --test test/action-parity.test.js' },
       input: EMPTY_INPUT,
@@ -166,7 +166,7 @@ export function buildActionRegistry({ wallet, kernel, copyCurrentKey } = {}) {
     defineAction({
       id: 'kernel.check_updates',
       title: '检查 DSH 内核更新',
-      description: '只读查询 npm stable 标签，不自动安装或切换未经验证的内核。',
+      description: '只读查询 npm latest 标签，不自动安装；网络不通时 latest 为空串且不报错。',
       effects: 'read',
       execution: { idempotent: true, timeout_ms: 20_000, evidence: 'node --test test/action-parity.test.js' },
       input: EMPTY_INPUT,
@@ -179,7 +179,12 @@ export function buildActionRegistry({ wallet, kernel, copyCurrentKey } = {}) {
       }),
       handler: async (_input, context) => {
         const value = await kernel.checkLatest('latest')
-        return { ...value, updateAvailable: value.latest !== value.pinned, coreExecutionId: context.executionId }
+        // latest 为空串 = 网络不可达（unknown），不能误报有更新。
+        return {
+          ...value,
+          updateAvailable: Boolean(value.latest) && value.latest !== value.pinned,
+          coreExecutionId: context.executionId,
+        }
       },
     }),
   ])

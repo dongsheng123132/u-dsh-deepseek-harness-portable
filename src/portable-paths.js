@@ -48,10 +48,6 @@ export function resolvePortablePaths({
     electronDataDir: path.join(hostRoot, 'electron'),
     logsDir: path.join(hostRoot, 'logs'),
     kernelDir,
-    downloadsDir: path.join(kernelDir, 'downloads'),
-    nodeVersionsDir: path.join(kernelDir, 'node'),
-    dshVersionsDir: path.join(kernelDir, 'dsh'),
-    npmCacheDir: path.join(kernelDir, 'npm-cache'),
     activeKernelFile: path.join(kernelDir, 'active.json'),
   }
 }
@@ -65,10 +61,6 @@ export function preparePortablePaths(paths) {
     paths.electronDataDir,
     paths.logsDir,
     paths.kernelDir,
-    paths.downloadsDir,
-    paths.nodeVersionsDir,
-    paths.dshVersionsDir,
-    paths.npmCacheDir,
   ]) {
     mkdirSync(directory, { recursive: true })
   }

@@ -5,9 +5,9 @@
  */
 
 export const ACTION = {
-  /** 只读查询 npm stable 标签，不自动安装或切换未经验证的内核。 */
+  /** 只读查询 npm latest 标签，不自动安装；网络不通时 latest 为空串且不报错。 */
   KERNEL_CHECK_UPDATES: "kernel.check_updates",
-  /** 读取本机 Node/DSH 缓存版本和 U 盘数据目录。 */
+  /** 读取随包 Node/DSH 内核版本和 U 盘数据目录，纯本地校验。 */
   KERNEL_STATUS: "kernel.status",
   /** 恢复未完成操作，必要时申领随机 Key，并写入 DSH 配置。 */
   WALLET_ENSURE: "wallet.ensure",

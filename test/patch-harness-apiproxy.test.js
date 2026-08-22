@@ -3,7 +3,7 @@ import test from 'node:test'
 import {
   encodeWindowsOpenCommand,
   patchWindowsPathOpener,
-} from '../scripts/prepare-dependencies.mjs'
+} from '../scripts/patch-harness-apiproxy.mjs'
 
 const ORIGINAL = `async function openWindowsPath(path, signal, run) {
 \tawait run("powershell.exe", [

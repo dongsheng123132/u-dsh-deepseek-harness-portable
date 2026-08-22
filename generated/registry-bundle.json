@@ -2,7 +2,7 @@
   "cli_help": {
     "actions": [
       {
-        "description": "只读查询 npm stable 标签，不自动安装或切换未经验证的内核。",
+        "description": "只读查询 npm latest 标签，不自动安装；网络不通时 latest 为空串且不报错。",
         "effects": {
           "audit_required": false,
           "class": "read",
@@ -54,7 +54,7 @@
         "title": "检查 DSH 内核更新"
       },
       {
-        "description": "读取本机 Node/DSH 缓存版本和 U 盘数据目录。",
+        "description": "读取随包 Node/DSH 内核版本和 U 盘数据目录，纯本地校验。",
         "effects": {
           "audit_required": false,
           "class": "read",
@@ -408,7 +408,7 @@
             "test": "test/action-parity.test.js"
           }
         ],
-        "description": "只读查询 npm stable 标签，不自动安装或切换未经验证的内核。",
+        "description": "只读查询 npm latest 标签，不自动安装；网络不通时 latest 为空串且不报错。",
         "effects": {
           "audit_required": false,
           "class": "read",
@@ -479,7 +479,7 @@
             "test": "test/action-parity.test.js"
           }
         ],
-        "description": "读取本机 Node/DSH 缓存版本和 U 盘数据目录。",
+        "description": "读取随包 Node/DSH 内核版本和 U 盘数据目录，纯本地校验。",
         "effects": {
           "audit_required": false,
           "class": "read",
