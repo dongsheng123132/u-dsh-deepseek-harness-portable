@@ -67,8 +67,16 @@
         "to": "runtime"
       },
       {
-        "from": "vendor/harness",
-        "to": "harness"
+        "from": "vendor/harness/node_modules",
+        "to": "harness/node_modules"
+      },
+      {
+        "from": "vendor/harness/package.json",
+        "to": "harness/package.json"
+      },
+      {
+        "from": "vendor/harness/package-lock.json",
+        "to": "harness/package-lock.json"
       }
     ],
     "directories": {

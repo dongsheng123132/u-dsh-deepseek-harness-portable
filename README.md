@@ -14,11 +14,9 @@ DSH is evolving quickly, so U-DSH keeps durable USB data separate from high-chur
 |---|---|---|
 | `U-DSH/data/dsh-home/` | DSH config, sessions, skills, and state | Yes |
 | `U-DSH/data/u-dsh-state/device-wallet.json` | Five-field wallet transaction state | Yes |
-| `%LOCALAPPDATA%/U-DSH/` | Electron cache, Node, DSH versions, npm cache, and logs | No |
+| `%LOCALAPPDATA%/U-DSH/` | Electron cache, logs, and the kernel activation pointer | No |
 
-On first use on a PC, U-DSH first probes an existing supported Node runtime (PATH, common Windows locations, and U-King/EchoBird-style runtime directories) and an existing global `@deepseek-ai/dsh` at the pinned version. If both are valid, it reuses them and makes no download. Only missing or incompatible components are downloaded and verified into the host cache. [`config/runtime-channel.json`](config/runtime-channel.json) is the single version source. A regional mirror may accelerate downloads, while root-package integrity is still checked against official npm metadata.
-
-Kernel installation uses staging, package identity/version/entry/required-peer validation, bounded subprocess timeouts, registry fallback, atomic rename, and an activation pointer. Previously installed versions remain available for fallback. Update checking reports npm tags but never replaces the active kernel without validation.
+The kernel (a pinned Node runtime plus the full `@deepseek-ai/dsh` dependency closure) is vendored into the release package at build time by `npm run prepare:vendor`. End-user machines never run npm and never download a byte: startup only resolves and validates the bundled kernel (package identity/version/entry/required-peer checks, milliseconds, fully offline). [`config/runtime-channel.json`](config/runtime-channel.json) is the single version source; the Node archive is SHA-256 verified and the DSH root package integrity is checked against official npm metadata — both at build time. Update checking reports npm tags but never installs anything; when the network is unreachable it degrades to "unknown" without failing startup. See [`docs/vendored-kernel.md`](docs/vendored-kernel.md).
 
 ## Device wallet
 
@@ -57,10 +55,11 @@ npm test
 npm run action-parity:check-generated
 npm run action-parity:verify
 npm run shadowfork:contract
-npm run dist:portable
+npm run prepare:vendor   # build machine only: stages the Node runtime + DSH closure into vendor/
+npm run dist:portable    # gated by prepare-vendor --check; refuses to build a shell without the kernel
 ```
 
-The result is `dist/U-DSH-DeepSeek-Harness-Portable-<version>-Windows-x64.zip`. First launch requires network access and verifies the Node archive with SHA-256.
+The result is `dist/U-DSH-DeepSeek-Harness-Portable-<version>-Windows-x64.zip`. Building the vendor closure requires network access on the build machine; the packaged app runs fully offline (device-wallet features excepted).
 
 ## Forking with ShadowFork
 

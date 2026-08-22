@@ -14,11 +14,9 @@ DSH 仍处于快速更新期。把某个 DSH 版本焊死在 Electron 包里，�
 |---|---|---|
 | `U-DSH/data/dsh-home/` | DSH 配置、会话、Skills、工作状态 | 是 |
 | `U-DSH/data/u-dsh-state/device-wallet.json` | 设备钱包五字段事务状态 | 是 |
-| `%LOCALAPPDATA%/U-DSH/` | Electron 缓存、Node、各版本 DSH、npm 缓存、日志 | 否 |
+| `%LOCALAPPDATA%/U-DSH/` | Electron 缓存、日志、内核激活指针 | 否 |
 
-第一次在一台电脑上运行时，U-DSH 下载并校验固定版本的 Node，再把固定版本的官方 DSH 安装到本机缓存（依网络和磁盘情况可能需要几分钟）。以后启动直接复用；U 盘只承担需要带走的数据，避免持续高频读写。所有版本参数集中在 [`config/runtime-channel.json`](config/runtime-channel.json)。国内镜像用于下载加速，但根包完整性仍与官方 npm 元数据核对。
-
-内核安装采用临时目录、包名/版本/入口/必需 peer 依赖校验、超时与镜像回退、原子改名和激活指针。新版本启动失败时仍可回到已安装的旧版本；“检查更新”只报告 npm 标签，不会未经验证自动替换正在使用的内核。
+内核（固定版本的 Node 运行时 + 官方 `@deepseek-ai/dsh` 的完整依赖闭包）在**构建时**由 `npm run prepare:vendor` 整体打进发布包。客户机一行 npm 都不跑、一个字节都不下载：启动只做随包内核的本地解析与校验（包名/版本/入口/必需 peer），毫秒级、完全离线。所有版本参数集中在 [`config/runtime-channel.json`](config/runtime-channel.json)；Node 压缩包的 SHA-256 与 DSH 根包 integrity 都在构建期核对。「检查更新」只报告 npm 标签、绝不安装，网络不通时降级为 unknown、不影响启动。详见 [`docs/vendored-kernel.md`](docs/vendored-kernel.md)。
 
 ## 设备钱包
 
@@ -62,10 +60,11 @@ npm test
 npm run action-parity:check-generated
 npm run action-parity:verify
 npm run shadowfork:contract
-npm run dist:portable
+npm run prepare:vendor   # 只在构建机跑：把 Node 运行时 + DSH 闭包落进 vendor/
+npm run dist:portable    # 有 prepare-vendor --check 门禁：没有闭包就打不出包
 ```
 
-生成物在 `dist/U-DSH-DeepSeek-Harness-Portable-<版本>-Windows-x64.zip`。首次启动需要网络，Node 下载包会先做 SHA-256 校验。
+生成物在 `dist/U-DSH-DeepSeek-Harness-Portable-<版本>-Windows-x64.zip`。需要网络的是构建机上的 vendor 这一步；打包后的应用完全离线可用（设备钱包相关功能除外）。U 盘仍需 NTFS：DSH 每次启动要在 `data/dsh-home/profiles/node_modules` 下建 junction，exFAT/FAT32 不支持。
 
 ## 方便继续 fork
 

@@ -95,7 +95,7 @@ try {
     throw new Error(`packaged CLI failed (${String(cliResult.status)}): ${cliResult.stderr}`)
   }
   const cliStatus = JSON.parse(cliResult.stdout)
-  if (cliStatus?.data?.nodeReady !== true) {
+  if (cliStatus?.result?.nodeReady !== true) {
     throw new Error(`packaged CLI reports the vendored runtime as not ready: ${cliResult.stdout}`)
   }
 
