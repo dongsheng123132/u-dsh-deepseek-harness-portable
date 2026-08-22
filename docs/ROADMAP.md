@@ -193,3 +193,16 @@ M1–M5 全绿之后才做。发之前重跑一遍全部验收判据，别信上
   `origin/feat/*` 这个 remote-tracking ref，`git status` 不会报 ahead/behind。
   别因此误判成"没推上去"，用 `git ls-remote --heads origin` 核。
 - remote-agent 对跑超过约 2 分钟的 exec 会截流，长活要 `Start-Process` 重定向到文件再轮询。
+
+## ⚠️ 开源前必须在服务端做掉的一件事
+
+**`POST api.u-claw.org/device/bind` 是无鉴权的**（`src/device-wallet.js` 的 `bindFresh`，
+body 只有 `hwHint / platform / channel`），调一次就返回一把带余额的 Key。
+
+这不是「机密泄露」——客户端里没有任何密钥，grep 过是干净的——而是**经济暴露**：
+谁都能写脚本循环调它白拿额度。这个洞**今天就存在**（解压发布包翻一下就有），
+开源只是把「逆向 10 分钟」变成「读代码 10 秒」。
+
+**推公开仓库之前，服务端必须先上限流/风控**（同 IP 频次、设备指纹去重、
+邀请码或验证码、新钱包额度下调）。否则「让最多人用」会直接变成「让最多人薅」。
+这条不属于本仓库的代码改动，但**它是发版的前置条件**，记在这里防止被忘掉。
