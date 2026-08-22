@@ -331,10 +331,25 @@ function findSymlinkOrBin(directory) {
 /** node-pty 的 prebuilds 带了所有平台的二进制，只留 win32-x64。 */
 function pruneHarness(harnessRoot) {
   const prebuilds = path.join(harnessRoot, 'node_modules', 'node-pty', 'prebuilds')
-  if (!existsSync(prebuilds)) return
-  for (const entry of readdirSync(prebuilds)) {
-    if (entry === runtimeTarget) continue
-    rmSync(path.join(prebuilds, entry), { recursive: true, force: true })
+  if (existsSync(prebuilds)) {
+    for (const entry of readdirSync(prebuilds)) {
+      if (entry === runtimeTarget) continue
+      rmSync(path.join(prebuilds, entry), { recursive: true, force: true })
+    }
+  }
+
+  // sharp 会把所有平台的原生变体都装下来。Windows 包只走 @img/sharp-win32-x64，
+  // wasm32 变体（8.7MB）纯属白背 —— 而且它是 LGPL-3.0-or-later，
+  // 少一个 copyleft 组件就少一份合规负担。
+  // 实测依据：剪掉后用随包 Node 跑 `require('sharp')` 并真做一次 png 编码，均通过。
+  // win32-x64 剪不掉：dsh-attachment-local 是静态 `from "sharp"`，删了图片附件就废。
+  const img = path.join(harnessRoot, 'node_modules', '@img')
+  if (existsSync(img)) {
+    for (const entry of readdirSync(img)) {
+      if (!entry.startsWith('sharp-')) continue
+      if (entry === `sharp-${runtimeTarget}`) continue
+      rmSync(path.join(img, entry), { recursive: true, force: true })
+    }
   }
 }
 

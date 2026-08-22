@@ -29,7 +29,35 @@ The full machine-generated license inventory for all of the above lives in
 Regenerate with `npm run licenses:generate`; the release gate
 `npm run licenses:check` fails if any shipped package is missing from the
 inventory, lacks a license text, or carries a copyleft (GPL/AGPL/LGPL) license
-pending manual review.
+that has not been explicitly adjudicated.
+
+Where an upstream package declares a standard SPDX license but ships no license
+text of its own, the standard text is supplied from
+`third-party-licenses/supplements/` and is **labelled as supplied by U-DSH**, not
+passed off as the upstream original.
+
+### libvips (LGPL-3.0-or-later) — your right to replace it
+
+This distribution includes **libvips**, the image-processing library used by
+`sharp`, which DeepSeek Harness uses to handle image attachments. libvips is
+licensed under the **LGPL-3.0-or-later**. It ships as two ordinary dynamic
+libraries:
+
+```
+resources/harness/node_modules/@img/sharp-win32-x64/lib/libvips-42.dll
+resources/harness/node_modules/@img/sharp-win32-x64/lib/libvips-cpp-8.18.3.dll
+```
+
+They are loaded dynamically at runtime by `sharp-win32-x64-0.35.3.node`
+(Apache-2.0). As required by the LGPL, **you may replace libvips with your own
+build**: the release package is a plain folder, so overwriting these files with
+compatible libraries of the same name is sufficient — no relinking, no rebuild
+of U-DSH, and nothing in this distribution prevents or restricts it.
+
+The complete LGPL-3.0 text is included in `third-party-licenses/NOTICES.md`.
+libvips upstream: <https://github.com/libvips/libvips>.
+
+No other copyleft-licensed component is shipped.
 
 ## Provenance
 

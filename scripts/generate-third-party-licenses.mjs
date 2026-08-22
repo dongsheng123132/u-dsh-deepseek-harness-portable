@@ -60,6 +60,27 @@ const LICENSE_TEXT_PATTERN = /^(licen[cs]e|copying)([-._][\w.+-]*)?$/i
 /** GPL/AGPL/LGPL 全系列。前置断言防止 LGPL 里的 GPL 被重复命中或 SGML 之类误伤。 */
 const COPYLEFT_PATTERN = /(?<![A-Za-z])(A?GPL|LGPL)(?![A-Za-z])/i
 
+/**
+ * 已经人工裁决过、允许随包分发的 copyleft 组件。
+ *
+ * 门禁的意义是「逼一个人真的看一眼」，不是「永远亮红灯」——一个从不转绿的门禁
+ * 三天后就会被所有人无视。所以裁决过的记在这里并写明理由，
+ * **没记在这里的 copyleft 照样让 licenses:check 失败**。
+ *
+ * 加条目前必须回答：以什么形态分发？用户能不能替换？义务履行在哪一段文字里？
+ */
+const ADJUDICATED_COPYLEFT = new Map([
+  ['@img/sharp-win32-x64', {
+    decidedOn: '2026-08-22',
+    reason:
+      'LGPL 部分是 libvips-42.dll / libvips-cpp-8.18.3.dll 两个独立 DLL，'
+      + '由 Apache-2.0 的 sharp-win32-x64.node 动态加载。发布包是普通文件夹，'
+      + '用户可直接用自己编译的 libvips 覆盖同名文件，LGPL 的可替换要求天然满足。'
+      + '义务履行：NOTICE.md 的 libvips 段落 + NOTICES.md 内的 LGPL 全文。'
+      + '剪不掉：dsh-attachment-local 是静态 `from "sharp"`，删了图片附件功能就废。',
+  }],
+])
+
 /** 收集包根目录下的许可相关文件（不递归——按 npm 惯例许可文件都在包根）。 */
 function collectLicenseFiles(packageDir) {
   const files = []
@@ -100,6 +121,21 @@ function normalizeAuthor(author) {
   return null
 }
 
+/**
+ * 上游没随包附许可原文时，按声明的 SPDX 标识补一份标准文本。
+ * 只覆盖「license 字段正确、tarball 里缺 LICENSE 文件」这一种上游打包疏漏；
+ * license 缺失 / UNLICENSED / SEE LICENSE IN 一律不许用模板糊过去。
+ * 详见 third-party-licenses/supplements/README.md。
+ */
+const supplementsDir = path.join(outputDir, 'supplements')
+
+function supplementFor(license) {
+  if (!license) return null
+  const file = path.join(supplementsDir, `${license}.txt`)
+  if (!existsSync(file)) return null
+  return { file, relativePath: relative(file) }
+}
+
 /** 判定这个包需要人看的原因；返回空数组即合规通过。 */
 function reviewReasons(entry) {
   const reasons = []
@@ -107,6 +143,12 @@ function reviewReasons(entry) {
   else if (/^UNLICENSED$/i.test(entry.license)) reasons.push('license 为 UNLICENSED（不许分发）')
   else if (/^SEE LICENSE/i.test(entry.license)) reasons.push(`license 为「${entry.license}」，需逐个确认实际条款`)
   if (!entry.licenseFiles.some((name) => LICENSE_TEXT_PATTERN.test(name))) {
+    // 上游没给原文，但声明的是标准 SPDX 且我们备了标准文本 —— 补上并如实标注来源，
+    // 不伪装成上游原件。剩下的（非标准 / 无声明）照旧交给人。
+    if (reasons.length === 0 && supplementFor(entry.license)) {
+      entry.licenseTextSupplied = true
+      return []
+    }
     reasons.push('包内找不到许可证原文文件（LICENSE/LICENCE/COPYING 变体）')
   }
   return reasons
@@ -292,6 +334,18 @@ function renderLicenseText(entry) {
     try { text = readFileSync(filePath, 'utf8').replace(/\r\n/g, '\n').trimEnd() } catch { continue }
     chunks.push(`#### ${fileName}\n\n\`\`\`\`text\n${text}\n\`\`\`\``)
   }
+  if (entry.licenseTextSupplied) {
+    const supplement = supplementFor(entry.license)
+    if (supplement) {
+      const text = readFileSync(supplement.file, 'utf8').replace(/\r\n/g, '\n').trimEnd()
+      chunks.push(
+        `#### ${entry.license}（许可原文由 U-DSH 按 SPDX 标准文本补充）\n\n`
+        + `> 上游 tarball 未随包提供许可原文；本节文本取自 \`${supplement.relativePath}\`，`
+        + `**不是**上游原件。版权归属以该包自身仓库与 \`package.json\` 为准。\n\n`
+        + `\`\`\`\`text\n${text}\n\`\`\`\``,
+      )
+    }
+  }
   return chunks
 }
 
@@ -326,6 +380,7 @@ async function generate() {
       origin: entry.origin,
       paths: entry.paths,
       licenseFiles: entry.licenseFiles,
+      licenseTextSupplied: Boolean(entry.licenseTextSupplied),
       copyleft: entry.copyleft,
       reviewReasons: entry.reviewReasons,
     })),
@@ -461,22 +516,30 @@ async function check() {
     fail(`${flagged.length} 个包需要人工确认，不许静默放过：`)
     for (const entry of flagged) fail(`  - ${entry.name}@${entry.version}：${entry.reviewReasons.join('；')}`)
   }
-  if (copyleft.length > 0) {
+  const unreviewedCopyleft = copyleft.filter((entry) => !ADJUDICATED_COPYLEFT.has(entry.name))
+  const acceptedCopyleft = copyleft.filter((entry) => ADJUDICATED_COPYLEFT.has(entry.name))
+  for (const entry of acceptedCopyleft) {
+    const { decidedOn, reason } = ADJUDICATED_COPYLEFT.get(entry.name)
+    log(`已裁决 copyleft：${entry.name}@${entry.version} → ${entry.license}（${decidedOn}）`)
+    log(`  ${reason}`)
+  }
+  if (unreviewedCopyleft.length > 0) {
     failed = true
     fail('════════════════════════════════════════════════════════════')
-    fail(`⚠️ 发现 ${copyleft.length} 个 copyleft（GPL/AGPL/LGPL 系）组件——闭源商业分发重大风险：`)
-    for (const entry of copyleft) {
+    fail(`⚠️ 发现 ${unreviewedCopyleft.length} 个**未裁决**的 copyleft（GPL/AGPL/LGPL 系）组件——闭源商业分发重大风险：`)
+    for (const entry of unreviewedCopyleft) {
       fail(`  - ${entry.name}@${entry.version} → ${entry.license}`)
       fail(`    位置：${entry.paths.join('、')}`)
     }
     fail('  必须人工逐个确认分发方式是否合规（动态链接的 LGPL ≠ 自动没事），生成器不代作判断。')
+    fail('  确认后记进 ADJUDICATED_COPYLEFT 并写明理由，别直接放宽门禁。')
     fail('════════════════════════════════════════════════════════════')
   }
   if (failed) {
     fail('licenses:check 未通过。')
     return
   }
-  log(`--check 通过：${entries.length} 个组件全部有清单记录与许可原文，无 copyleft，无待确认项。`)
+  log(`--check 通过：${entries.length} 个组件全部有清单记录与许可原文；copyleft ${acceptedCopyleft.length} 个均已裁决，无待确认项。`)
 }
 
 if (checkMode) {

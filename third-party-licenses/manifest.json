@@ -1,22 +1,21 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-08-22T09:33:24.493Z",
+  "generatedAt": "2026-08-22T15:07:50.158Z",
   "generator": "scripts/generate-third-party-licenses.mjs",
-  "packageCount": 529,
+  "packageCount": 528,
   "licenseCounts": {
     "MIT": 434,
     "Apache-2.0": 61,
     "BSD-3-Clause": 15,
     "ISC": 12,
     "BSD-2-Clause": 2,
-    "Apache-2.0 AND LGPL-3.0-or-later AND MIT": 1,
     "Apache-2.0 AND LGPL-3.0-or-later": 1,
     "Python-2.0": 1,
     "Node.js 聚合许可（见 LICENSE 全文）": 1,
     "0BSD": 1
   },
-  "needsReviewCount": 6,
-  "copyleftCount": 2,
+  "needsReviewCount": 0,
+  "copyleftCount": 1,
   "packages": [
     {
       "name": "@anthropic-ai/sdk",
@@ -32,6 +31,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -49,6 +49,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -66,6 +67,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -83,6 +85,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -100,6 +103,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -117,6 +121,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -134,6 +139,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -151,6 +157,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -166,10 +173,9 @@
         "vendor/harness/node_modules/@aws-sdk/credential-provider-http"
       ],
       "licenseFiles": [],
+      "licenseTextSupplied": true,
       "copyleft": false,
-      "reviewReasons": [
-        "包内找不到许可证原文文件（LICENSE/LICENCE/COPYING 变体）"
-      ]
+      "reviewReasons": []
     },
     {
       "name": "@aws-sdk/credential-provider-ini",
@@ -185,6 +191,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -200,10 +207,9 @@
         "vendor/harness/node_modules/@aws-sdk/credential-provider-login"
       ],
       "licenseFiles": [],
+      "licenseTextSupplied": true,
       "copyleft": false,
-      "reviewReasons": [
-        "包内找不到许可证原文文件（LICENSE/LICENCE/COPYING 变体）"
-      ]
+      "reviewReasons": []
     },
     {
       "name": "@aws-sdk/credential-provider-node",
@@ -219,6 +225,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -236,6 +243,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -253,6 +261,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -270,6 +279,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -287,6 +297,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -304,6 +315,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -321,6 +333,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -336,10 +349,9 @@
         "vendor/harness/node_modules/@aws-sdk/nested-clients"
       ],
       "licenseFiles": [],
+      "licenseTextSupplied": true,
       "copyleft": false,
-      "reviewReasons": [
-        "包内找不到许可证原文文件（LICENSE/LICENCE/COPYING 变体）"
-      ]
+      "reviewReasons": []
     },
     {
       "name": "@aws-sdk/signature-v4-multi-region",
@@ -355,6 +367,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -372,6 +385,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -389,6 +403,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -406,6 +421,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -423,6 +439,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -440,6 +457,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -457,6 +475,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -474,6 +493,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -491,6 +511,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -508,6 +529,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -525,6 +547,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -542,6 +565,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -559,6 +583,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -576,6 +601,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -593,6 +619,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -610,6 +637,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -627,6 +655,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -644,6 +673,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -661,6 +691,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -678,6 +709,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -695,6 +727,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -712,6 +745,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -729,6 +763,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -746,6 +781,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -763,6 +799,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -780,6 +817,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -797,6 +835,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -814,6 +853,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -831,6 +871,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -848,6 +889,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -865,6 +907,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -882,6 +925,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -899,6 +943,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -916,6 +961,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -933,6 +979,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -950,6 +997,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -967,6 +1015,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -984,6 +1033,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1001,6 +1051,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1018,6 +1069,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1035,6 +1087,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1052,6 +1105,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1069,6 +1123,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1086,6 +1141,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1103,6 +1159,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1120,6 +1177,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1137,6 +1195,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1154,6 +1213,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1171,6 +1231,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1188,6 +1249,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1205,6 +1267,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1222,6 +1285,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1239,6 +1303,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1256,6 +1321,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1273,6 +1339,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1290,6 +1357,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1307,6 +1375,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1324,6 +1393,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1341,6 +1411,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1358,6 +1429,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1375,6 +1447,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1392,6 +1465,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1409,6 +1483,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1426,6 +1501,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1443,6 +1519,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1460,6 +1537,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1477,6 +1555,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1494,6 +1573,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1511,6 +1591,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1528,6 +1609,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1545,6 +1627,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1562,6 +1645,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1579,6 +1663,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1596,6 +1681,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1613,6 +1699,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1630,6 +1717,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1647,6 +1735,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1664,6 +1753,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1681,6 +1771,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1698,6 +1789,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1715,6 +1807,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1732,6 +1825,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1749,6 +1843,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1766,6 +1861,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1783,6 +1879,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1800,6 +1897,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1817,6 +1915,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1834,6 +1933,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1851,6 +1951,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1868,6 +1969,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1885,6 +1987,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1902,6 +2005,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1919,6 +2023,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1936,6 +2041,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1953,6 +2059,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1970,6 +2077,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -1987,6 +2095,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2004,6 +2113,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2021,6 +2131,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2038,6 +2149,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2055,6 +2167,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2072,6 +2185,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2089,6 +2203,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2106,6 +2221,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2123,6 +2239,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2140,6 +2257,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2157,6 +2275,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2174,6 +2293,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2191,6 +2311,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2208,6 +2329,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2225,6 +2347,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2242,6 +2365,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2259,6 +2383,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2276,6 +2401,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2293,6 +2419,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2310,6 +2437,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2327,6 +2455,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2344,6 +2473,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2361,6 +2491,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2378,6 +2509,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2395,6 +2527,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2412,6 +2545,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2429,6 +2563,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2446,6 +2581,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2463,6 +2599,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2480,6 +2617,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2497,6 +2635,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2514,6 +2653,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2531,6 +2671,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2548,6 +2689,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2565,6 +2707,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2582,6 +2725,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2599,6 +2743,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2616,6 +2761,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2633,6 +2779,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2650,6 +2797,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2667,6 +2815,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2684,6 +2833,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2701,6 +2851,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2718,6 +2869,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2735,6 +2887,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2752,6 +2905,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2769,6 +2923,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2786,6 +2941,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2803,6 +2959,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2820,6 +2977,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2837,6 +2995,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2854,6 +3013,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2871,6 +3031,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2888,6 +3049,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2905,6 +3067,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2922,6 +3085,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2939,6 +3103,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2956,6 +3121,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2973,6 +3139,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -2990,6 +3157,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3007,6 +3175,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3024,6 +3193,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3041,6 +3211,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3058,6 +3229,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3075,6 +3247,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3092,6 +3265,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3109,6 +3283,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3126,6 +3301,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3143,6 +3319,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3160,6 +3337,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3177,6 +3355,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3194,6 +3373,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3211,6 +3391,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3228,6 +3409,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3245,6 +3427,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3262,6 +3445,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3279,6 +3463,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3296,6 +3481,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3313,6 +3499,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3330,6 +3517,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3347,6 +3535,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3364,6 +3553,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3381,6 +3571,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3398,6 +3589,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3415,6 +3607,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3432,6 +3625,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3449,6 +3643,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3466,6 +3661,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3483,6 +3679,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3500,6 +3697,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3517,6 +3715,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3534,6 +3733,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3551,6 +3751,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3568,6 +3769,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3585,6 +3787,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3602,6 +3805,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3619,6 +3823,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3636,6 +3841,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3653,6 +3859,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3670,6 +3877,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3687,6 +3895,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3704,6 +3913,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3721,6 +3931,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3738,6 +3949,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3755,6 +3967,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3772,6 +3985,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3789,6 +4003,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3806,6 +4021,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3823,6 +4039,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3838,10 +4055,9 @@
         "vendor/harness/node_modules/@earendil-works/pi-ai"
       ],
       "licenseFiles": [],
+      "licenseTextSupplied": true,
       "copyleft": false,
-      "reviewReasons": [
-        "包内找不到许可证原文文件（LICENSE/LICENCE/COPYING 变体）"
-      ]
+      "reviewReasons": []
     },
     {
       "name": "@emnapi/runtime",
@@ -3857,6 +4073,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3874,6 +4091,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3891,6 +4109,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3908,24 +4127,8 @@
       "licenseFiles": [
         "LICENSE.md"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
-      "reviewReasons": []
-    },
-    {
-      "name": "@img/sharp-wasm32",
-      "version": "0.35.3",
-      "license": "Apache-2.0 AND LGPL-3.0-or-later AND MIT",
-      "licenseSource": "license",
-      "repository": "git+https://github.com/lovell/sharp.git",
-      "author": "Lovell Fuller <npm@lovell.info>",
-      "origin": "harness",
-      "paths": [
-        "vendor/harness/node_modules/@img/sharp-wasm32"
-      ],
-      "licenseFiles": [
-        "LICENSE"
-      ],
-      "copyleft": true,
       "reviewReasons": []
     },
     {
@@ -3942,6 +4145,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": true,
       "reviewReasons": []
     },
@@ -3959,6 +4163,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -3974,10 +4179,9 @@
         "vendor/harness/node_modules/@koromix/koffi-win32-x64"
       ],
       "licenseFiles": [],
+      "licenseTextSupplied": true,
       "copyleft": false,
-      "reviewReasons": [
-        "包内找不到许可证原文文件（LICENSE/LICENCE/COPYING 变体）"
-      ]
+      "reviewReasons": []
     },
     {
       "name": "@mistralai/mistralai",
@@ -3993,6 +4197,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4010,6 +4215,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4027,6 +4233,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4044,6 +4251,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4061,6 +4269,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4078,6 +4287,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4095,6 +4305,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4112,6 +4323,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4129,6 +4341,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4146,6 +4359,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4163,6 +4377,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4180,6 +4395,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4200,6 +4416,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4217,6 +4434,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4234,6 +4452,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4251,6 +4470,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4268,6 +4488,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4285,6 +4506,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4302,6 +4524,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4319,6 +4542,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4336,6 +4560,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4353,6 +4578,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4370,6 +4596,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4387,6 +4614,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4404,6 +4632,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4421,6 +4650,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4438,6 +4668,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4455,6 +4686,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4472,6 +4704,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4489,6 +4722,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4506,6 +4740,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4523,6 +4758,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4540,6 +4776,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4557,6 +4794,7 @@
       "licenseFiles": [
         "LICENSE.md"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4574,6 +4812,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4591,6 +4830,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4608,6 +4848,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4625,6 +4866,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4643,6 +4885,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4660,6 +4903,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4677,6 +4921,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4694,6 +4939,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4711,6 +4957,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4728,6 +4975,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4745,6 +4993,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4762,6 +5011,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4779,6 +5029,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4796,6 +5047,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4813,6 +5065,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4830,6 +5083,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4847,6 +5101,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4864,6 +5119,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4881,6 +5137,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4898,6 +5155,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4915,6 +5173,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4932,6 +5191,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4949,6 +5209,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4966,6 +5227,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -4983,6 +5245,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5000,6 +5263,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5017,6 +5281,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5034,6 +5299,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5051,6 +5317,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5068,6 +5335,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5085,6 +5353,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5102,6 +5371,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5119,6 +5389,7 @@
       "licenseFiles": [
         "LICENCE.md"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5136,6 +5407,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5153,6 +5425,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5170,6 +5443,7 @@
       "licenseFiles": [
         "LICENSE.txt"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5187,6 +5461,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5204,6 +5479,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5221,6 +5497,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5238,6 +5515,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5255,6 +5533,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5272,6 +5551,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5289,6 +5569,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5306,6 +5587,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5323,6 +5605,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5340,6 +5623,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5357,6 +5641,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5374,6 +5659,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5391,6 +5677,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5408,6 +5695,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5425,6 +5713,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5443,6 +5732,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5460,6 +5750,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5477,6 +5768,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5494,6 +5786,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5511,6 +5804,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5526,10 +5820,9 @@
         "vendor/harness/node_modules/data-uri-to-buffer"
       ],
       "licenseFiles": [],
+      "licenseTextSupplied": true,
       "copyleft": false,
-      "reviewReasons": [
-        "包内找不到许可证原文文件（LICENSE/LICENCE/COPYING 变体）"
-      ]
+      "reviewReasons": []
     },
     {
       "name": "debug",
@@ -5545,6 +5838,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5562,6 +5856,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5579,6 +5874,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5596,6 +5892,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5613,6 +5910,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5630,6 +5928,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5647,6 +5946,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5664,6 +5964,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5681,6 +5982,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5698,6 +6000,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5715,6 +6018,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5732,6 +6036,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5749,6 +6054,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5766,6 +6072,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5783,6 +6090,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5800,6 +6108,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5817,6 +6126,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5834,6 +6144,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5851,6 +6162,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5868,6 +6180,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5885,6 +6198,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5902,6 +6216,7 @@
       "licenseFiles": [
         "license.md"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5919,6 +6234,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5936,6 +6252,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5953,6 +6270,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5970,6 +6288,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -5987,6 +6306,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6004,6 +6324,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6021,6 +6342,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6038,6 +6360,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6055,6 +6378,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6072,6 +6396,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6089,6 +6414,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6106,6 +6432,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6123,6 +6450,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6140,6 +6468,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6157,6 +6486,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6174,6 +6504,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6191,6 +6522,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6208,6 +6540,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6225,6 +6558,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6242,6 +6576,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6259,6 +6594,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6276,6 +6612,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6293,6 +6630,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6310,6 +6648,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6327,6 +6666,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6344,6 +6684,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6361,6 +6702,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6378,6 +6720,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6395,6 +6738,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6412,6 +6756,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6429,6 +6774,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6446,6 +6792,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6463,6 +6810,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6480,6 +6828,7 @@
       "licenseFiles": [
         "LICENSE.md"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6497,6 +6846,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6514,6 +6864,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6531,6 +6882,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6548,6 +6900,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6565,6 +6918,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6582,6 +6936,7 @@
       "licenseFiles": [
         "LICENSE.md"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6599,6 +6954,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6616,6 +6972,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6633,6 +6990,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6650,6 +7008,7 @@
       "licenseFiles": [
         "LICENSE.txt"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6667,6 +7026,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6684,6 +7044,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6701,6 +7062,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6718,6 +7080,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6735,6 +7098,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6752,6 +7116,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6769,6 +7134,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6786,6 +7152,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6803,6 +7170,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6820,6 +7188,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6837,6 +7206,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6854,6 +7224,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6871,6 +7242,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6888,6 +7260,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6905,6 +7278,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6922,6 +7296,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6939,6 +7314,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6956,6 +7332,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6973,6 +7350,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -6990,6 +7368,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7007,6 +7386,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7024,6 +7404,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7041,6 +7422,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7058,6 +7440,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7075,6 +7458,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7092,6 +7476,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7109,6 +7494,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7126,6 +7512,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7143,6 +7530,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7160,6 +7548,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7177,6 +7566,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7194,6 +7584,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7211,6 +7602,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7228,6 +7620,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7245,6 +7638,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7262,6 +7656,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7279,6 +7674,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7296,6 +7692,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7313,6 +7710,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7330,6 +7728,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7347,6 +7746,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7364,6 +7764,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7381,6 +7782,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7398,6 +7800,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7415,6 +7818,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7432,6 +7836,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7449,6 +7854,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7466,6 +7872,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7483,6 +7890,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7500,6 +7908,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7517,6 +7926,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7534,6 +7944,7 @@
       "licenseFiles": [
         "license.md"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7551,6 +7962,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7568,6 +7980,7 @@
       "licenseFiles": [
         "LICENSE.md"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7585,6 +7998,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7602,6 +8016,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7619,6 +8034,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7636,6 +8052,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7653,6 +8070,7 @@
       "licenseFiles": [
         "LICENSE.md"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7670,6 +8088,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7687,6 +8106,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7704,6 +8124,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7721,6 +8142,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7738,6 +8160,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7755,6 +8178,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7772,6 +8196,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7789,6 +8214,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7806,6 +8232,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7823,6 +8250,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7840,6 +8268,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7857,6 +8286,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7874,6 +8304,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7891,6 +8322,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7908,6 +8340,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7925,6 +8358,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7942,6 +8376,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7959,6 +8394,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7976,6 +8412,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -7993,6 +8430,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8010,6 +8448,7 @@
       "licenseFiles": [
         "LICENSE.md"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8027,6 +8466,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8044,6 +8484,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8061,6 +8502,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8078,6 +8520,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8095,6 +8538,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8112,6 +8556,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8129,6 +8574,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8146,6 +8592,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8163,6 +8610,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8180,6 +8628,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8197,6 +8646,7 @@
       "licenseFiles": [
         "License"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8214,6 +8664,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8231,6 +8682,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8248,6 +8700,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8265,6 +8718,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8282,6 +8736,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8299,6 +8754,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8316,6 +8772,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8333,6 +8790,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8350,6 +8808,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8367,6 +8826,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8384,6 +8844,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8401,6 +8862,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8418,6 +8880,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8435,6 +8898,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8452,6 +8916,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8469,6 +8934,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8486,6 +8952,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8503,6 +8970,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8520,6 +8988,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8537,6 +9006,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8554,6 +9024,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8571,6 +9042,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8588,6 +9060,7 @@
       "licenseFiles": [
         "LICENSE.txt"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8605,6 +9078,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8622,6 +9096,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8639,6 +9114,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8656,6 +9132,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8673,6 +9150,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8690,6 +9168,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8707,6 +9186,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8724,6 +9204,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8741,6 +9222,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8758,6 +9240,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8775,6 +9258,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8792,6 +9276,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8809,6 +9294,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8826,6 +9312,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8843,6 +9330,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8860,6 +9348,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8877,6 +9366,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8894,6 +9384,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8911,6 +9402,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8928,6 +9420,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8945,6 +9438,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8962,6 +9456,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8979,6 +9474,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -8996,6 +9492,7 @@
       "licenseFiles": [
         "LICENSE"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     },
@@ -9013,6 +9510,7 @@
       "licenseFiles": [
         "license"
       ],
+      "licenseTextSupplied": false,
       "copyleft": false,
       "reviewReasons": []
     }
