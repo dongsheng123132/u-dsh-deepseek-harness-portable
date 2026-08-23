@@ -3,7 +3,8 @@
 > **这份文件是唯一真相源。** 会话记忆会丢，多终端会打架，所以「下一步干什么」「什么叫做完」
 > 只认这里写的。改了先提交，别口头约定。
 >
-> 最后更新：2026-08-23（v0.2.0 已发布；下一步是服务端风控 + 收真实 bug + 真机复验）
+> 最后更新：2026-08-23（v0.2.0 已发布；服务端风控第一批已上线，剩 SetTrustedProxies 一条；
+> 然后是收真实 bug + 真机复验）
 
 ## 一句话目标
 
@@ -175,9 +176,11 @@ https://github.com/dongsheng123132/u-dsh-deepseek-harness-portable/releases/tag/
 
 ### M7 · 发布之后（当前重心）
 
-- [ ] **服务端 `/device/bind` 风控 —— 推广前的硬门槛**（见文末）。
-      发布本身不放大风险（源码本就公开），但一旦上宣发引流，就是真金白银。
-      不在本仓库，需要在虾盘云服务端做。
+- [x] **服务端风控第一批已上线**（2026-08-23，见文末）：activate 公开口令、
+      `/internal/*` 弱口令、全站日预算、sqlite 锁、绑回环。今天行为零变化。
+- [ ] **服务端风控最后一条 —— 推广前的硬门槛**：`SetTrustedProxies`。
+      不修的话所有 per-IP 限流都能被一个请求头绕过。它是唯一会真改变行为的一条，
+      上之前要先定「device 上限提到 50 还是给开发出口加白名单」（见文末）。
 - [ ] 收第一批真实 bug。收集链路已通：托盘右键「报告问题…」→ 自动带诊断信息
       （Key 已打码）→ 预填 GitHub issue；`.github/ISSUE_TEMPLATE` 必填「U 盘什么格式」
 - [ ] 真机复验：真 U 盘上跑一遍，重点看解压实际耗时、以及发消息能否收到回复
@@ -215,15 +218,47 @@ https://github.com/dongsheng123132/u-dsh-deepseek-harness-portable/releases/tag/
   别因此误判成"没推上去"，用 `git ls-remote --heads origin` 核。
 - remote-agent 对跑超过约 2 分钟的 exec 会截流，长活要 `Start-Process` 重定向到文件再轮询。
 
-## ⚠️ 开源前必须在服务端做掉的一件事
+## ⚠️ 服务端风控（2026-08-23 已推进一轮，剩最后一条）
 
-**`POST api.u-claw.org/device/bind` 是无鉴权的**（`src/device-wallet.js` 的 `bindFresh`，
-body 只有 `hwHint / platform / channel`），调一次就返回一把带余额的 Key。
+`POST api.u-claw.org/device/bind` 无鉴权：调一次就返回一把 Key
+（`src/device-wallet.js` 的 `bindFresh`，body 只有 `hwHint / platform / channel`）。
+不是「机密泄露」——客户端里没有任何密钥，grep 过是干净的——而是**经济暴露**。
 
-这不是「机密泄露」——客户端里没有任何密钥，grep 过是干净的——而是**经济暴露**：
-谁都能写脚本循环调它白拿额度。这个洞**今天就存在**（解压发布包翻一下就有），
-开源只是把「逆向 10 分钟」变成「读代码 10 秒」。
+**上一版这里写的「谁都能写脚本循环调它白拿额度」不准确，已核实并订正：**
 
-**推公开仓库之前，服务端必须先上限流/风控**（同 IP 频次、设备指纹去重、
-邀请码或验证码、新钱包额度下调）。否则「让最多人用」会直接变成「让最多人薅」。
-这条不属于本仓库的代码改动，但**它是发版的前置条件**，记在这里防止被忘掉。
+1. **不是完全无防护。** 服务端 `pay-server/device.go` 早就有
+   `globalDeviceLimiter = newActivateLimiter("device", 20)`，20 次/IP/24h 滑动窗，
+   bind / rotate / migrate 共用一个桶。
+2. **今天的敞口≈0。** `activate.json` 是 `{"enabled":true,"bonusCNY":0}`，
+   每把新 key 只送 `deviceVerifyGrant = 1` 个 quota 单位——那不是钱，只是让 key
+   在 new-api 那边能过鉴权（否则新装机拿到的是一把「查余额报 Invalid token」的死 key）。
+3. **日志里那些密集 bind 是自己人测 ClawX**，不是薅羊毛。
+
+真正的洞在别处，**已修并已上线**（虾盘云仓库 `17fd480` + `71d84c6`，
+新加坡节点已发布，7 项冒烟全绿）：
+
+- `/recharge/activate` 的 `ACTIVATE_SECRET` 生产上**根本没配**，用的是代码里
+  硬编码的 `uclaw2026activate`——而这串口令出现在客户端二进制、公网可访问的
+  `recharge.html`，以及**已开源的** `v1-开源/u-claw.org/docs/api-xiapan.md` 里。
+  现在：没配该变量且 `bonusCNY>0` 时直接 403。
+- `/internal/activate/config`、`/internal/token/ensure` 能开关赠送、给任意 key
+  设任意额度、绕过限流与账本，且被 nginx 公网暴露，却只有会回退到内置口令的
+  `adminAuth()`。现在加挂 `requireStrongAdminToken()`。
+- 加了全站每日赠额预算（默认 500/天，`DEVICE_BONUS_DAILY_CAP` 可调）。
+  per-IP 拦不住「很多真实 IP 各来一次」的代理池。**超额是降级不是拒绝**——
+  拒绝 bind 会让新客户装完拿不到 key，把风控成本转嫁给无辜用户。
+- sqlite 加 `_busy_timeout=5000`；`r.Run` 从 `:3001` 改绑 `127.0.0.1:3001`。
+
+**还差最后一条（唯一会改变行为的那条）：**
+
+- [ ] **`gin.SetTrustedProxies(["127.0.0.1","::1"])`**。`main.go` 用 `gin.Default()`
+      且从未设置可信代理，gin v1.10 默认信任 `0.0.0.0/0`；`validateHeader()` 从右往左
+      扫 XFF，全可信时返回**最左边**那个 = 攻击者自填。所以**上面那个 20 次/IP
+      目前用一个 `X-Forwarded-For` 请求头就能完全绕过**，`activate` / `generate-key` /
+      `card-redeem` 的限流同样失效。已读 gin 源码 + 实跑五个用例证实。
+      修法只有一行，但它会让限流从形同虚设变成**真的拦人**，而计数器是纯内存、
+      没有手工清空入口，只能重启服务。**上之前先定：device 上限 20→50，
+      还是给开发出口加白名单？** 第一个撞上的会是我们自己测 ClawX。
+
+**结论：宣发引流前必须做掉上面这条**，否则「让最多人用」会变成「让最多人薅」。
+调高 `bonusCNY` 之前也必须先配 `ACTIVATE_SECRET`（现在会被 403 挡住，不会静默流血）。
