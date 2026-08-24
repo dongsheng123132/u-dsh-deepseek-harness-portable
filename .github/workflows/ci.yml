@@ -1,0 +1,24 @@
+name: CI
+
+# push/PR 就跑一遍测试闸门（与 release.yml 同一套 npm test），
+# 让 README 的 tests badge 平时常绿，而不是只在手动发版时才有状态。
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm test

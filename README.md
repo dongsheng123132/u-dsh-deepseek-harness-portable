@@ -7,7 +7,7 @@
 [![Latest Release](https://img.shields.io/github/v/release/dongsheng123132/u-dsh-deepseek-harness-portable)](../../releases/latest)
 [![Release Date](https://img.shields.io/github/release-date/dongsheng123132/u-dsh-deepseek-harness-portable)](../../releases)
 [![GitHub Downloads](https://img.shields.io/github/downloads/dongsheng123132/u-dsh-deepseek-harness-portable/total)](../../releases)
-[![Tests](https://img.shields.io/github/actions/workflow/status/dongsheng123132/u-dsh-deepseek-harness-portable/release.yml?label=tests%20%26%20build)](../../actions/workflows/release.yml)
+[![Tests](https://img.shields.io/github/actions/workflow/status/dongsheng123132/u-dsh-deepseek-harness-portable/ci.yml?label=tests)](../../actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Platform](https://img.shields.io/badge/platform-Windows%20x64-lightgrey)](#scope)
 
