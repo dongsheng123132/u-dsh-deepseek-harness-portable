@@ -21,7 +21,7 @@
  * 用法：node scripts/build-sfx.mjs   （需先 npm run dist:portable 产出 dist/win-unpacked）
  */
 import { spawnSync } from 'node:child_process'
-import { existsSync, readFileSync, statSync, unlinkSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync, readdirSync, statSync, unlinkSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -70,17 +70,31 @@ if (existsSync(dataDir)) {
   if (leaked.stdout?.trim()) {
     fail(`拒绝打包：${path.relative(root, dataDir)} 里有疑似凭据\n${leaked.stdout.trim()}\n先删掉整个 data 目录再重来。`)
   }
-  log(`跳过 ${path.relative(root, dataDir)}（运行期数据，不进发布包）`)
 }
 
-log(`压缩 ${path.relative(root, unpacked)} …（几万个小文件，需要几分钟）`)
+// 打包清单：显式列出顶层条目、跳过运行期 data/。
+//
+// 为什么不用 `7z a archive <unpacked>/* -xr!data`？-x!data 的匹配是**按条目名、不分
+// 深度**的（`r` 递归只是让规则也作用于目录内部），而内核依赖里恰好有必须发布的
+// data 目录 —— v0.2.0 的 SFX 就这样把 @earendil-works/pi-ai/dist/providers/data/
+// 等四处内核文件排掉了，客户机启动必现 ERR_MODULE_NOT_FOUND「启动失败」弹窗。
+// （zip 载荷由 electron-builder 打的，没有这个问题；SFX 和 zip 并存时只有 SFX 坏。）
+//
+// 显式传顶层条目时 cwd 必须是 unpacked 本身（传 `<unpacked>/xxx` 会把前缀带进归档，
+// SFX 的 InstallPath 是 %%T\U-DSH，多一层目录用户解压完找不到 exe）。实测 7z 对
+// 显式传入的目录条目会原样收进归档路径，不带 ./ 前缀。
+const payloadEntries = readdirSync(unpacked, { withFileTypes: true })
+  .filter((entry) => entry.name !== 'data')
+  .map((entry) => `./${entry.name}`)
+if (payloadEntries.length === 0) fail(`${path.relative(root, unpacked)} 里没有任何可打包的内容`)
+
+log(`压缩 ${payloadEntries.length} 个顶层条目 …（几万个小文件，需要几分钟）`)
 // -mx=5 是刻意的折中：-mx=9 能再小一点，但压缩耗时翻几倍，而用户在意的是
 // 下载体积和**解压速度**，解压速度跟压缩等级基本无关。
-const compress = spawnSync(sevenZip, [
-  'a', '-t7z', '-mx=5', '-mmt=on', '-bso0', '-bsp0',
-  '-xr!data',
-  archive, path.join(unpacked, '*'),
-], { stdio: ['ignore', 'inherit', 'inherit'] })
+const compress = spawnSync(sevenZip, ['a', '-t7z', '-mx=5', '-mmt=on', '-bso0', '-bsp0', archive, ...payloadEntries], {
+  stdio: ['ignore', 'inherit', 'inherit'],
+  cwd: unpacked,
+})
 if (compress.status !== 0) fail(`7z 压缩失败，退出码 ${String(compress.status)}`)
 
 // SFX 配置：解压到用户选的目录下的 U-DSH\，完成后不自动运行 ——
