@@ -1,8 +1,35 @@
 # U-DSH Portable — DeepSeek Harness Portable / USB Edition for Windows
 
+<div align="center">
+
+**A full DeepSeek AI assistant in your pocket: unzip and run on any Windows PC, with credit out of the box.**
+
+[![Latest Release](https://img.shields.io/github/v/release/dongsheng123132/u-dsh-deepseek-harness-portable)](../../releases/latest)
+[![Release Date](https://img.shields.io/github/release-date/dongsheng123132/u-dsh-deepseek-harness-portable)](../../releases)
+[![GitHub Downloads](https://img.shields.io/github/downloads/dongsheng123132/u-dsh-deepseek-harness-portable/total)](../../releases)
+[![Tests](https://img.shields.io/github/actions/workflow/status/dongsheng123132/u-dsh-deepseek-harness-portable/release.yml?label=tests%20%26%20build)](../../actions/workflows/release.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Windows%20x64-lightgrey)](#scope)
+
+[简体中文](README.zh-CN.md) · [Download latest](../../releases/latest) · [Beginner's guide (中文)](docs/新手教程.md) · [FAQ](#faq)
+
+</div>
+
+---
+
 > **No-install portable build of DeepSeek Harness (DSH)**: unzip and run. **No Node.js, no npm, no
 > kernel download.** Drop it on a USB stick or external drive, double-click on any Windows PC, and
 > your sessions, credentials and workspace travel with the folder — nothing lands on `C:`.
+
+## Why U-DSH?
+
+| | U-DSH Portable | Other DSH desktop / portable builds |
+|---|---|---|
+| Install | Unzip, double-click — nothing to install | Installer, or a DIY Node + npm setup |
+| API key | **Credit included**, no signup required | Register at platform.deepseek.com → top up → copy & paste a key |
+| Portability | Sessions/config/credentials live in the folder — every PC feels like yours | Data scattered across each PC's `%USERPROFILE%` |
+| Offline | Kernel ships inside the package; first launch needs no network | Usually downloads a runtime or kernel first |
+| System footprint | No registry writes, no env changes; delete the folder = clean uninstall | Regular installs write the registry and leave caches |
 
 **What makes it different: it comes with credit. No API key signup required.**
 
@@ -10,8 +37,6 @@ Every other DSH portable/desktop build asks you to register at platform.deepseek
 API key and paste it back — the steepest drop-off in the whole funnel. U-DSH ships the **Xiapan Cloud
 device wallet**: on first launch it issues a key for this device and wires it up automatically, so you
 can **just start chatting**. Top up with one click, or swap in your own key any time.
-
-[简体中文](README.zh-CN.md) · [Download latest](../../releases/latest) · [FAQ](#faq)
 
 ## Features
 
@@ -30,6 +55,8 @@ can **just start chatting**. Top up with one click, or swap in your own key any 
 1. Grab `U-DSH-DeepSeek-Harness-Portable-*-Windows-x64.zip` from [Releases](../../releases/latest)
 2. Unzip to a USB stick, external drive or local folder (**USB drives must be NTFS** — see [FAQ](#faq))
 3. Double-click `U-DSH Portable.exe`
+
+> 📖 First time? The [beginner's guide](docs/新手教程.md) walks through download → USB prep → first chat, step by step (in Chinese).
 
 > ⏳ **First unzip is slow.** The package contains tens of thousands of small files; on a slow drive
 > this can take upwards of ten minutes. Startup afterwards is instant. Unzip to a local disk first,
@@ -109,34 +136,52 @@ Prefer additions under [`src/extensions/`](src/extensions/), update kernels thro
 
 ## FAQ
 
-**Why must the USB drive be NTFS? Won't exFAT work?**
-It won't. DSH creates a directory junction under its data directory on every launch, and
-exFAT/FAT32 cannot hold one — it fails with `EISDIR`. U-DSH probes for this before starting and tells
-you to switch to NTFS instead of throwing a raw error at you. Back up the drive before reformatting.
+<details>
+<summary><b>Why must the USB drive be NTFS? Won't exFAT work?</b></summary>
 
-**Why is the first unzip so slow?**
+It won't. DSH creates a directory junction under its data directory on every launch, and
+exFAT/FAT32 cannot hold one — it fails with <code>EISDIR</code>. U-DSH probes for this before starting and tells
+you to switch to NTFS instead of throwing a raw error at you. Back up the drive before reformatting.
+</details>
+
+<details>
+<summary><b>Why is the first unzip so slow?</b></summary>
+
 The package carries DSH's full dependency closure — tens of thousands of small files. The bottleneck
 is file count, not size, so a slow drive can take ten minutes or more. That is the price of "nothing
 to install, works offline": we ran the install at build time so you never have to. Every launch after
 that is instant.
+</details>
 
-**Can I use my own API key instead of your credit?**
+<details>
+<summary><b>Can I use my own API key instead of your credit?</b></summary>
+
 Yes. The wallet page has a "use an existing key" option, and you can switch back at any time.
+</details>
 
-**Does it write anything to my machine?**
+<details>
+<summary><b>Does it write anything to my machine?</b></summary>
+
 No registry writes, no environment changes. Sessions, settings, credentials and workspace all live
 next to the executable — deleting the folder is a complete uninstall. (Electron's own window cache and
 logs go to the system cache directory and contain no credentials.)
+</details>
 
-**Something broke — how do I report it? Where are the logs?**
+<details>
+<summary><b>Something broke — how do I report it? Where are the logs?</b></summary>
+
 Right-click the tray icon -> "Report a problem", or use the button on the wallet page. It gathers
-the version, kernel status and a log excerpt (**keys redacted**) and opens a pre-filled GitHub
-issue; just add a sentence describing what happened. To read the logs yourself: `Win + R` ->
-`%LOCALAPPDATA%\U-DSH\logs`. They live in the system cache directory and do **not** travel with the USB drive
+the version, kernel status and a log excerpt (<b>keys redacted</b>) and opens a pre-filled GitHub
+issue; just add a sentence describing what happened. To read the logs yourself: <code>Win + R</code> ->
+<code>%LOCALAPPDATA%\U-DSH\logs</code>. They live in the system cache directory and do <b>not</b> travel with the USB drive
 (they contain no credentials).
+</details>
 
-**Is this official?**
+<details>
+<summary><b>Is this official?</b></summary>
+
 No. This is an independent community distribution, not affiliated with DeepSeek.
+</details>
 
 ## Sources and licenses
 

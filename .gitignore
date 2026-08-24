@@ -15,3 +15,9 @@ assets/dsh-node.exe
 assets/windows-hidden-console.exe
 # third-party-licenses/ 全部进 git：NOTICES.md/manifest.json 是合规凭据，不是构建产物。
 .u-dsh-dev/
+# 本地测试压缩包 / 分卷 / 解压残留 / 杂物（不进仓库）
+/.extract-*/
+/u-dsh-test.*
+/U-DSH-DeepSeek-Harness-Portable-*.zip
+/*.part-new-*
+/坚果年货礼盒.png

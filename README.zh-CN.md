@@ -1,13 +1,36 @@
-# U-DSH Portable｜DeepSeek Harness 便携版 · U盘绿色免安装版
+# U-DSH Portable｜DeepSeek Harness 便携版 · U盘绿色免安装版 · 开箱即有额度
+
+<div align="center">
+
+**把整个 DeepSeek AI 助手塞进 U 盘：解压即用、拔盘即走，打开就有额度。**
+
+[![Latest Release](https://img.shields.io/github/v/release/dongsheng123132/u-dsh-deepseek-harness-portable)](../../releases/latest)
+[![Release Date](https://img.shields.io/github/release-date/dongsheng123132/u-dsh-deepseek-harness-portable)](../../releases)
+[![GitHub Downloads](https://img.shields.io/github/downloads/dongsheng123132/u-dsh-deepseek-harness-portable/total)](../../releases)
+[![Tests](https://img.shields.io/github/actions/workflow/status/dongsheng123132/u-dsh-deepseek-harness-portable/release.yml?label=tests%20%26%20build)](../../actions/workflows/release.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-Windows%20x64-lightgrey)](#支持范围)
+
+[English](README.md) · [下载最新版](../../releases/latest) · [新手教程](docs/新手教程.md) · [常见问题](#常见问题)
+
+</div>
+
+---
 
 > **DeepSeek Harness（DSH）Windows 免安装便携版**：解压即用，**不装 Node.js、不跑 npm、不联网下载内核**。
 > 拷进 U 盘或移动硬盘，插到任何一台 Windows 电脑上双击就能用，数据随盘走，不污染 C 盘。
 
-**最大的不同：开箱就有额度，不用自己去申请 API Key。**
+## 为什么是 U-DSH？
 
-其他 DSH 便携版/桌面版都要你先去 platform.deepseek.com 注册账号、充值、复制 Key、粘回软件里 —— 这一段劝退了大多数人。U-DSH 内置**虾盘云设备钱包**：首次启动自动签发一把属于这台设备的 Key 并配好，**打开就能对话**，想加钱点一下「一键充值」。也支持随时换成你自己的 Key。
+| | U-DSH 便携版 | 其他 DSH 桌面版 / 便携版 |
+|---|---|---|
+| 安装 | 解压双击，零安装 | 要么跑安装程序，要么自己配 Node + npm |
+| API Key | **开箱自带额度**，免注册免申请 | 必须注册 platform.deepseek.com → 充值 → 复制 Key 粘回来 |
+| 随身携带 | 会话/配置/凭据全在包目录，插哪台电脑都是你的环境 | 数据散落在各电脑的 `%USERPROFILE%` |
+| 离线启动 | 内核随包，首次启动不需要联网 | 一般要联网下载运行时或内核 |
+| 系统痕迹 | 不写注册表、不改环境变量，删文件夹=卸载干净 | 常规安装写注册表、留缓存 |
 
-[English](README.md) · [下载最新版](../../releases/latest) · [常见问题](#常见问题)
+「申请 API Key」这一步劝退了大多数人。U-DSH 内置**虾盘云设备钱包**：首次启动自动签发一把属于这台设备的 Key 并配好，**打开就能对话**；想加钱点一下「一键充值」，也随时可以换成你自己的 Key。
 
 ## 特性
 
@@ -20,6 +43,8 @@
 - ✅ **完全开源（MIT）**：客户端代码可审计、可自建
 
 ## 快速开始
+
+> 📖 **零基础请看[《新手教程》](docs/新手教程.md)**：从下载、检查 U 盘格式到第一次对话，一步一步带。
 
 1. 到 [Releases](../../releases/latest) 下载 `U-DSH-DeepSeek-Harness-Portable-*-Windows-x64.zip`
 2. 解压到 U 盘、移动硬盘或本地文件夹（**U 盘必须是 NTFS 格式**，原因见[常见问题](#常见问题)）
@@ -37,7 +62,7 @@
 与社区 [deepseek-harness-desktop](https://github.com/steven-kid/deepseek-harness-desktop)，
 只增加便携数据边界、随包内核、设备钱包和无界面动作接口。
 
-## 为什么采用“瘦壳 + 可换内核”
+## 为什么采用"瘦壳 + 可换内核"
 
 DSH 仍处于快速更新期。把某个 DSH 版本焊死在 Electron 包里，会让每次升级都重新发布整个桌面应用。U-DSH 把三类状态分开：
 
@@ -108,31 +133,49 @@ npm run dist:portable    # 有 prepare-vendor --check 门禁：没有闭包就�
 
 ## 常见问题
 
-**U 盘为什么必须是 NTFS？exFAT 行不行？**
+<details>
+<summary><b>U 盘为什么必须是 NTFS？exFAT 行不行？</b></summary>
+
 不行。DSH 每次启动都要在数据目录下建一个目录链接（junction），exFAT / FAT32 放不下这种链接，
 实测直接 `EISDIR` 失败。U-DSH 在启动前会真探一次，盘不对会直接告诉你换 NTFS，而不是抛一堆看不懂的报错。
 格式化前记得先备份盘上资料。
+</details>
 
-**为什么解压这么慢？**
+<details>
+<summary><b>为什么解压这么慢？</b></summary>
+
 包里是 DSH 的完整依赖闭包，几万个小文件。瓶颈不是体积，是文件数量 —— 慢盘上十几分钟很正常。
 这是「客户机零安装、离线可用」的代价：我们在构建时把该装的都装好了，你那边就不用再跑 npm。
 解压完之后每次启动都是秒级。
+</details>
 
-**我不想用你们的额度，能用自己的 Key 吗？**
+<details>
+<summary><b>我不想用你们的额度，能用自己的 Key 吗？</b></summary>
+
 能。钱包页有「填入已有 Key」，填你自己的就行，随时可以换回来。
+</details>
 
-**它会往我电脑里写东西吗？**
+<details>
+<summary><b>它会往我电脑里写东西吗？</b></summary>
+
 不写注册表、不改环境变量。会话、配置、凭据、工作区全在包所在目录，删掉文件夹就等于卸载干净。
 （Electron 自身的窗口缓存和日志放在系统缓存目录，不含任何凭据。）
+</details>
 
-**出问题了怎么反馈？日志在哪？**
+<details>
+<summary><b>出问题了怎么反馈？日志在哪？</b></summary>
+
 托盘图标右键 →「报告问题」，或钱包页的「报告问题」按钮。它会自动收好版本、内核状态和
 日志摘要（**Key 已打码**），打开预填好的 GitHub issue，你补一句问题描述就能提交。
-想自己看日志：`Win + R` 输入 `%LOCALAPPDATA%\U-DSH\logs`。
-注意日志放在系统缓存目录，**不跟着 U 盘走**（里面不含任何凭据）。
+想自己看日志：<code>Win + R</code> 输入 <code>%LOCALAPPDATA%\U-DSH\logs</code>。
+注意日志放在系统缓存目录，<b>不跟着 U 盘走</b>（里面不含任何凭据）。
+</details>
 
-**这是 DeepSeek 官方的吗？**
+<details>
+<summary><b>这是 DeepSeek 官方的吗？</b></summary>
+
 不是。这是社区独立发行版，与 DeepSeek 官方无隶属关系。
+</details>
 
 ## 来源与许可
 

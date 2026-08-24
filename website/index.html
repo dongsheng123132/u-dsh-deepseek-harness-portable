@@ -1,238 +1,221 @@
 <!doctype html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#05070b" />
-    <meta
-      name="description"
-      content="DeepSeek Harness Desktop — 基于官方 DeepSeek Harness 的简洁、开箱即用跨平台桌面客户端。"
-    />
-    <meta property="og:title" content="DeepSeek Harness Desktop" />
-    <meta
-      property="og:description"
-      content="An unofficial community desktop client for DeepSeek Harness, available on macOS, Windows, and Linux."
-    />
-    <meta
-      property="og:image"
-      content="https://deepseek-harness-desktop.vercel.app/product-screenshot.jpg"
-    />
-    <meta property="og:type" content="website" />
-    <title>DeepSeek Harness Desktop</title>
-    <link rel="icon" href="./logo.svg" type="image/svg+xml" />
-    <link rel="preload" href="./product-screenshot.jpg" as="image" type="image/jpeg" />
-    <link rel="stylesheet" href="./harness-site.css" />
-  </head>
-  <body>
-    <header class="replica-header">
-      <div class="header-inner">
-        <a class="brand" href="/" aria-label="DeepSeek Harness Desktop">
-          <img class="wordmark" src="./deepseek-wordmark.svg" alt="DeepSeek" />
-          <span class="harness-chip">Harness</span>
-          <span class="desktop-chip" data-i18n="desktopPreview">桌面版</span>
-        </a>
-        <nav class="desktop-nav" aria-label="主要导航">
-          <a href="#features" data-i18n="features">桌面能力</a>
-          <a href="#design" data-i18n="design">设计思路</a>
-          <a href="#downloads" data-i18n="downloads">下载</a>
-        </nav>
-        <div class="header-actions">
-          <div class="language-switcher" role="group" aria-label="切换语言">
-            <button type="button" class="language-button active" data-language="zh">中文</button>
-            <button type="button" class="language-button" data-language="en">EN</button>
-          </div>
-          <a class="header-github button button-light" href="https://github.com/steven-kid/deepseek-harness-desktop" target="_blank" rel="noreferrer">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .8A11.2 11.2 0 0 0 8.46 22.62c.56.1.77-.24.77-.54v-2.17c-3.14.68-3.8-1.33-3.8-1.33-.51-1.3-1.25-1.66-1.25-1.66-1.02-.7.08-.68.08-.68 1.13.08 1.72 1.16 1.72 1.16 1 1.72 2.63 1.23 3.27.94.1-.73.39-1.23.71-1.51-2.5-.29-5.14-1.26-5.14-5.54 0-1.23.44-2.23 1.15-3.02-.12-.28-.5-1.43.1-2.98 0 0 .94-.3 3.08 1.15a10.62 10.62 0 0 1 5.6 0c2.14-1.45 3.08-1.15 3.08-1.15.6 1.55.22 2.7.1 2.98.72.79 1.15 1.79 1.15 3.02 0 4.3-2.64 5.25-5.15 5.53.41.35.76 1.04.76 2.1v3.18c0 .3.2.65.78.54A11.2 11.2 0 0 0 12 .8Z"/></svg>
-            <span>GitHub</span>
-          </a>
-        </div>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>U-DSH 便携版｜DeepSeek Harness U盘绿色免安装版 · 解压即用 · 开箱即有额度</title>
+  <meta name="description" content="U-DSH 是 DeepSeek Harness（DSH）的 Windows 免安装便携版：解压到 U 盘双击即用，不装 Node.js、不跑 npm、不联网下载内核，数据随盘走。内置设备钱包开箱自带额度，免注册、免申请 API Key。" />
+  <meta name="keywords" content="DeepSeek便携版, DeepSeek Harness, DSH, U盘AI助手, 免安装, 绿色软件, portable, USB, AI聊天, 设备钱包, U-DSH" />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <link rel="canonical" href="https://dongsheng123132.github.io/u-dsh-deepseek-harness-portable/" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="U-DSH Portable" />
+  <meta property="og:title" content="U-DSH 便携版：把 DeepSeek 助手装进 U 盘，解压即用、开箱即有额度" />
+  <meta property="og:description" content="DeepSeek Harness 的 Windows 免安装便携版：不装 Node.js、不跑 npm、离线可用；会话配置随 U 盘走，不污染系统。内置额度，免注册免 API Key。" />
+  <meta property="og:url" content="https://dongsheng123132.github.io/u-dsh-deepseek-harness-portable/" />
+  <meta property="og:locale" content="zh_CN" />
+  <meta property="og:locale:alternate" content="en_US" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="U-DSH Portable — DeepSeek Harness USB edition for Windows" />
+  <meta name="twitter:description" content="Unzip and run on any Windows PC. No Node.js, no npm, works offline. Credit out of the box — no API key signup." />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "U-DSH Portable",
+    "operatingSystem": "Windows x64",
+    "applicationCategory": "DeveloperApplication",
+    "softwareVersion": "0.2.0",
+    "license": "https://opensource.org/licenses/MIT",
+    "isAccessibleForFree": true,
+    "description": "DeepSeek Harness 的 Windows 免安装便携版：解压到 U 盘双击即用，不装 Node.js、不跑 npm、不联网下载内核；内置设备钱包，开箱自带额度。",
+    "downloadUrl": "https://github.com/dongsheng123132/u-dsh-deepseek-harness-portable/releases/latest",
+    "codeRepository": "https://github.com/dongsheng123132/u-dsh-deepseek-harness-portable",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "U 盘为什么必须是 NTFS 格式？exFAT 行不行？",
+        "acceptedAnswer": { "@type": "Answer", "text": "不行。DSH 每次启动要在数据目录下创建目录链接（junction），exFAT/FAT32 不支持，会直接失败。U-DSH 启动前会自动探测并提示改用 NTFS。格式化前请先备份资料。" }
+      },
+      {
+        "@type": "Question",
+        "name": "为什么第一次解压这么慢？",
+        "acceptedAnswer": { "@type": "Answer", "text": "包内是 DSH 的完整依赖闭包，几万个小文件，瓶颈是文件数量而非体积，慢盘上十几分钟属正常。解压一次之后每次启动都是秒级。" }
+      },
+      {
+        "@type": "Question",
+        "name": "可以不用内置额度，换成自己的 API Key 吗？",
+        "acceptedAnswer": { "@type": "Answer", "text": "可以。钱包页提供「填入已有 Key」，支持 DeepSeek 官方 API 或其他 OpenAI 兼容服务，且随时可以换回。" }
+      },
+      {
+        "@type": "Question",
+        "name": "它会给我的电脑留下痕迹吗？",
+        "acceptedAnswer": { "@type": "Answer", "text": "不写注册表、不改环境变量。会话、配置、凭据、工作区全部保存在程序所在目录，删除文件夹即完全卸载。" }
+      },
+      {
+        "@type": "Question",
+        "name": "这是 DeepSeek 官方产品吗？",
+        "acceptedAnswer": { "@type": "Answer", "text": "不是。U-DSH 是社区独立发行版，与 DeepSeek 官方无隶属关系；客户端代码以 MIT 许可开源。" }
+      }
+    ]
+  }
+  </script>
+
+  <style>
+    :root { --ink:#1c2733; --muted:#5b6b7b; --line:#d9e1e8; --accent:#1a5fb4; --accent-ink:#fff; --bg:#ffffff; --panel:#f5f8fa; }
+    * { box-sizing:border-box; margin:0; padding:0; }
+    body { font-family:"Microsoft YaHei","PingFang SC","Segoe UI",system-ui,sans-serif; color:var(--ink); background:var(--bg); line-height:1.75; }
+    .wrap { max-width:1020px; margin:0 auto; padding:0 24px; }
+    header.site { border-bottom:1px solid var(--line); background:#fff; position:sticky; top:0; z-index:10; }
+    .bar { display:flex; align-items:center; justify-content:space-between; height:60px; }
+    .brand { font-weight:700; font-size:18px; color:var(--ink); text-decoration:none; }
+    .brand em { color:var(--accent); font-style:normal; }
+    nav a { margin-left:20px; color:var(--muted); text-decoration:none; font-size:15px; }
+    nav a:hover { color:var(--accent); }
+    .hero { padding:72px 0 56px; text-align:center; }
+    .hero h1 { font-size:38px; line-height:1.3; letter-spacing:.5px; }
+    .hero h1 span { color:var(--accent); }
+    .hero p.sub { max-width:720px; margin:18px auto 0; color:var(--muted); font-size:17px; }
+    .cta { margin-top:30px; display:flex; gap:14px; justify-content:center; flex-wrap:wrap; }
+    .btn { display:inline-block; padding:12px 26px; border-radius:6px; text-decoration:none; font-size:16px; border:1px solid var(--line); color:var(--ink); background:#fff; }
+    .btn.primary { background:var(--accent); border-color:var(--accent); color:var(--accent-ink); }
+    .btn:hover { opacity:.92; }
+    .hero .fineprint { margin-top:16px; color:var(--muted); font-size:13px; }
+    section { padding:52px 0; border-top:1px solid var(--line); }
+    h2 { font-size:26px; text-align:center; margin-bottom:8px; }
+    p.lead { text-align:center; color:var(--muted); max-width:760px; margin:0 auto 32px; }
+    ol.steps { display:flex; gap:18px; flex-wrap:wrap; justify-content:center; counter-reset:s; list-style:none; }
+    ol.steps li { flex:1 1 260px; max-width:320px; background:var(--panel); border:1px solid var(--line); border-radius:8px; padding:22px; }
+    ol.steps li::before { counter-increment:s; content:"第 " counter(s) " 步"; display:block; color:var(--accent); font-weight:700; margin-bottom:6px; }
+    ol.steps b { display:block; font-size:17px; margin-bottom:6px; }
+    table.cmp { width:100%; border-collapse:collapse; background:#fff; }
+    table.cmp th, table.cmp td { border:1px solid var(--line); padding:12px 14px; text-align:left; vertical-align:top; font-size:15px; }
+    table.cmp th { background:var(--panel); }
+    td.win { color:var(--accent); font-weight:600; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px; }
+    .card { border:1px solid var(--line); border-radius:8px; padding:20px 22px; background:#fff; }
+    .card h3 { font-size:17px; margin-bottom:6px; }
+    .card p { color:var(--muted); font-size:14.5px; }
+    details.faq { border:1px solid var(--line); border-radius:8px; padding:14px 18px; margin-bottom:12px; background:#fff; }
+    details.faq summary { cursor:pointer; font-weight:700; }
+    details.faq p { margin-top:10px; color:var(--muted); }
+    footer.site { border-top:1px solid var(--line); padding:28px 0 40px; color:var(--muted); font-size:13.5px; background:var(--panel); }
+    footer.site .cols { display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap; }
+    footer.site a { color:var(--accent); text-decoration:none; }
+    @media (max-width:640px){ .hero h1{font-size:28px;} nav a{margin-left:12px;font-size:13px;} }
+  </style>
+</head>
+<body>
+<header class="site">
+  <div class="wrap bar">
+    <a class="brand" href="./">U-<em>DSH</em> 便携版</a>
+    <nav aria-label="页面导航">
+      <a href="#start">快速开始</a>
+      <a href="#compare">对比</a>
+      <a href="#features">特性</a>
+      <a href="#faq">常见问题</a>
+      <a href="https://github.com/dongsheng123132/u-dsh-deepseek-harness-portable" target="_blank" rel="noreferrer">GitHub</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="wrap hero">
+    <h1>把 DeepSeek 助手装进 U 盘<br /><span>解压即用，拔盘即走</span></h1>
+    <p class="sub">U-DSH 是 DeepSeek Harness（DSH）的 Windows 免安装便携版：不装 Node.js、不跑 npm、不联网下载内核。
+      插到任何一台 Windows 电脑上双击就能用，会话和配置随盘带走。<strong>打开就有额度——不用注册、不用申请 API Key。</strong></p>
+    <div class="cta">
+      <a class="btn primary" href="https://github.com/dongsheng123132/u-dsh-deepseek-harness-portable/releases/latest" target="_blank" rel="noreferrer">下载最新版</a>
+      <a class="btn" href="https://github.com/dongsheng123132/u-dsh-deepseek-harness-portable/blob/main/docs/%E6%96%B0%E6%89%8B%E6%95%99%E7%A8%8B.md" target="_blank" rel="noreferrer">新手教程（零基础）</a>
+    </div>
+    <p class="fineprint">Windows x64 · MIT 开源 · 与 DeepSeek 官方无隶属关系 · U 盘需 NTFS 格式</p>
+  </div>
+
+  <section id="start">
+    <div class="wrap">
+      <h2>三步开始使用</h2>
+      <p class="lead">全程不需要命令行，不需要安装任何运行环境。</p>
+      <ol class="steps">
+        <li><b>下载压缩包</b>到 Releases 页下载 <code>U-DSH-DeepSeek-Harness-Portable-*-Windows-x64.zip</code>。</li>
+        <li><b>解压</b>到本地硬盘或 U 盘（U 盘须为 NTFS 格式）。首次解压因文件数量多会稍慢，之后启动是秒级。</li>
+        <li><b>双击 <code>U-DSH Portable.exe</code></b>，等界面出来即可开始对话。首次联网启动自动配好设备 Key。</li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="compare">
+    <div class="wrap">
+      <h2>为什么选 U-DSH？</h2>
+      <p class="lead">和其他 DSH 桌面版 / 便携版比一比：「申请 API Key」这一步劝退了大多数人，U-DSH 把它直接砍掉了。</p>
+      <table class="cmp">
+        <tr><th style="width:18%"></th><th>U-DSH 便携版</th><th>其他 DSH 桌面版 / 便携版</th></tr>
+        <tr><td><b>安装</b></td><td class="win">解压双击，零安装</td><td>跑安装程序，或自己配 Node + npm</td></tr>
+        <tr><td><b>API Key</b></td><td class="win">开箱自带额度，免注册免申请</td><td>注册 platform.deepseek.com → 充值 → 复制 Key 粘回来</td></tr>
+        <tr><td><b>随身携带</b></td><td class="win">会话/配置/凭据全在包目录</td><td>数据散落在各电脑的用户目录</td></tr>
+        <tr><td><b>离线启动</b></td><td class="win">内核随包，首次启动不需联网</td><td>一般要联网下载运行时或内核</td></tr>
+        <tr><td><b>系统痕迹</b></td><td class="win">不写注册表，删文件夹=卸载干净</td><td>常规安装写注册表、留缓存</td></tr>
+      </table>
+    </div>
+  </section>
+
+  <section id="features">
+    <div class="wrap">
+      <h2>核心特性</h2>
+      <p class="lead">瘦壳 + 随包内核：客户机一行 npm 都不跑、一个字节都不下载。</p>
+      <div class="grid">
+        <div class="card"><h3>免安装绿色版</h3><p>内置 Node.js 运行时和 @deepseek-ai/dsh 完整依赖闭包，目标电脑零依赖。</p></div>
+        <div class="card"><h3>开箱即有额度</h3><p>虾盘云设备钱包首次启动自动签发本机 Key 并配好，一键充值，也可随时换自己的 Key。</p></div>
+        <div class="card"><h3>U 盘便携</h3><p>会话、配置、凭据、工作区全在程序所在目录，插哪台电脑都是你的环境。</p></div>
+        <div class="card"><h3>不污染系统</h3><p>不写注册表、不改环境变量、不动用户目录；删除文件夹即完全卸载。</p></div>
+        <div class="card"><h3>离线可用</h3><p>内核随包分发，构建期完成 SHA-256 校验；首次启动不需要联网。</p></div>
+        <div class="card"><h3>无界面可调用</h3><p>每个业务动作都有稳定 Action ID，CLI / MCP / API 都能调，密钥永不落命令行参数。</p></div>
       </div>
-    </header>
+    </div>
+  </section>
 
-    <main>
-      <section class="hero">
-        <div class="hero-grid" aria-hidden="true"></div>
-        <div class="hero-ribbons" aria-hidden="true">
-          <span class="ribbon ribbon-a"></span>
-          <span class="ribbon ribbon-b"></span>
-          <span class="ribbon ribbon-c"></span>
-        </div>
-        <div class="hero-whale" aria-hidden="true"></div>
-        <div class="container hero-content">
-          <div class="hero-copy">
-            <p class="eyebrow" data-i18n="preview">DeepSeek Harness 非官方桌面版</p>
-            <h1 data-i18n="headline">Harness 桌面即用</h1>
-            <div class="hero-description">
-              <p data-i18n="heroParagraphOne">将官方 DeepSeek Harness 完整封装为桌面应用，无需命令行，也无需手动管理端口。</p>
-              <p data-i18n="heroParagraphTwo">保留模型、工具、技能、会话、沙箱、存储和插件等全部能力，打开应用即可开始工作。</p>
-            </div>
-            <div class="hero-actions">
-              <a class="button button-light" id="primary-download" href="https://github.com/steven-kid/deepseek-harness-desktop/releases/latest">
-                <svg class="platform-icon" viewBox="0 0 24 24" aria-hidden="true">
-                  <path id="platform-icon-path" d="M17.05 12.54c-.02-2.27 1.86-3.37 1.95-3.42a4.2 4.2 0 0 0-3.31-1.79c-1.39-.15-2.74.83-3.45.83-.72 0-1.81-.82-2.98-.8a4.38 4.38 0 0 0-3.69 2.25c-1.6 2.77-.41 6.84 1.12 9.08.76 1.09 1.64 2.31 2.81 2.27 1.14-.05 1.57-.73 2.95-.73 1.36 0 1.77.73 2.96.7 1.23-.02 2-1.1 2.73-2.2a9.08 9.08 0 0 0 1.25-2.55 3.93 3.93 0 0 1-2.34-3.64ZM14.78 5.85a4 4 0 0 0 .92-2.86 4.1 4.1 0 0 0-2.66 1.36 3.8 3.8 0 0 0-.95 2.75 3.39 3.39 0 0 0 2.69-1.25Z"/>
-                </svg>
-                <span id="primary-download-label" data-i18n="downloadMac">下载 macOS 版</span>
-              </a>
-              <a class="button button-glass" href="https://github.com/steven-kid/deepseek-harness-desktop/releases/latest" target="_blank" rel="noreferrer" data-i18n="allDownloads">全部下载</a>
-              <a class="button button-glass" href="https://pan.quark.cn/s/e2dfc232c52d" target="_blank" rel="noreferrer" data-i18n="quark">夸克网盘</a>
-            </div>
-          </div>
+  <section id="faq">
+    <div class="wrap">
+      <h2>常见问题</h2>
+      <p class="lead">更多内容见 <a href="https://github.com/dongsheng123132/u-dsh-deepseek-harness-portable#readme" target="_blank" rel="noreferrer">GitHub README</a>。</p>
+      <details class="faq" open>
+        <summary>U 盘为什么必须是 NTFS 格式？exFAT 行不行？</summary>
+        <p>不行。DSH 每次启动要在数据目录下创建目录链接（junction），exFAT/FAT32 不支持，会直接失败。U-DSH 启动前会自动探测并提示改用 NTFS。格式化前请先备份资料。</p>
+      </details>
+      <details class="faq">
+        <summary>为什么第一次解压这么慢？</summary>
+        <p>包内是 DSH 的完整依赖闭包，几万个小文件，瓶颈是文件数量而非体积，慢盘上十几分钟属正常。解压一次之后每次启动都是秒级。</p>
+      </details>
+      <details class="faq">
+        <summary>可以不用内置额度，换成自己的 API Key 吗？</summary>
+        <p>可以。钱包页提供「填入已有 Key」，支持 DeepSeek 官方 API 或其他 OpenAI 兼容服务，且随时可以换回。</p>
+      </details>
+      <details class="faq">
+        <summary>它会给我的电脑留下痕迹吗？</summary>
+        <p>不写注册表、不改环境变量。会话、配置、凭据、工作区全部保存在程序所在目录，删除文件夹即完全卸载。</p>
+      </details>
+      <details class="faq">
+        <summary>这是 DeepSeek 官方产品吗？</summary>
+        <p>不是。U-DSH 是社区独立发行版，与 DeepSeek 官方无隶属关系；客户端代码以 MIT 许可开源。</p>
+      </details>
+    </div>
+  </section>
+</main>
 
-          <div class="hero-terminal" aria-label="桌面版安装">
-            <div class="terminal-tabs">
-              <button class="terminal-tab active" type="button" data-terminal="download" data-i18n="oneClick">一键安装</button>
-              <button class="terminal-tab" type="button" data-terminal="source" data-i18n="sourceInstall">源码安装</button>
-            </div>
-            <div class="terminal-window">
-              <div class="terminal-bar">
-                <span class="terminal-dots"><i></i><i></i><i></i></span>
-                <button class="copy-button" type="button" data-i18n="copy">复制</button>
-              </div>
-              <code id="terminal-command">$ open DeepSeek-Harness-Desktop*.dmg</code>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section class="intro-section section-dark" id="features">
-        <div class="container">
-          <div class="section-intro centered">
-            <span class="mono-pill">HARNESS + DESKTOP</span>
-            <h2><strong>HARNESS</strong> <span data-i18n="introTitle">让 Agent 在桌面上持续工作</span></h2>
-            <p data-i18n="introDescription">模型是 Agent 的灵魂。Harness 赋予 Agent 理解环境和使用工具的能力，Desktop 则让这一切打开即用。</p>
-          </div>
-          <div class="capability-grid">
-            <article class="capability-card">
-              <div class="capability-icon atom-icon" aria-hidden="true"><span></span><span></span><span></span><i></i></div>
-              <h3 data-i18n="capabilityOneTitle">原生桌面封装</h3>
-              <small>NATIVE DESKTOP SHELL</small>
-              <p data-i18n="capabilityOneDescription">保留官方 Web UI 与 Harness 内核，只增加桌面窗口、生命周期和系统集成。</p>
-            </article>
-            <article class="capability-card">
-              <div class="capability-icon orbit-icon" aria-hidden="true"><span></span><i></i><i></i><i></i></div>
-              <h3 data-i18n="capabilityTwoTitle">自动启动服务</h3>
-              <small>AUTOMATIC RUNTIME</small>
-              <p data-i18n="capabilityTwoDescription">自动选择可用端口、启动本地服务并加载界面，不再维护终端进程。</p>
-            </article>
-            <article class="capability-card">
-              <div class="capability-icon blocks-icon" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
-              <h3 data-i18n="capabilityThreeTitle">跨平台发布</h3>
-              <small>MAC · WINDOWS · LINUX</small>
-              <p data-i18n="capabilityThreeDescription">提供 Apple Silicon、Intel Mac、Windows x64 与 Linux x64 安装包。</p>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section class="design-section section-dark" id="design">
-        <div class="container">
-          <div class="section-intro">
-            <span class="mono-pill" data-i18n="designLabel">设计思路</span>
-            <h2 data-i18n="designTitle">能力保持不变，使用方式更加自然</h2>
-          </div>
-          <div class="design-rows">
-            <article class="design-row">
-              <div class="design-copy">
-                <h3><span class="row-icon">◇</span><span data-i18n="designOneTitle">打开即用</span></h3>
-                <p data-i18n="designOneDescription">启动应用时自动拉起 DeepSeek Harness，并在服务准备完成后加载官方 Web UI。你无需记住命令，也不必处理端口冲突。</p>
-              </div>
-              <div class="design-media desktop-preview">
-                <div class="preview-titlebar">
-                  <span class="terminal-dots"><i></i><i></i><i></i></span>
-                  <span>DeepSeek Harness Desktop</span>
-                  <span class="preview-online">● Local</span>
-                </div>
-                <img src="./product-screenshot.jpg" width="1800" height="1172" loading="lazy" decoding="async" alt="DeepSeek Harness Desktop 应用界面" />
-              </div>
-            </article>
-            <article class="design-row reverse">
-              <div class="design-copy">
-                <h3><span class="row-icon">▷</span><span data-i18n="designTwoTitle">本地运行，有迹可循</span></h3>
-                <p data-i18n="designTwoDescription">Harness 服务运行在本机，工作目录、会话与工具调用保持原有机制。桌面封装不会改变 Harness 的能力边界。</p>
-              </div>
-              <div class="design-media code-preview">
-                <div class="code-preview-head"><span>DeepSeek Harness</span><span>127.0.0.1</span></div>
-                <div class="code-preview-body">
-                  <span><i class="blue"></i>Runtime</span><strong data-i18n="runtimeReady">已就绪</strong>
-                  <span><i class="green"></i>Workspace</span><strong data-i18n="localDirectory">本地目录</strong>
-                  <span><i class="purple"></i>Session</span><strong data-i18n="persistent">持续保存</strong>
-                </div>
-              </div>
-            </article>
-            <article class="design-row">
-              <div class="design-copy">
-                <h3><span class="row-icon">▦</span><span data-i18n="designThreeTitle">适配不同系统</span></h3>
-                <p data-i18n="designThreeDescription">在 macOS、Windows 和 Linux 上使用一致的 Harness 体验，并针对系统窗口、菜单、托盘与目录选择器进行适配。</p>
-              </div>
-              <div class="design-media platforms-preview">
-                <span>macOS<strong>Apple Silicon<br />Intel</strong></span>
-                <span>Windows<strong>x64 Installer<br />Portable ZIP</strong></span>
-                <span>Linux<strong>AppImage<br />DEB</strong></span>
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section class="demo-section section-dark">
-        <div class="container">
-          <h2 data-i18n="demoTitle">完整的 DeepSeek Harness，原生的桌面体验</h2>
-          <div class="demo-frame">
-            <img src="./product-screenshot.jpg" width="1800" height="1172" loading="lazy" decoding="async" alt="DeepSeek Harness Desktop 产品预览" />
-          </div>
-        </div>
-      </section>
-
-      <section class="downloads-section section-dark" id="downloads">
-        <div class="container">
-          <div class="section-intro">
-            <span class="mono-pill" data-i18n="startNow">开始使用</span>
-            <h2 data-i18n="downloadTitle">选择适合你的安装包</h2>
-          </div>
-          <div class="install-grid">
-            <article class="install-card">
-              <h3>macOS</h3>
-              <p data-i18n="macDescription">支持 Apple Silicon 与 Intel Mac。</p>
-              <div class="install-links">
-                <a href="https://github.com/steven-kid/deepseek-harness-desktop/releases/download/v0.3.5/DeepSeek-Harness-Desktop-0.3.5-arm64.dmg"><span>$</span> Apple Silicon · DMG <b>↓</b></a>
-                <a href="https://github.com/steven-kid/deepseek-harness-desktop/releases/download/v0.3.5/DeepSeek-Harness-Desktop-0.3.5-x64.dmg"><span>$</span> Intel · DMG <b>↓</b></a>
-              </div>
-            </article>
-            <article class="install-card">
-              <h3>Windows & Linux</h3>
-              <p data-i18n="otherPlatformsDescription">提供 Windows 安装程序与 Linux AppImage。</p>
-              <div class="install-links">
-                <a href="https://github.com/steven-kid/deepseek-harness-desktop/releases/download/v0.3.5/DeepSeek-Harness-Desktop-0.3.5-windows-x64.exe"><span>$</span> Windows x64 · EXE <b>↓</b></a>
-                <a href="https://github.com/steven-kid/deepseek-harness-desktop/releases/download/v0.3.5/DeepSeek-Harness-Desktop-0.3.5-linux-x86_64.AppImage"><span>$</span> Linux x64 · AppImage <b>↓</b></a>
-              </div>
-            </article>
-          </div>
-        </div>
-      </section>
-
-      <section class="join-section section-dark">
-        <div class="join-grid" aria-hidden="true"></div>
-        <div class="join-whale" aria-hidden="true"></div>
-        <div class="container join-content">
-          <h2 data-i18n="joinTitle">让 Harness 随手可用</h2>
-          <p data-i18n="joinDescription">这是一个非官方社区项目，只封装桌面端能力，不修改 DeepSeek Harness 本身。欢迎下载、反馈与共同完善。</p>
-          <div class="hero-actions">
-            <a class="button button-light" href="https://github.com/steven-kid/deepseek-harness-desktop" target="_blank" rel="noreferrer" data-i18n="viewGithub">查看 GitHub</a>
-            <a class="button button-glass" href="https://github.com/steven-kid/deepseek-harness-desktop/releases/latest" target="_blank" rel="noreferrer" data-i18n="allDownloads">全部下载</a>
-            <a class="button button-glass" href="https://pan.quark.cn/s/e2dfc232c52d" target="_blank" rel="noreferrer" data-i18n="quark">夸克网盘</a>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <footer class="site-footer section-dark">
-      <div class="container footer-inner">
-        <span data-i18n="community">非官方社区项目</span>
-        <span>开源 · MIT · DeepSeek Harness Desktop</span>
-        <span><a href="https://github.com/deepseek-ai/deepseek-harness" target="_blank" rel="noreferrer">Powered by DeepSeek Harness</a></span>
-      </div>
-    </footer>
-
-    <script src="./harness-site.js"></script>
-  </body>
+<footer class="site">
+  <div class="wrap cols">
+    <span>非官方社区项目 · 与 DeepSeek 无隶属关系</span>
+    <span><a href="https://github.com/dongsheng123132/u-dsh-deepseek-harness-portable" target="_blank" rel="noreferrer">GitHub 仓库</a> · <a href="https://github.com/dongsheng123132/u-dsh-deepseek-harness-portable/releases/latest" target="_blank" rel="noreferrer">下载</a> · MIT License</span>
+    <span>Powered by open-source <a href="https://github.com/deepseek-ai/deepseek-harness" target="_blank" rel="noreferrer">DeepSeek Harness</a></span>
+  </div>
+</footer>
+</body>
 </html>
