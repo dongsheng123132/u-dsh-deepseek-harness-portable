@@ -53,7 +53,7 @@ v0.1.3 及以前，客户机首启时 `kernel-manager` 会在客户机上真跑
 - DSH 入口 = `<resources>/harness/node_modules/@deepseek-ai/dsh` 按其 `bin.dsh` 解析
 - 开发态（未打包）回落到仓库的 `vendor/`，`npm start` 照常可用
 - `ensure()` 是纯本地校验（身份/版本/入口/peer，能抓到拷贝损坏或用户手删），毫秒级
-- `checkLatest()` 只报告 npm 上有没有新版，**非致命**：网络不通返回 `latest: ''`（unknown），绝不影响启动
+- 不检查 npm 或任何远端版本；运行期没有下载、安装或升级路径。升级只能用新的完整发布包完成
 
 删掉的东西（连同只服务它们的辅助函数）：`installDsh`、`discoverSystemDsh`、
 `discoverSystemNode`、`download`、`expandZipWindows`、系统 Node/DSH 回落、

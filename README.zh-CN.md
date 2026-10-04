@@ -62,9 +62,9 @@
 与社区 [deepseek-harness-desktop](https://github.com/steven-kid/deepseek-harness-desktop)，
 只增加便携数据边界、随包内核、设备钱包和无界面动作接口。
 
-## 为什么采用"瘦壳 + 可换内核"
+## 为什么采用"瘦壳 + 固定内核"
 
-DSH 仍处于快速更新期。把某个 DSH 版本焊死在 Electron 包里，会让每次升级都重新发布整个桌面应用。U-DSH 把三类状态分开：
+DSH 仍处于快速更新期。U-DSH 选择把可运行版本焊死在完整发布包里：客户端不检查、不下载、不自动升级内核；需要升级时，直接用新的完整 U-DSH 发布包替换。U-DSH 把三类状态分开：
 
 | 位置 | 内容 | 是否随 U 盘移动 |
 |---|---|---|
@@ -72,7 +72,7 @@ DSH 仍处于快速更新期。把某个 DSH 版本焊死在 Electron 包里，�
 | `U-DSH/data/u-dsh-state/device-wallet.json` | 设备钱包五字段事务状态 | 是 |
 | `%LOCALAPPDATA%/U-DSH/` | Electron 缓存、日志、内核激活指针 | 否 |
 
-内核（固定版本的 Node 运行时 + 官方 `@deepseek-ai/dsh` 的完整依赖闭包）在**构建时**由 `npm run prepare:vendor` 整体打进发布包。客户机一行 npm 都不跑、一个字节都不下载：启动只做随包内核的本地解析与校验（包名/版本/入口/必需 peer），毫秒级、完全离线。所有版本参数集中在 [`config/runtime-channel.json`](config/runtime-channel.json)；Node 压缩包的 SHA-256 与 DSH 根包 integrity 都在构建期核对。「检查更新」只报告 npm 标签、绝不安装，网络不通时降级为 unknown、不影响启动。详见 [`docs/vendored-kernel.md`](docs/vendored-kernel.md)。
+内核（固定版本的 Node 运行时 + 官方 `@deepseek-ai/dsh` 的完整依赖闭包）在**构建时**由 `npm run prepare:vendor` 整体打进发布包。客户机一行 npm 都不跑、一个字节都不下载，也不联网检查版本：启动只做随包内核的本地解析与校验（包名/版本/入口/必需 peer），毫秒级、完全离线。所有版本参数集中在 [`config/runtime-channel.json`](config/runtime-channel.json)；Node 压缩包的 SHA-256 与 DSH 根包 integrity 都在构建期核对。详见 [`docs/vendored-kernel.md`](docs/vendored-kernel.md)。
 
 ## 设备钱包
 
@@ -127,7 +127,7 @@ npm run dist:portable    # 有 prepare-vendor --check 门禁：没有闭包就�
 - [`.shadowfork/profile.yaml`](.shadowfork/profile.yaml) 记录 U-DSH 相对社区桌面壳上游的定制，后续可判断上游更新是否撞到安全边界；
 - [`.shadowfork/upstream.yaml`](.shadowfork/upstream.yaml) 是 U-DSH 给下游 fork 的派生契约，声明必须换的身份字段、保护区、扩展点和归因要求。
 
-业务扩展优先放到 [`src/extensions/`](src/extensions/)，内核版本通过配置升级，ActionParity 生成文件不要手改。
+业务扩展优先放到 [`src/extensions/`](src/extensions/)，内核版本只在构建新发布包时调整，ActionParity 生成文件不要手改。
 
 ## 常见问题
 

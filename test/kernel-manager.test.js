@@ -106,23 +106,13 @@ test('kernel manager only serves the pinned version and fails fast without the r
   }
 })
 
-test('checkLatest is non-fatal and reports unknown when the network is down', async () => {
-  const { root, manager } = await fixture()
-  try {
-    const value = await manager.checkLatest()
-    assert.deepEqual(value, { current: null, pinned: '0.1.0-rc.7', latest: '' })
-  } finally {
-    await rm(root, { recursive: true, force: true })
-  }
-})
-
 // 决定性回归：随包内核代码路径里不允许存在任何会 spawn npm / 下载 / 解压
-// 的实现。文本断言抓的是"有人把安装逻辑加回来"这一类回归。
-test('kernel code path contains no npm/download/extract machinery', () => {
+// 或联网升级的实现。文本断言抓的是"有人把升级逻辑加回来"这一类回归。
+test('kernel code path contains no install or upgrade machinery', () => {
   const srcDir = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'src')
   for (const filename of ['kernel-manager.js', 'harness-validate.js']) {
     const source = readFileSync(path.join(srcDir, filename), 'utf8')
-    for (const forbidden of ['child_process', 'spawn', 'npm-cli', 'installDsh', 'Expand-Archive', 'downloadsDir', 'npmCacheDir']) {
+    for (const forbidden of ['child_process', 'spawn', 'npm-cli', 'installDsh', 'Expand-Archive', 'downloadsDir', 'npmCacheDir', 'checkLatest', 'registryMetadata', 'fetchImpl']) {
       assert.equal(source.includes(forbidden), false, `${filename} 不应包含 ${forbidden}`)
     }
   }

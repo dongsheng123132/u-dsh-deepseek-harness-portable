@@ -130,7 +130,7 @@ The result is `dist/U-DSH-DeepSeek-Harness-Portable-<version>-Windows-x64.zip`. 
 - [`.shadowfork/profile.yaml`](.shadowfork/profile.yaml) records U-DSH's customizations relative to the community desktop upstream.
 - [`.shadowfork/upstream.yaml`](.shadowfork/upstream.yaml) publishes U-DSH's downstream derivation contract: identity fields, protected boundaries, extension points, and attribution.
 
-Prefer additions under [`src/extensions/`](src/extensions/), update kernels through the channel config, and regenerate rather than manually edit ActionParity outputs.
+Prefer additions under [`src/extensions/`](src/extensions/), change the pinned kernel only when building a new release, and regenerate rather than manually edit ActionParity outputs.
 
 ## FAQ
 

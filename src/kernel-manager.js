@@ -34,13 +34,12 @@ export function resolveVendorRoot({
 /**
  * 随包内核管理器：内核（Node 运行时 + DSH 闭包）在构建时已完整 vendor 进
  * 发布包，这里只做本地解析与校验——无网络、无安装、无子进程，毫秒级。
- * 唯一允许联网的是 checkLatest（只读报告 npm 上有没有新版，且非致命）。
+ * 运行期不提供检查或下载升级的能力；升级只能由新的完整发布包替换。
  */
 export function createKernelManager({
   paths,
   channel,
   vendorRoot,
-  fetchImpl = fetch,
   env = process.env,
   platform = process.platform,
   arch = process.arch,
@@ -97,33 +96,6 @@ export function createKernelManager({
     return { target, previous }
   }
 
-  async function registryMetadata() {
-    const encodedName = encodeURIComponent(channel.dsh.package).replace('%40', '@')
-    const url = `${channel.dsh.registry.replace(/\/$/, '')}/${encodedName}`
-    const response = await fetchImpl(url, { signal: AbortSignal.timeout(15_000) })
-    if (!response.ok) throw new Error(`读取 DSH 版本目录失败：HTTP ${response.status}`)
-    return response.json()
-  }
-
-  /**
-   * 只读报告 npm 上有没有新版，绝不安装。必须非致命：网络不通时
-   * latest 返回空串（unknown），不允许影响启动。
-   */
-  async function checkLatest(tag = 'latest') {
-    const current = await activeVersion()
-    try {
-      const metadata = await registryMetadata()
-      const version = metadata?.['dist-tags']?.[tag]
-      return {
-        current,
-        pinned: channel.dsh.version,
-        latest: EXACT_VERSION.test(version || '') ? version : '',
-      }
-    } catch {
-      return { current, pinned: channel.dsh.version, latest: '' }
-    }
-  }
-
   async function status() {
     const installed = await listInstalled()
     return {
@@ -140,7 +112,6 @@ export function createKernelManager({
   return {
     activate,
     activeVersion,
-    checkLatest,
     ensure,
     listInstalled,
     resolveDsh,
