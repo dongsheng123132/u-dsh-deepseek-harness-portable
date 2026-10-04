@@ -20,8 +20,8 @@ function normalizedWalletStatus(value) {
   }
 }
 
-export function buildActionRegistry({ wallet, kernel, copyCurrentKey, openRecharge, reportProblem } = {}) {
-  if (!wallet || !kernel) throw new Error('wallet 和 kernel 是必填项')
+export function buildActionRegistry({ wallet, copyCurrentKey, openRecharge } = {}) {
+  if (!wallet) throw new Error('wallet 是必填项')
   const registry = createRegistry({
     application: {
       id: 'org.uclaw.udsh',
@@ -117,17 +117,24 @@ export function buildActionRegistry({ wallet, kernel, copyCurrentKey, openRechar
       },
     }),
     defineAction({
-      id: 'support.report_problem',
-      title: '报告问题',
-      description: '收集版本、内核与钱包状态和日志摘要，打开预填的 GitHub issue；凭据已打码，Key 本身不进报告。',
+      id: 'wallet.onboard',
+      title: '一键开通并充值设备钱包',
+      description: '自动申领或恢复设备钱包、写入 DSH 配置，然后在系统浏览器打开充值页；不会自动扣费。',
       effects: { class: 'external', risk: 'low', reversible: true },
-      execution: { idempotent: true, timeout_ms: 20_000, evidence: 'node --test test/diagnostics.test.js' },
+      execution: { idempotent: true, timeout_ms: 45_000, evidence: 'node --test test/action-parity.test.js' },
       input: EMPTY_INPUT,
       output: MESSAGE_OUTPUT,
       handler: async (_input, context) => {
-        if (!reportProblem) throw new Error('当前界面不支持打开系统浏览器')
-        await reportProblem()
-        return { message: '已打开问题反馈页，诊断信息已填好（Key 已打码），补一句问题描述就能提交', coreExecutionId: context.executionId }
+        const ensured = await wallet.ensure()
+        if (!ensured?.apiKey || ensured.configured === false) {
+          throw new Error('设备钱包暂时无法就绪。请检查网络后重试，DSH 仍可照常打开。')
+        }
+        if (!openRecharge) throw new Error('当前界面不支持打开系统浏览器')
+        await openRecharge()
+        return {
+          message: '设备钱包已自动配好，已打开充值页面；付款后回到 DSH 即可开始使用。',
+          coreExecutionId: context.executionId,
+        }
       },
     }),
     defineAction({
@@ -171,50 +178,6 @@ export function buildActionRegistry({ wallet, kernel, copyCurrentKey, openRechar
       input: EMPTY_INPUT,
       output: KEY_MESSAGE_OUTPUT,
       handler: async (_input, context) => ({ ...await wallet.resetLocal(), coreExecutionId: context.executionId }),
-    }),
-    defineAction({
-      id: 'kernel.status',
-      title: '读取 DSH 内核状态',
-      description: '读取随包 Node/DSH 内核版本和 U 盘数据目录，纯本地校验。',
-      effects: 'read',
-      // 校验会遍历整个 vendor 闭包（250+ 包）的 peer 解析，冷盘实测 10s+，5s 必超时。
-      execution: { idempotent: true, timeout_ms: 30_000, evidence: 'node --test test/action-parity.test.js' },
-      input: EMPTY_INPUT,
-      output: s.object({
-        nodeVersion: s.string(),
-        nodeReady: s.boolean(),
-        pinnedVersion: s.string(),
-        activeVersion: s.nullable(s.string()),
-        installedVersions: s.array(s.string()),
-        cacheDir: s.string(),
-        dataDir: s.string(),
-        coreExecutionId: s.string(),
-      }),
-      handler: async (_input, context) => ({ ...await kernel.status(), coreExecutionId: context.executionId }),
-    }),
-    defineAction({
-      id: 'kernel.check_updates',
-      title: '检查 DSH 内核更新',
-      description: '只读查询 npm latest 标签，不自动安装；网络不通时 latest 为空串且不报错。',
-      effects: 'read',
-      execution: { idempotent: true, timeout_ms: 20_000, evidence: 'node --test test/action-parity.test.js' },
-      input: EMPTY_INPUT,
-      output: s.object({
-        current: s.nullable(s.string()),
-        pinned: s.string(),
-        latest: s.string(),
-        updateAvailable: s.boolean(),
-        coreExecutionId: s.string(),
-      }),
-      handler: async (_input, context) => {
-        const value = await kernel.checkLatest('latest')
-        // latest 为空串 = 网络不可达（unknown），不能误报有更新。
-        return {
-          ...value,
-          updateAvailable: Boolean(value.latest) && value.latest !== value.pinned,
-          coreExecutionId: context.executionId,
-        }
-      },
     }),
   ])
 

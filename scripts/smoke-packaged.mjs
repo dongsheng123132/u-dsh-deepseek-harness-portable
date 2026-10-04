@@ -84,19 +84,21 @@ const nodeProbe = spawnSync('node', ['--version'], { env: hostileEnv, encoding: 
 if (!nodeProbe.error) throw new Error('hostile PATH still resolves a system node; smoke evidence would be void')
 
 try {
-  const cliResult = spawnSync('cmd.exe', ['/d', '/c', cli, 'kernel.status', '--json'], {
+  // v0.2.1 把内核维护动作从公开 CLI 裁掉了；这里改用仍公开的钱包只读动作，
+  // 同时下方直接调用 kernel.ensure() 验证随包 Node/DSH。两条证据各管一件事。
+  const cliResult = spawnSync('cmd.exe', ['/d', '/c', cli, 'wallet.status', '--json'], {
     cwd: appDir,
     env: hostileEnv,
     encoding: 'utf8',
     timeout: 30_000,
   })
   if (cliResult.error) throw cliResult.error
-  if (cliResult.status !== 0 || !cliResult.stdout.includes('pinnedVersion')) {
+  if (cliResult.status !== 0 || !cliResult.stdout.includes('walletId')) {
     throw new Error(`packaged CLI failed (${String(cliResult.status)}): ${cliResult.stderr}`)
   }
   const cliStatus = JSON.parse(cliResult.stdout)
-  if (cliStatus?.result?.nodeReady !== true) {
-    throw new Error(`packaged CLI reports the vendored runtime as not ready: ${cliResult.stdout}`)
+  if (typeof cliStatus?.result?.available !== 'boolean') {
+    throw new Error(`packaged CLI returned an invalid wallet status: ${cliResult.stdout}`)
   }
 
   const kernel = createKernelManager({ paths, channel: loadRuntimeChannel(), vendorRoot })

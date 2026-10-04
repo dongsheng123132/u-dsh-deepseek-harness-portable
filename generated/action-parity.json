@@ -5,215 +5,6 @@
       "bindings": [
         {
           "surface": "cli",
-          "target": "u-dsh kernel.check_updates --json",
-          "test": "test/action-parity.test.js"
-        },
-        {
-          "surface": "gui",
-          "target": "data-action-id=kernel.check_updates",
-          "test": "test/action-parity.test.js"
-        }
-      ],
-      "description": "只读查询 npm latest 标签，不自动安装；网络不通时 latest 为空串且不报错。",
-      "effects": {
-        "audit_required": false,
-        "class": "read",
-        "confirmation": "never",
-        "reversible": true,
-        "risk": "low"
-      },
-      "execution": {
-        "cancellable": false,
-        "headless": true,
-        "headless_evidence": "node --test test/action-parity.test.js",
-        "idempotent": true,
-        "timeout_ms": 20000
-      },
-      "id": "kernel.check_updates",
-      "input_schema": {
-        "additionalProperties": false,
-        "properties": {},
-        "type": "object"
-      },
-      "output_schema": {
-        "additionalProperties": false,
-        "properties": {
-          "coreExecutionId": {
-            "type": "string"
-          },
-          "current": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "latest": {
-            "type": "string"
-          },
-          "pinned": {
-            "type": "string"
-          },
-          "updateAvailable": {
-            "type": "boolean"
-          }
-        },
-        "required": [
-          "current",
-          "pinned",
-          "latest",
-          "updateAvailable",
-          "coreExecutionId"
-        ],
-        "type": "object"
-      },
-      "title": "检查 DSH 内核更新"
-    },
-    {
-      "bindings": [
-        {
-          "surface": "cli",
-          "target": "u-dsh kernel.status --json",
-          "test": "test/action-parity.test.js"
-        },
-        {
-          "surface": "gui",
-          "target": "data-action-id=kernel.status",
-          "test": "test/action-parity.test.js"
-        }
-      ],
-      "description": "读取随包 Node/DSH 内核版本和 U 盘数据目录，纯本地校验。",
-      "effects": {
-        "audit_required": false,
-        "class": "read",
-        "confirmation": "never",
-        "reversible": true,
-        "risk": "low"
-      },
-      "execution": {
-        "cancellable": false,
-        "headless": true,
-        "headless_evidence": "node --test test/action-parity.test.js",
-        "idempotent": true,
-        "timeout_ms": 30000
-      },
-      "id": "kernel.status",
-      "input_schema": {
-        "additionalProperties": false,
-        "properties": {},
-        "type": "object"
-      },
-      "output_schema": {
-        "additionalProperties": false,
-        "properties": {
-          "activeVersion": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          },
-          "cacheDir": {
-            "type": "string"
-          },
-          "coreExecutionId": {
-            "type": "string"
-          },
-          "dataDir": {
-            "type": "string"
-          },
-          "installedVersions": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array"
-          },
-          "nodeReady": {
-            "type": "boolean"
-          },
-          "nodeVersion": {
-            "type": "string"
-          },
-          "pinnedVersion": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "nodeVersion",
-          "nodeReady",
-          "pinnedVersion",
-          "activeVersion",
-          "installedVersions",
-          "cacheDir",
-          "dataDir",
-          "coreExecutionId"
-        ],
-        "type": "object"
-      },
-      "title": "读取 DSH 内核状态"
-    },
-    {
-      "bindings": [
-        {
-          "surface": "cli",
-          "target": "u-dsh support.report_problem --json",
-          "test": "test/action-parity.test.js"
-        },
-        {
-          "surface": "gui",
-          "target": "data-action-id=support.report_problem",
-          "test": "test/action-parity.test.js"
-        }
-      ],
-      "description": "收集版本、内核与钱包状态和日志摘要，打开预填的 GitHub issue；凭据已打码，Key 本身不进报告。",
-      "effects": {
-        "audit_required": true,
-        "class": "external",
-        "confirmation": "conditional",
-        "reversible": true,
-        "risk": "low"
-      },
-      "execution": {
-        "cancellable": false,
-        "headless": true,
-        "headless_evidence": "node --test test/diagnostics.test.js",
-        "idempotent": true,
-        "timeout_ms": 20000
-      },
-      "id": "support.report_problem",
-      "input_schema": {
-        "additionalProperties": false,
-        "properties": {},
-        "type": "object"
-      },
-      "output_schema": {
-        "additionalProperties": false,
-        "properties": {
-          "coreExecutionId": {
-            "type": "string"
-          },
-          "message": {
-            "type": "string"
-          }
-        },
-        "required": [
-          "message",
-          "coreExecutionId"
-        ],
-        "type": "object"
-      },
-      "title": "报告问题"
-    },
-    {
-      "bindings": [
-        {
-          "surface": "cli",
           "target": "u-dsh wallet.ensure --json",
           "test": "test/action-parity.test.js"
         },
@@ -444,6 +235,58 @@
       "bindings": [
         {
           "surface": "cli",
+          "target": "u-dsh wallet.onboard --json",
+          "test": "test/action-parity.test.js"
+        },
+        {
+          "surface": "gui",
+          "target": "data-action-id=wallet.onboard",
+          "test": "test/action-parity.test.js"
+        }
+      ],
+      "description": "自动申领或恢复设备钱包、写入 DSH 配置，然后在系统浏览器打开充值页；不会自动扣费。",
+      "effects": {
+        "audit_required": true,
+        "class": "external",
+        "confirmation": "conditional",
+        "reversible": true,
+        "risk": "low"
+      },
+      "execution": {
+        "cancellable": false,
+        "headless": true,
+        "headless_evidence": "node --test test/action-parity.test.js",
+        "idempotent": true,
+        "timeout_ms": 45000
+      },
+      "id": "wallet.onboard",
+      "input_schema": {
+        "additionalProperties": false,
+        "properties": {},
+        "type": "object"
+      },
+      "output_schema": {
+        "additionalProperties": false,
+        "properties": {
+          "coreExecutionId": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message",
+          "coreExecutionId"
+        ],
+        "type": "object"
+      },
+      "title": "一键开通并充值设备钱包"
+    },
+    {
+      "bindings": [
+        {
+          "surface": "cli",
           "target": "u-dsh wallet.recharge.open --json",
           "test": "test/action-parity.test.js"
         },
@@ -642,7 +485,7 @@
     "id": "org.uclaw.udsh",
     "name": "U-DSH Portable",
     "source": "https://github.com/dongsheng123132/u-dsh-deepseek-harness-portable",
-    "version": "0.2.0"
+    "version": "0.2.1"
   },
   "generated_from": {
     "generator": "action-parity-sdk/0.7.0",

@@ -5,12 +5,6 @@
  */
 
 export const ACTION = {
-  /** 只读查询 npm latest 标签，不自动安装；网络不通时 latest 为空串且不报错。 */
-  KERNEL_CHECK_UPDATES: "kernel.check_updates",
-  /** 读取随包 Node/DSH 内核版本和 U 盘数据目录，纯本地校验。 */
-  KERNEL_STATUS: "kernel.status",
-  /** 收集版本、内核与钱包状态和日志摘要，打开预填的 GitHub issue；凭据已打码，Key 本身不进报告。 */
-  SUPPORT_REPORT_PROBLEM: "support.report_problem",
   /** 恢复未完成操作，必要时申领随机 Key，并写入 DSH 配置。 */
   WALLET_ENSURE: "wallet.ensure",
   /** 只读验证已有 Key，成功后写入 U 盘钱包和 DSH 配置。 */
@@ -19,6 +13,8 @@ export const ACTION = {
   WALLET_KEY_COPY: "wallet.key.copy",
   /** 生成并验证新 Key，提交后旧 Key 失效，钱包余额不变。 */
   WALLET_KEY_ROTATE: "wallet.key.rotate",
+  /** 自动申领或恢复设备钱包、写入 DSH 配置，然后在系统浏览器打开充值页；不会自动扣费。 */
+  WALLET_ONBOARD: "wallet.onboard",
   /** 在系统浏览器打开当前钱包的充值页面；充值 URL 含 Key，不进入输出。 */
   WALLET_RECHARGE_OPEN: "wallet.recharge.open",
   /** 先清除 DSH 消费端配置，再清 U 盘本地钱包；不会删除服务端钱包和余额。 */
@@ -30,26 +26,22 @@ export const ACTION = {
 export type ActionId = (typeof ACTION)[keyof typeof ACTION];
 
 export type ActionInputMap = {
-  "kernel.check_updates": Record<string, never>;
-  "kernel.status": Record<string, never>;
-  "support.report_problem": Record<string, never>;
   "wallet.ensure": Record<string, never>;
   "wallet.key.adopt": { apiKey: string; };
   "wallet.key.copy": Record<string, never>;
   "wallet.key.rotate": Record<string, never>;
+  "wallet.onboard": Record<string, never>;
   "wallet.recharge.open": Record<string, never>;
   "wallet.reset_local": Record<string, never>;
   "wallet.status": { refreshBalance?: boolean; };
 };
 
 export type ActionOutputMap = {
-  "kernel.check_updates": { coreExecutionId: string; current: string | null; latest: string; pinned: string; updateAvailable: boolean; };
-  "kernel.status": { activeVersion: string | null; cacheDir: string; coreExecutionId: string; dataDir: string; installedVersions: Array<string>; nodeReady: boolean; nodeVersion: string; pinnedVersion: string; };
-  "support.report_problem": { coreExecutionId: string; message: string; };
   "wallet.ensure": { available: boolean; configured: boolean; coreExecutionId: string; };
   "wallet.key.adopt": { apiKeyMasked: string; coreExecutionId: string; message: string; };
   "wallet.key.copy": { coreExecutionId: string; message: string; };
   "wallet.key.rotate": { apiKeyMasked: string; coreExecutionId: string; message: string; };
+  "wallet.onboard": { coreExecutionId: string; message: string; };
   "wallet.recharge.open": { coreExecutionId: string; message: string; };
   "wallet.reset_local": { apiKeyMasked: string; coreExecutionId: string; message: string; };
   "wallet.status": { apiKeyMasked: string; available: boolean; balanceAvailable: number | null; balanceError: string; coreExecutionId: string; pending: boolean; pendingKind: string; walletId: string; };

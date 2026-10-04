@@ -94,8 +94,6 @@ GUI 和 CLI 共用同一个无界面动作核心。Windows 便携包根目录会
 ```powershell
 .\U-DSH-CLI.cmd list --json
 .\U-DSH-CLI.cmd wallet.status --json
-.\U-DSH-CLI.cmd kernel.status --json
-.\U-DSH-CLI.cmd kernel.check_updates --json
 ```
 
 密钥禁止作为命令行参数或普通 JSON 输出；填入 Key 只接受标准输入或文件：

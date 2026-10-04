@@ -65,6 +65,9 @@
       input[type="password"] { width: 100%; min-width: 0; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: var(--bg); color: var(--text); font: 14px ui-monospace, SFMono-Regular, Consolas, monospace; outline: none; }
       input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 16%, transparent); }
       .danger-zone { border: 1px solid color-mix(in srgb, var(--danger) 35%, var(--line)); border-radius: 14px; padding: 15px; background: var(--danger-bg); }
+      details { margin-top: 20px; }
+      summary { color: var(--muted); cursor: pointer; font-weight: 600; }
+      details > section { margin-top: 16px; }
       .check { display: flex; gap: 8px; align-items: flex-start; margin: 12px 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
       #message { min-height: 22px; margin: 14px 2px 0; color: var(--success); font-size: 13px; }
       #message.error { color: var(--danger); }
@@ -74,7 +77,7 @@
     <main>
       <header>
         <h1>设备钱包</h1>
-        <p>免登录使用虾盘云。Key 就是你的钱包，请复制到安全的地方自行备份。</p>
+        <p>不用注册账号。我们会自动把设备钱包写入 DSH；首次只需充值一次即可开始使用。</p>
       </header>
       <section class="card">
         <div class="row between">
@@ -89,46 +92,38 @@
           <strong id="balance">—</strong>
         </div>
         <div class="row">
-          <button class="primary" id="recharge" data-action-id="wallet.recharge.open">一键充值</button>
-          <button id="retry" data-action-id="wallet.ensure">联网重试</button>
+          <button class="primary" id="onboard" data-action-id="wallet.onboard">一键开通并充值</button>
           <button id="refresh" data-action-id="wallet.status">刷新余额</button>
-          <button id="copy" data-action-id="wallet.key.copy">复制 Key</button>
-          <button id="rotate" data-action-id="wallet.key.rotate">换一把</button>
         </div>
+        <p class="hint">不会自动扣费。付款在系统浏览器完成；充完回到 DSH 就能直接对话。</p>
 
-        <hr />
-        <h2>填入已有 Key</h2>
-        <p class="hint">换电脑或重装后，把备份的 Key 填回来，原钱包余额会一起回来。</p>
-        <div class="input-row">
-          <input id="adopt-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-…" />
-          <button id="paste">粘贴</button>
-        </div>
-        <button class="primary" id="adopt" data-action-id="wallet.key.adopt" style="margin-top: 9px">验证并启用</button>
-
-        <hr />
-        <h2>DSH 内核</h2>
-        <p class="hint">内核在本机缓存运行，配置、会话和钱包仍保存在 U 盘。升级失败会保留上一个可用版本。</p>
-        <div class="balance">
-          <span class="label">当前 / 固定版本</span>
-          <strong id="kernel-version">正在读取…</strong>
-        </div>
-        <div class="row">
-          <button id="kernel-refresh" data-action-id="kernel.status">刷新内核状态</button>
-          <button id="kernel-check" data-action-id="kernel.check_updates">检查官方更新</button>
-        </div>
-
-        <hr />
-        <h2>遇到问题</h2>
-        <p class="hint">一键生成带诊断信息的反馈（版本、内核状态、日志摘要），Key 会自动打码。</p>
-        <button id="report" data-action-id="support.report_problem">报告问题</button>
-
-        <hr />
-        <div class="danger-zone">
-          <h2>移除本机钱包</h2>
-          <p class="hint">只清这台 U-DSH，不会删除服务端钱包，也不会销毁旧余额。随后会创建一个余额为 0 的新钱包。</p>
-          <label class="check"><input id="backed-up" type="checkbox" />我已经复制并安全备份当前 Key，理解旧余额不会自动转入新钱包。</label>
-          <button class="danger" id="reset" data-action-id="wallet.reset_local" disabled>移除本机钱包</button>
-        </div>
+        <details>
+          <summary>管理钱包、备份或换机</summary>
+          <section>
+            <h2>备份当前 Key</h2>
+            <p class="hint">Key 就是你的钱包。请复制到安全的地方；换电脑或重装后可用它找回余额。</p>
+            <div class="row">
+              <button id="copy" data-action-id="wallet.key.copy">复制 Key</button>
+              <button id="rotate" data-action-id="wallet.key.rotate">换一把</button>
+              <button id="retry" data-action-id="wallet.ensure">联网重试</button>
+              <button id="recharge" data-action-id="wallet.recharge.open">单独打开充值页</button>
+            </div>
+          </section>
+          <section>
+            <h2>填入已有 Key</h2>
+            <div class="input-row">
+              <input id="adopt-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-…" />
+              <button id="paste">粘贴</button>
+            </div>
+            <button id="adopt" data-action-id="wallet.key.adopt" style="margin-top: 9px">验证并启用</button>
+          </section>
+          <section class="danger-zone">
+            <h2>移除本机钱包</h2>
+            <p class="hint">只清这台 U-DSH，不会删除服务端钱包或销毁余额。请先备份 Key。</p>
+            <label class="check"><input id="backed-up" type="checkbox" />我已备份当前 Key，理解旧余额不会自动转入新钱包。</label>
+            <button class="danger" id="reset" data-action-id="wallet.reset_local" disabled>移除本机钱包</button>
+          </section>
+        </details>
         <div id="message" role="status" aria-live="polite"></div>
       </section>
     </main>
@@ -138,7 +133,7 @@
         key: document.querySelector('#key'), state: document.querySelector('#state'),
         balance: document.querySelector('#balance'), message: document.querySelector('#message'),
         input: document.querySelector('#adopt-key'), reset: document.querySelector('#reset'),
-        backedUp: document.querySelector('#backed-up'), kernelVersion: document.querySelector('#kernel-version'),
+        backedUp: document.querySelector('#backed-up'),
       }
       const buttons = [...document.querySelectorAll('button')]
       const setBusy = (busy) => buttons.forEach((button) => { button.disabled = busy || (button === elements.reset && !elements.backedUp.checked) })
@@ -160,11 +155,6 @@
         else if (status.balanceAvailable !== null) elements.balance.textContent = formatTokens(status.balanceAvailable)
         else elements.balance.textContent = '点击“刷新余额”查询'
       }
-      async function loadKernel() {
-        const status = await unwrap(api.kernelStatus())
-        elements.kernelVersion.textContent = `${status.activeVersion || '未启动'} / ${status.pinnedVersion}`
-        return status
-      }
       async function run(action, success, reload = true) {
         setBusy(true); showMessage('')
         try {
@@ -177,6 +167,7 @@
         } finally { setBusy(false) }
       }
       document.querySelector('#refresh').addEventListener('click', () => run(() => load(true), '', false))
+      document.querySelector('#onboard').addEventListener('click', () => run(() => unwrap(api.onboard()), '', false))
       document.querySelector('#retry').addEventListener('click', () => run(() => unwrap(api.retry())))
       document.querySelector('#recharge').addEventListener('click', () => run(() => unwrap(api.recharge()), '', false))
       document.querySelector('#copy').addEventListener('click', () => run(() => unwrap(api.copyKey()), '', false))
@@ -190,29 +181,14 @@
         elements.input.value = ''
         return value
       }))
-      document.querySelector('#kernel-refresh').addEventListener('click', () => run(async () => {
-        await loadKernel()
-        return { message: '内核状态已刷新' }
-      }, '', false))
-      document.querySelector('#kernel-check').addEventListener('click', () => run(async () => {
-        const value = await unwrap(api.checkKernelUpdates())
-        return {
-          message: value.updateAvailable
-            ? `官方已有 ${value.latest}；当前 U-DSH 固定在 ${value.pinned}，请先完成兼容验证再跟版。`
-            : `当前固定版本 ${value.pinned} 已是 stable 最新版。`,
-        }
-      }, '', false))
       document.querySelector('#rotate').addEventListener('click', () => {
         void run(() => unwrap(api.rotate()))
-      })
-      document.querySelector('#report').addEventListener('click', () => {
-        void run(() => unwrap(api.reportProblem()), '', false)
       })
       elements.backedUp.addEventListener('change', () => { elements.reset.disabled = !elements.backedUp.checked })
       elements.reset.addEventListener('click', () => {
         void run(() => unwrap(api.resetLocal())).then(() => { elements.backedUp.checked = false; elements.reset.disabled = true })
       })
-      Promise.all([load(true), loadKernel()]).catch((error) => showMessage(error.message || String(error), true))
+      load(true).catch((error) => showMessage(error.message || String(error), true))
     </script>
   </body>
 </html>

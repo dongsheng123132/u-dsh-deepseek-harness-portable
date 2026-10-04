@@ -1,14 +1,10 @@
 #!/usr/bin/env node
 import { spawn } from 'node:child_process'
-import os from 'node:os'
 import { createCliRunner } from 'action-parity-sdk/cli'
 import { buildActionRegistry } from './action-core.js'
 import { createDeviceWallet, createFileWalletStore } from './device-wallet.js'
 import { createDshConfigManager } from './dsh-config.js'
-import { buildIssueUrl, buildReport, readLogTail } from './diagnostics.js'
-import { createKernelManager } from './kernel-manager.js'
 import { preparePortablePaths, resolvePortablePaths } from './portable-paths.js'
-import { loadRuntimeChannel } from './runtime-channel.js'
 import { resolveUclawEndpoints } from './uclaw-endpoints.js'
 
 const paths = preparePortablePaths(resolvePortablePaths())
@@ -19,7 +15,6 @@ const wallet = createDeviceWallet({
   endpoints,
   applyKey: dshConfig.applyKey,
 })
-const kernel = createKernelManager({ paths, channel: loadRuntimeChannel() })
 
 async function copyCurrentKey() {
   const apiKey = await wallet.currentApiKey()
@@ -55,20 +50,4 @@ async function openUrl(url) {
   })
 }
 
-async function reportProblem() {
-  const settle = async (task) => { try { return await task() } catch { return null } }
-  const [kernelStatus, walletStatus] = await Promise.all([
-    settle(() => kernel.status()),
-    settle(() => wallet.status()),
-  ])
-  await openUrl(buildIssueUrl(buildReport({
-    appVersion: process.env.npm_package_version || '',
-    kernelStatus,
-    walletStatus,
-    logTail: readLogTail(paths.logsDir),
-    osRelease: os.release(),
-    logsDir: paths.logsDir,
-  })))
-}
-
-await createCliRunner(buildActionRegistry({ wallet, kernel, copyCurrentKey, openRecharge, reportProblem }), { name: 'u-dsh' }).main()
+await createCliRunner(buildActionRegistry({ wallet, copyCurrentKey, openRecharge }), { name: 'u-dsh' }).main()

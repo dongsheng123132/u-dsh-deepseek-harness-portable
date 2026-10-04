@@ -1,23 +1,5 @@
 [
   {
-    "action_id": "kernel.check_updates",
-    "surface": "gui",
-    "request_execution_id": "evidence-gui-kernel.check_updates",
-    "core_execution_id": "evidence-gui-kernel.check_updates"
-  },
-  {
-    "action_id": "kernel.status",
-    "surface": "gui",
-    "request_execution_id": "evidence-gui-kernel.status",
-    "core_execution_id": "evidence-gui-kernel.status"
-  },
-  {
-    "action_id": "support.report_problem",
-    "surface": "gui",
-    "request_execution_id": "evidence-gui-support.report_problem",
-    "core_execution_id": "evidence-gui-support.report_problem"
-  },
-  {
     "action_id": "wallet.ensure",
     "surface": "gui",
     "request_execution_id": "evidence-gui-wallet.ensure",
@@ -42,6 +24,12 @@
     "core_execution_id": "evidence-gui-wallet.key.rotate"
   },
   {
+    "action_id": "wallet.onboard",
+    "surface": "gui",
+    "request_execution_id": "evidence-gui-wallet.onboard",
+    "core_execution_id": "evidence-gui-wallet.onboard"
+  },
+  {
     "action_id": "wallet.recharge.open",
     "surface": "gui",
     "request_execution_id": "evidence-gui-wallet.recharge.open",
@@ -58,24 +46,6 @@
     "surface": "gui",
     "request_execution_id": "evidence-gui-wallet.status",
     "core_execution_id": "evidence-gui-wallet.status"
-  },
-  {
-    "action_id": "kernel.check_updates",
-    "surface": "cli",
-    "request_execution_id": "evidence-cli-kernel.check_updates",
-    "core_execution_id": "evidence-cli-kernel.check_updates"
-  },
-  {
-    "action_id": "kernel.status",
-    "surface": "cli",
-    "request_execution_id": "evidence-cli-kernel.status",
-    "core_execution_id": "evidence-cli-kernel.status"
-  },
-  {
-    "action_id": "support.report_problem",
-    "surface": "cli",
-    "request_execution_id": "evidence-cli-support.report_problem",
-    "core_execution_id": "evidence-cli-support.report_problem"
   },
   {
     "action_id": "wallet.ensure",
@@ -100,6 +70,12 @@
     "surface": "cli",
     "request_execution_id": "evidence-cli-wallet.key.rotate",
     "core_execution_id": "evidence-cli-wallet.key.rotate"
+  },
+  {
+    "action_id": "wallet.onboard",
+    "surface": "cli",
+    "request_execution_id": "evidence-cli-wallet.onboard",
+    "core_execution_id": "evidence-cli-wallet.onboard"
   },
   {
     "action_id": "wallet.recharge.open",

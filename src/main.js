@@ -322,11 +322,9 @@ async function launch() {
   kernel = createKernelManager({ paths, channel: runtimeChannel })
   actionRegistry = buildActionRegistry({
     wallet,
-    kernel,
     async openRecharge() {
       await shell.openExternal(await wallet.rechargeUrl())
     },
-    reportProblem: () => openProblemReport(),
     async copyCurrentKey() {
       const apiKey = await wallet.currentApiKey()
       if (!apiKey) throw new Error('当前没有设备钱包')

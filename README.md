@@ -99,8 +99,6 @@ GUI and CLI share one headless action core. The Windows package includes `U-DSH-
 ```powershell
 .\U-DSH-CLI.cmd list --json
 .\U-DSH-CLI.cmd wallet.status --json
-.\U-DSH-CLI.cmd kernel.status --json
-.\U-DSH-CLI.cmd kernel.check_updates --json
 ```
 
 Secrets are rejected in command-line flags and ordinary JSON output. Adopt a key through stdin or a file:
