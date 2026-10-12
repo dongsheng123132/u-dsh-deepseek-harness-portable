@@ -18,7 +18,7 @@ import { startDshService } from './dsh-service.js'
 import { createDeviceWallet, createFileWalletStore } from './device-wallet.js'
 import { buildIssueUrl, buildReport, readLogTail } from './diagnostics.js'
 import { createDshConfigManager, XIAPAN_CREDENTIAL_REF } from './dsh-config.js'
-import { buildWalletEntryScript, isWalletOpenRequest, shouldAutoOpenWallet } from './first-run.js'
+import { buildWalletEntryScript, isWalletOpenRequest, readStartupWalletStatus, shouldAutoOpenWallet } from './first-run.js'
 import { createKernelManager } from './kernel-manager.js'
 import { createLogger } from './logger.js'
 import { applyMacTitleBarStyle } from './mac-titlebar.js'
@@ -245,13 +245,7 @@ async function openProblemReport() {
  * 已充值或余额未知（离线没查到）就别打扰。
  */
 async function presentWalletIfNeeded(walletState) {
-  let status
-  try {
-    status = await wallet.status()
-  } catch (error) {
-    logger.warn('[first-run] 读钱包状态失败，按未就绪处理', error?.message)
-    status = { available: Boolean(walletState?.apiKey), pending: false, balanceAvailable: null }
-  }
+  const status = await readStartupWalletStatus(wallet, walletState, logger)
   if (!shouldAutoOpenWallet(status)) return
   logger.info('[first-run] 钱包需要用户处理，主动打开钱包页')
   await showWalletWindow()

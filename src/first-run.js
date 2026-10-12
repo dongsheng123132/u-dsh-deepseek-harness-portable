@@ -1,5 +1,5 @@
 /**
- * 首次运行体验的纯逻辑：钱包入口注入、udsh:// 拦截、要不要主动递上钱包页。
+ * 首次运行体验：钱包入口注入、udsh:// 拦截、要不要主动递上钱包页。
  * 与 Electron 解耦，方便 node --test 直接断言。
  */
 
@@ -8,6 +8,16 @@ export const WALLET_OPEN_URL = 'udsh://wallet'
 
 export function isWalletOpenRequest(url) {
   return typeof url === 'string' && url.trim().toLowerCase().startsWith('udsh:')
+}
+
+// 主界面已加载后才查询余额；读取失败只保留未知状态，不影响界面启动。
+export async function readStartupWalletStatus(wallet, walletState, logger = console) {
+  try {
+    return await wallet.status({ refreshBalance: true })
+  } catch (error) {
+    logger.warn('[first-run] 读钱包状态失败，按未就绪处理', error?.message)
+    return { available: Boolean(walletState?.apiKey), pending: false, balance: null }
+  }
 }
 
 /**
@@ -21,9 +31,7 @@ export function shouldAutoOpenWallet(status) {
   if (!status) return true
   if (!status.available) return true
   if (status.pending) return true
-  return status.balanceAvailable !== null
-    && status.balanceAvailable !== undefined
-    && status.balanceAvailable <= 0
+  return Number.isFinite(status.balance?.available) && status.balance.available <= 0
 }
 
 /**

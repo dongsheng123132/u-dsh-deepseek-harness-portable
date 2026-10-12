@@ -3,7 +3,8 @@ import { mkdtempSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import test from 'node:test'
-import { WALLET_OPEN_URL, buildWalletEntryScript, isWalletOpenRequest, shouldAutoOpenWallet } from '../src/first-run.js'
+import { WALLET_OPEN_URL, buildWalletEntryScript, isWalletOpenRequest, readStartupWalletStatus, shouldAutoOpenWallet } from '../src/first-run.js'
+import { createDeviceWallet } from '../src/device-wallet.js'
 import { probeJunctionSupport } from '../src/portable-preflight.js'
 import { describeStartupFailure } from '../src/startup-errors.js'
 
@@ -20,12 +21,45 @@ test('钱包未就绪时必须主动递到用户面前', () => {
   assert.ok(shouldAutoOpenWallet(undefined), '读不到状态')
   assert.ok(shouldAutoOpenWallet({ available: false }), '离线首启没签发出来')
   assert.ok(shouldAutoOpenWallet({ available: true, pending: true }), '换 Key 没走完')
-  assert.ok(shouldAutoOpenWallet({ available: true, balanceAvailable: 0 }), '余额为 0，发一句话只会报错')
+  assert.ok(shouldAutoOpenWallet({ available: true, balance: { available: 0 } }), '余额为 0，发一句话只会报错')
 })
 
 test('已充值或余额未知时别打扰用户', () => {
-  assert.ok(!shouldAutoOpenWallet({ available: true, pending: false, balanceAvailable: 12.5 }))
-  assert.ok(!shouldAutoOpenWallet({ available: true, pending: false, balanceAvailable: null }))
+  assert.ok(!shouldAutoOpenWallet({ available: true, pending: false, balance: { available: 12.5 } }))
+  assert.ok(!shouldAutoOpenWallet({ available: true, pending: false, balance: null }))
+  assert.ok(!shouldAutoOpenWallet({ available: true, balance: { error: 'offline' } }))
+  assert.ok(!shouldAutoOpenWallet({ available: true, balance: { available: NaN } }))
+})
+
+test('首启读取真实钱包返回结构并只查询余额，零余额必须打开充值窗口', async () => {
+  const requests = []
+  const wallet = createDeviceWallet({
+    store: {
+      get: async () => ({ apiKey: 'sk-first-run-fixture', walletId: 'fixture', pendingKey: '' }),
+      set: async () => { throw new Error('Startup status must not write the wallet') },
+    },
+    endpoints: { apiBase: 'https://fixture.invalid/v1', payBase: 'https://fixture.invalid', fallbacks: [] },
+    applyKey: async () => { throw new Error('Startup status must not apply a key') },
+    fetch: async (url, options) => {
+      requests.push({ url, method: options.method })
+      return new Response(JSON.stringify({ total_available: 0, total_used: 0, total_granted: 0 }))
+    },
+  })
+  const status = await readStartupWalletStatus(wallet, { apiKey: 'sk-first-run-fixture' })
+  assert.deepEqual(requests, [{ url: 'https://fixture.invalid/api/usage/token/', method: 'GET' }])
+  assert.equal(shouldAutoOpenWallet(status), true)
+})
+
+test('首启钱包读取失败不会抛出或把未知余额当成零余额', async () => {
+  const warnings = []
+  const failedWallet = { status: async () => { throw new Error('read unavailable') } }
+  const logger = { warn: (...args) => warnings.push(args) }
+  const existing = await readStartupWalletStatus(failedWallet, { apiKey: 'sk-first-run-fixture' }, logger)
+  assert.equal(shouldAutoOpenWallet(existing), false)
+  assert.equal(existing.balance, null)
+  const fresh = await readStartupWalletStatus(failedWallet, {}, logger)
+  assert.equal(shouldAutoOpenWallet(fresh), true)
+  assert.equal(warnings.length, 2)
 })
 
 test('钱包入口脚本幂等，且带稳定的非视觉标识', () => {
