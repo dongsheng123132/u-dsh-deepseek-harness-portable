@@ -11,7 +11,7 @@
   },
   "dsh": {
     "package": "@deepseek-ai/dsh",
-    "version": "0.1.0-rc.7",
+    "version": "0.2.0-rc.2",
     "registry": "https://registry.npmjs.org/",
     "installRegistries": [
       "https://registry.npmmirror.com/",
