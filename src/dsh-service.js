@@ -1,6 +1,7 @@
 import { spawn } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
+import { sanitizeRuntimeEnv } from './env-sanitize.js'
 
 const READY_PATTERN = /^dsh web: (http:\/\/127\.0\.0\.1:\d+)\b/m
 
@@ -76,9 +77,13 @@ export function startDshService({
     windowsLauncher,
   })
 
+  // 剥离宿主机残留的第三方 provider 凭证（见 env-sanitize.js 说明）。
+  // 幂等：调用方已传净化环境也不受影响；UDSH_*/UCLAW_* 自身变量保留。
+  const runtimeEnv = sanitizeRuntimeEnv(environment).env
+
   const child = spawn(command, args, {
     env: {
-      ...environment,
+      ...runtimeEnv,
       ...(platform === 'win32' ? {} : { ELECTRON_RUN_AS_NODE: '1' }),
     },
     cwd,
