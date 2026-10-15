@@ -1,15 +1,15 @@
-# U-DSH Portable — DeepSeek Harness Portable / USB Edition for Windows
+# U-DSH Portable — DeepSeek Harness Portable / USB Edition (Windows + macOS, exFAT-ready)
 
 <div align="center">
 
-**A full DeepSeek AI assistant in your pocket: unzip and run on any Windows PC, with credit out of the box.**
+**A full DeepSeek AI assistant in your pocket: unzip and run on any Windows or Mac, with credit out of the box.**
 
 [![Latest Release](https://img.shields.io/github/v/release/dongsheng123132/u-dsh-deepseek-harness-portable)](../../releases/latest)
 [![Release Date](https://img.shields.io/github/release-date/dongsheng123132/u-dsh-deepseek-harness-portable)](../../releases)
 [![GitHub Downloads](https://img.shields.io/github/downloads/dongsheng123132/u-dsh-deepseek-harness-portable/total)](../../releases)
 [![Tests](https://img.shields.io/github/actions/workflow/status/dongsheng123132/u-dsh-deepseek-harness-portable/ci.yml?label=tests)](../../actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-Windows%20x64-lightgrey)](#scope)
+[![Platform](https://img.shields.io/badge/platform-Windows%20x64%20%2B%20macOS-lightgrey)](#scope)
 
 [简体中文](README.zh-CN.md) · [Download latest](../../releases/latest) · [Beginner's guide (中文)](docs/新手教程.md) · [FAQ](#faq)
 
@@ -18,8 +18,22 @@
 ---
 
 > **No-install portable build of DeepSeek Harness (DSH)**: unzip and run. **No Node.js, no npm, no
-> kernel download.** Drop it on a USB stick or external drive, double-click on any Windows PC, and
-> your sessions, credentials and workspace travel with the folder — nothing lands on `C:`.
+> kernel download.** Drop it on a USB stick or external drive, double-click on any Windows PC or Mac,
+> and your sessions, credentials and workspace travel with the folder — nothing lands on the system disk.
+
+## Which build should I download?
+
+| | **v0.2.1 WebUI (recommended)** | v0.2.0 Electron (desktop app) |
+|---|---|---|
+| Interface | Browser UI (auto-opens) | Desktop app (`U-DSH Portable.exe`) |
+| OS | **Windows x64 + macOS** (Apple Silicon / Intel) | Windows x64 only |
+| USB filesystem | **exFAT or NTFS** (exFAT verified — works on the same stick for Windows and Mac) | NTFS only |
+| Launch | Double-click `启动 U-DSH Web.bat` (Win) / `启动 U-DSH Web.command` (Mac) | Double-click `U-DSH Portable.exe` |
+| Download | `U-DSH-WebUI-Portable-0.2.1-win-mac.zip` | `U-DSH-DeepSeek-Harness-Portable-0.2.0-Windows-x64.zip` |
+
+**Pick the WebUI build** if you want one download that runs on both Windows and Mac and works from an
+exFAT-formatted USB drive (the format both systems can read/write). The Electron build is kept for
+users who prefer a desktop window on Windows/NTFS.
 
 ## Why U-DSH?
 
@@ -52,6 +66,15 @@ can **just start chatting**. Top up with one click, or swap in your own key any 
 
 ## Quick start
 
+**WebUI build (v0.2.1, recommended):**
+
+1. Grab `U-DSH-WebUI-Portable-0.2.1-win-mac.zip` from [Releases](../../releases/latest)
+2. Unzip to a USB stick, external drive or local folder (**exFAT or NTFS both work**)
+3. Windows: double-click `启动 U-DSH Web.bat` · macOS: double-click `启动 U-DSH Web.command`
+4. Your browser opens the DeepSeek Harness web UI; data lives in `u-dsh/data/dsh-home` on the drive
+
+**Electron build (v0.2.0):**
+
 1. Grab `U-DSH-DeepSeek-Harness-Portable-*-Windows-x64.zip` from [Releases](../../releases/latest)
 2. Unzip to a USB stick, external drive or local folder (**USB drives must be NTFS** — see [FAQ](#faq))
 3. Double-click `U-DSH Portable.exe`
@@ -64,8 +87,9 @@ can **just start chatting**. Top up with one click, or swap in your own key any 
 
 ## Scope
 
-**Windows x64 only** for now. macOS and Linux are not supported — those build targets are gated off so
-a kernel-less package can never be produced by accident.
+**WebUI build (v0.2.1): Windows x64 + macOS (Apple Silicon and Intel)** — one package, dual platform.
+**Electron build (v0.2.0): Windows x64 only.** Linux is not supported; those build targets are gated
+off so a kernel-less package can never be produced by accident.
 
 U-DSH Portable is unofficial. It does not modify the DSH Web UI or duplicate its business logic; it
 reuses the official [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) and the
@@ -137,9 +161,14 @@ Prefer additions under [`src/extensions/`](src/extensions/), change the pinned k
 <details>
 <summary><b>Why must the USB drive be NTFS? Won't exFAT work?</b></summary>
 
-It won't. DSH creates a directory junction under its data directory on every launch, and
-exFAT/FAT32 cannot hold one — it fails with <code>EISDIR</code>. U-DSH probes for this before starting and tells
-you to switch to NTFS instead of throwing a raw error at you. Back up the drive before reformatting.
+It depends on the build you use. The **Electron desktop build (v0.2.0)** needs NTFS: DSH creates a
+directory junction under its data directory on every launch, and exFAT/FAT32 cannot hold one — it
+fails with <code>EISDIR</code>. The Electron build probes for this before starting and tells you to switch
+to NTFS instead of throwing a raw error at you.
+
+The **WebUI build (v0.2.1)** runs from **exFAT or NTFS** — verified on an exFAT-formatted USB drive
+(Windows). exFAT is what lets one USB stick work on both Windows and Mac without reformatting.
+Back up the drive before reformatting.
 </details>
 
 <details>

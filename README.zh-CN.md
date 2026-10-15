@@ -9,7 +9,7 @@
 [![GitHub Downloads](https://img.shields.io/github/downloads/dongsheng123132/u-dsh-deepseek-harness-portable/total)](../../releases)
 [![Tests](https://img.shields.io/github/actions/workflow/status/dongsheng123132/u-dsh-deepseek-harness-portable/ci.yml?label=tests)](../../actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-[![Platform](https://img.shields.io/badge/platform-Windows%20x64-lightgrey)](#支持范围)
+[![Platform](https://img.shields.io/badge/platform-Windows%20x64%20%2B%20macOS-lightgrey)](#支持范围)
 
 [English](README.md) · [下载最新版](../../releases/latest) · [新手教程](docs/新手教程.md) · [常见问题](#常见问题)
 
@@ -17,8 +17,21 @@
 
 ---
 
-> **DeepSeek Harness（DSH）Windows 免安装便携版**：解压即用，**不装 Node.js、不跑 npm、不联网下载内核**。
-> 拷进 U 盘或移动硬盘，插到任何一台 Windows 电脑上双击就能用，数据随盘走，不污染 C 盘。
+> **DeepSeek Harness（DSH）免安装便携版**：解压即用，**不装 Node.js、不跑 npm、不联网下载内核**。
+> 拷进 U 盘或移动硬盘，插到任何一台 **Windows 或 Mac** 电脑上双击就能用，数据随盘走，不污染系统盘。
+
+## 下载哪个版本？
+
+| | **v0.2.1 WebUI（推荐）** | v0.2.0 Electron（桌面 App） |
+|---|---|---|
+| 界面 | 浏览器界面（自动打开） | 桌面窗口（`U-DSH Portable.exe`） |
+| 系统 | **Windows x64 + macOS**（Apple Silicon / Intel） | 仅 Windows x64 |
+| U 盘格式 | **exFAT 或 NTFS**（exFAT 实测可用，一盘通吃 Windows + Mac） | 仅 NTFS |
+| 启动 | 双击「启动 U-DSH Web.bat」（Win）/「启动 U-DSH Web.command」（Mac） | 双击 `U-DSH Portable.exe` |
+| 下载 | `U-DSH-WebUI-Portable-0.2.1-win-mac.zip` | `U-DSH-DeepSeek-Harness-Portable-0.2.0-Windows-x64.zip` |
+
+**选 WebUI 版**：一个包 Windows / Mac 都能用，exFAT 格式 U 盘（Windows 和 Mac 都能读写的格式）直接跑。
+习惯 Windows + NTFS 桌面窗口的用户可以继续用 Electron 版。
 
 ## 为什么是 U-DSH？
 
@@ -44,7 +57,14 @@
 
 ## 快速开始
 
-> 📖 **零基础请看[《新手教程》](docs/新手教程.md)**：从下载、检查 U 盘格式到第一次对话，一步一步带。
+**WebUI 版（v0.2.1，推荐）：**
+
+1. 到 [Releases](../../releases/latest) 下载 `U-DSH-WebUI-Portable-0.2.1-win-mac.zip`
+2. 解压到 U 盘、移动硬盘或本地文件夹（**exFAT / NTFS 都可以**）
+3. Windows 双击「启动 U-DSH Web.bat」，macOS 双击「启动 U-DSH Web.command」
+4. 浏览器自动打开 DeepSeek Harness Web 界面；数据保存在本盘 `u-dsh/data/dsh-home`，随盘携带
+
+**Electron 版（v0.2.0）：**
 
 1. 到 [Releases](../../releases/latest) 下载 `U-DSH-DeepSeek-Harness-Portable-*-Windows-x64.zip`
 2. 解压到 U 盘、移动硬盘或本地文件夹（**U 盘必须是 NTFS 格式**，原因见[常见问题](#常见问题)）
@@ -55,7 +75,8 @@
 
 ## 支持范围
 
-当前是 **Windows x64** 单平台。macOS / Linux 暂不支持（构建会被门禁拦住，不会打出缺内核的坏包）。
+**WebUI 版（v0.2.1）：Windows x64 + macOS（Apple Silicon / Intel）双平台**，一个包通吃。
+**Electron 版（v0.2.0）：仅 Windows x64。** Linux 暂不支持（构建会被门禁拦住，不会打出缺内核的坏包）。
 
 它不是 DeepSeek 官方产品，也不修改 DSH Web UI、不复制 DSH 的业务实现 ——
 复用官方 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)
@@ -118,7 +139,7 @@ npm run prepare:vendor   # 只在构建机跑：把 Node 运行时 + DSH 闭包�
 npm run dist:portable    # 有 prepare-vendor --check 门禁：没有闭包就打不出包
 ```
 
-生成物在 `dist/U-DSH-DeepSeek-Harness-Portable-<版本>-Windows-x64.zip`。需要网络的是构建机上的 vendor 这一步；打包后的应用完全离线可用（设备钱包相关功能除外）。U 盘仍需 NTFS：DSH 每次启动要在 `data/dsh-home/profiles/node_modules` 下建 junction，exFAT/FAT32 不支持。
+生成物在 `dist/U-DSH-DeepSeek-Harness-Portable-<版本>-Windows-x64.zip`。需要网络的是构建机上的 vendor 这一步；打包后的应用完全离线可用（设备钱包相关功能除外）。Electron 版要求 U 盘 NTFS：DSH 每次启动要在 `data/dsh-home/profiles/node_modules` 下建 junction，exFAT/FAT32 不支持；WebUI 版（v0.2.1）实测 exFAT / NTFS 均可。
 
 ## 方便继续 fork
 
@@ -134,9 +155,12 @@ npm run dist:portable    # 有 prepare-vendor --check 门禁：没有闭包就�
 <details>
 <summary><b>U 盘为什么必须是 NTFS？exFAT 行不行？</b></summary>
 
-不行。DSH 每次启动都要在数据目录下建一个目录链接（junction），exFAT / FAT32 放不下这种链接，
-实测直接 `EISDIR` 失败。U-DSH 在启动前会真探一次，盘不对会直接告诉你换 NTFS，而不是抛一堆看不懂的报错。
-格式化前记得先备份盘上资料。
+看版本。**Electron 桌面版（v0.2.0）需要 NTFS**：DSH 每次启动都要在数据目录下建一个目录链接（junction），
+exFAT / FAT32 放不下这种链接，实测直接 `EISDIR` 失败。Electron 版启动前会真探一次，盘不对会直接
+告诉你换 NTFS，而不是抛一堆看不懂的报错。
+
+**WebUI 版（v0.2.1）exFAT / NTFS 都可以**（Windows exFAT U 盘实测可用）。exFAT 正是 Windows 和 Mac
+都能读写、一盘双用的格式。格式化前记得先备份盘上资料。
 </details>
 
 <details>
