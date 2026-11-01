@@ -4,6 +4,10 @@ name: Build & verify WebUI portable
 # 跑「引擎装本机 / 数据留盘」真机验证 → 产出可发布的 zip。
 # 这是 WebUI 便携包唯一的可复现构建路径（Mac 上没法正确产出 win32 闭包）。
 on:
+  # 分支上 push 也能跑：workflow_dispatch 只认默认分支上的工作流文件，
+  # 发版前需要在特性分支上先产出/验证包。
+  push:
+    branches: ['feat/**']
   workflow_dispatch:
     inputs:
       engine_mode:
