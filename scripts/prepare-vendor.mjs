@@ -258,40 +258,50 @@ const SHARED_INSTALL_FLAGS = [
  */
 async function installHarness(staging, version, publishedAt) {
   // npm 的 prerelease caret 会把 rc.7 的内部包解析到 rc.8；限制到该版本发布时间窗口。
-  const before = new Date(new Date(publishedAt).getTime() + 10 * 60_000).toISOString()
+  //
+  // 时间窗不能只给 10 分钟：DSH 的内部包不是一个批次发出来的，实测有内部包
+  // （如 @deepseek-ai/dsh-client-ui-settings-account@0.2.0-rc.2）的发布时间比主包晚，
+  // 窗口太窄会 npm ETARGET/notarget 直接装不出来。做法是先按窄窗装，只在
+  // ETARGET/notarget 时逐级放宽——正常情况仍保持窄窗的确定性。
+  const windowMinutes = [10, 24 * 60, 7 * 24 * 60]
   const installRegistries = channel.dsh.installRegistries?.length
     ? channel.dsh.installRegistries
     : [channel.dsh.registry]
   let installError
   for (const registry of installRegistries) {
-    await rm(path.join(staging, 'node_modules'), { recursive: true, force: true })
-    await rm(path.join(staging, 'package-lock.json'), { force: true })
-    log(`npm install ${channel.dsh.package}@${version}（registry ${registry}）`)
-    try {
-      await runNpm(['install', ...SHARED_INSTALL_FLAGS, `--before=${before}`, `--registry=${registry}`], staging)
-      // DSH 的内部包靠 peerDependencies 互相发现且确实需要多轮收敛：
-      // 查的是 node_modules 下所有顶层包的 peer 声明，不是根包的（根包声明 0 个）。
-      for (let round = 0; round < 5; round += 1) {
-        const missingPeers = await missingRequiredPeers(staging, version)
-        if (missingPeers.length === 0) break
-        log(`补齐 ${missingPeers.length} 个 peer 依赖（第 ${round + 1} 轮）`)
-        await runNpm([
-          'install',
-          '--save-exact',
-          ...SHARED_INSTALL_FLAGS,
-          `--before=${before}`,
-          `--registry=${registry}`,
-          ...missingPeers.map(({ name, spec }) => `${name}@${spec}`),
-        ], staging)
+    for (const minutes of windowMinutes) {
+      const before = new Date(new Date(publishedAt).getTime() + minutes * 60_000).toISOString()
+      await rm(path.join(staging, 'node_modules'), { recursive: true, force: true })
+      await rm(path.join(staging, 'package-lock.json'), { force: true })
+      log(`npm install ${channel.dsh.package}@${version}（registry ${registry}，时间窗 +${minutes} 分钟）`)
+      try {
+        await runNpm(['install', ...SHARED_INSTALL_FLAGS, `--before=${before}`, `--registry=${registry}`], staging)
+        // DSH 的内部包靠 peerDependencies 互相发现且确实需要多轮收敛：
+        // 查的是 node_modules 下所有顶层包的 peer 声明，不是根包的（根包声明 0 个）。
+        for (let round = 0; round < 5; round += 1) {
+          const missingPeers = await missingRequiredPeers(staging, version)
+          if (missingPeers.length === 0) break
+          log(`补齐 ${missingPeers.length} 个 peer 依赖（第 ${round + 1} 轮）`)
+          await runNpm([
+            'install',
+            '--save-exact',
+            ...SHARED_INSTALL_FLAGS,
+            `--before=${before}`,
+            `--registry=${registry}`,
+            ...missingPeers.map(({ name, spec }) => `${name}@${spec}`),
+          ], staging)
+        }
+        const unresolvedPeers = await missingRequiredPeers(staging, version)
+        if (unresolvedPeers.length > 0) {
+          throw new Error(`DSH peer 依赖未收敛：${unresolvedPeers.map(({ name }) => name).join(', ')}`)
+        }
+        return
+      } catch (error) {
+        installError = error
+        log(`registry ${registry} 安装失败（时间窗 +${minutes} 分钟）：${error.message}`)
+        // 只有「某个内部包落在时间窗之外」才值得放宽窗口；其它错误换下一个 registry。
+        if (!/ETARGET|notarget|No matching version/i.test(error.message)) break
       }
-      const unresolvedPeers = await missingRequiredPeers(staging, version)
-      if (unresolvedPeers.length > 0) {
-        throw new Error(`DSH peer 依赖未收敛：${unresolvedPeers.map(({ name }) => name).join(', ')}`)
-      }
-      return
-    } catch (error) {
-      installError = error
-      log(`registry ${registry} 安装失败：${error.message}`)
     }
   }
   throw installError
