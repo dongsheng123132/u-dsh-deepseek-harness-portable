@@ -85,15 +85,18 @@
 
 ## 为什么采用"瘦壳 + 固定内核"
 
-DSH 仍处于快速更新期。U-DSH 选择把可运行版本焊死在完整发布包里：客户端不检查、不下载、不自动升级内核；需要升级时，直接用新的完整 U-DSH 发布包替换。U-DSH 把三类状态分开：
+DSH 仍处于快速更新期。U-DSH 选择把可运行版本焊死在完整发布包里：客户端不检查、不下载、不自动升级内核；需要升级时，直接用新的完整 U-DSH 发布包替换。
+
+**大块头装本机，数据随 U 盘。** 内核（固定版本的 Node 运行时 + 官方 `@deepseek-ai/dsh` 的完整依赖闭包）随包发行，**首次启动装到本机硬盘**（默认），之后从本机高速启动；换一台电脑首次自动装一次，U 盘只负责带数据。三类状态分开：
 
 | 位置 | 内容 | 是否随 U 盘移动 |
 |---|---|---|
 | `U-DSH/data/dsh-home/` | DSH 配置、会话、Skills、工作状态 | 是 |
 | `U-DSH/data/u-dsh-state/device-wallet.json` | 设备钱包五字段事务状态 | 是 |
-| `%LOCALAPPDATA%/U-DSH/` | Electron 缓存、日志、内核激活指针 | 否 |
+| `%LOCALAPPDATA%/U-DSH/engine/<dsh版本>/`（Win）或 `~/Library/Caches/U-DSH/engine/<dsh版本>/`（Mac） | 已安装的 Node 运行时 + DSH 闭包 | 否 |
+| `%LOCALAPPDATA%/U-DSH/` | Electron 缓存、日志 | 否 |
 
-内核（固定版本的 Node 运行时 + 官方 `@deepseek-ai/dsh` 的完整依赖闭包）在**构建时**由 `npm run prepare:vendor` 整体打进发布包。客户机一行 npm 都不跑、一个字节都不下载，也不联网检查版本：启动只做随包内核的本地解析与校验（包名/版本/入口/必需 peer），毫秒级、完全离线。所有版本参数集中在 [`config/runtime-channel.json`](config/runtime-channel.json)；Node 压缩包的 SHA-256 与 DSH 根包 integrity 都在构建期核对。详见 [`docs/vendored-kernel.md`](docs/vendored-kernel.md)。
+引擎装哪由 `UDSH_ENGINE_MODE` 控制：`auto`（默认，装本机；移动硬盘 ≥128GB 则装盘上）、`host`、`drive`、`temp`（临时目录、退出清理）、`usb`（不安装直跑）。每次安装按版本隔离且原子落地，第二次直接复用。客户机一行 npm 都不跑、一个字节都不下载：启动时解析随包内核并在本机复制一次（包名/版本/入口/必需 peer 校验），完全离线。所有版本参数集中在 [`config/runtime-channel.json`](config/runtime-channel.json)；Node 压缩包的 SHA-256 与 DSH 根包 integrity 都在构建期核对。详见 [`docs/vendored-kernel.md`](docs/vendored-kernel.md)。
 
 ## 设备钱包
 

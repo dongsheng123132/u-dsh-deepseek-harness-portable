@@ -98,15 +98,34 @@ only portable data boundaries, the vendored kernel, the device wallet and a head
 
 ## Thin shell, replaceable kernel
 
-DSH is evolving quickly, so U-DSH keeps durable USB data separate from high-churn host caches:
+The kernel (a pinned Node runtime plus the full `@deepseek-ai/dsh` dependency closure) ships inside the
+release package. **On first launch it installs itself to the host computer** (default), so later
+launches are fast local-disk starts — the USB stick only carries data. Durable data always stays on
+the USB drive:
 
 | Location | Contents | Travels with USB |
 |---|---|---|
 | `U-DSH/data/dsh-home/` | DSH config, sessions, skills, and state | Yes |
 | `U-DSH/data/u-dsh-state/device-wallet.json` | Five-field wallet transaction state | Yes |
-| `%LOCALAPPDATA%/U-DSH/` | Electron cache, logs, and the kernel activation pointer | No |
+| `%LOCALAPPDATA%/U-DSH/engine/<dsh-version>/` · `~/Library/Caches/U-DSH/engine/<dsh-version>/` | Installed Node runtime + DSH closure | No |
+| `%LOCALAPPDATA%/U-DSH/` | Electron cache and logs | No |
 
-The kernel (a pinned Node runtime plus the full `@deepseek-ai/dsh` dependency closure) is vendored into the release package at build time by `npm run prepare:vendor`. End-user machines never run npm and never download a byte: startup only resolves and validates the bundled kernel (package identity/version/entry/required-peer checks, milliseconds, fully offline). [`config/runtime-channel.json`](config/runtime-channel.json) is the single version source; the Node archive is SHA-256 verified and the DSH root package integrity is checked against official npm metadata — both at build time. Update checking reports npm tags but never installs anything; when the network is unreachable it degrades to "unknown" without failing startup. See [`docs/vendored-kernel.md`](docs/vendored-kernel.md).
+Where the engine goes is configurable via `UDSH_ENGINE_MODE`:
+
+- `auto` (default) — install to the host; a portable HDD/SSD (≥128 GB, `UDSH_HDD_THRESHOLD_GB`) keeps it on the drive instead.
+- `host` — always install to the host (`%LOCALAPPDATA%` / `Library/Caches`).
+- `drive` — install to `<drive>/engine/<dsh-version>` (portable HDD/SSD).
+- `temp` — copy to the system temp dir and remove on exit (install-sensitive machines).
+- `usb` — run straight from the USB stick (slowest, zero install).
+
+Every install is version-isolated and atomic (`engine/<dsh-version>/`; reuses on the second launch).
+End-user machines never run npm and never download a byte: startup resolves the bundled kernel and
+copies it locally once (package identity/version/entry/required-peer checks, fully offline).
+[`config/runtime-channel.json`](config/runtime-channel.json) is the single version source; the Node
+archive is SHA-256 verified and the DSH root package integrity is checked against official npm
+metadata — both at build time. Update checking reports npm tags but never installs anything; when the
+network is unreachable it degrades to "unknown" without failing startup. See
+[`docs/vendored-kernel.md`](docs/vendored-kernel.md).
 
 ## Device wallet
 
