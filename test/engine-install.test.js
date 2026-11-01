@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { createRequire } from 'node:module'
-import { mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
+import { execFileSync } from 'node:child_process'
+import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import os from 'node:os'
 import path from 'node:path'
 import test from 'node:test'
@@ -85,5 +86,44 @@ test('resolveEngine drive: 装到盘根 engine/<版本>', async () => {
     const engine = await withEnv({ UDSH_ENGINE_HOST_ROOT: path.join(root, 'host-engine') }, () => resolveEngine({ appRoot, mode: 'drive' }))
     assert.equal(engine.mode, 'drive')
     assert.equal(engine.engineRoot, path.join(root, 'engine', VERSION))
+  } finally { await rm(root, { recursive: true, force: true }) }
+})
+
+/** 造一个「单文件归档」形态的包：appRoot/engine.tar 里放 runtime + 闭包 + package.json。 */
+async function createTarballApp(root) {
+  const appRoot = await createApp(root)
+  const staging = path.join(root, 'tar-staging')
+  await cp(path.join(appRoot, 'runtime'), path.join(staging, 'runtime'), { recursive: true })
+  await cp(path.join(appRoot, 'node_modules'), path.join(staging, 'node_modules'), { recursive: true })
+  await writeFile(path.join(staging, 'package.json'), JSON.stringify({ name: 'u-dsh-vendored-kernel', version: '0.0.0' }))
+  execFileSync('tar', ['-cf', path.join(appRoot, 'engine.tar'), '-C', staging, 'runtime', 'node_modules', 'package.json'])
+  // 归档形态下随包不再有松散目录
+  await rm(path.join(appRoot, 'runtime'), { recursive: true, force: true })
+  await rm(path.join(appRoot, 'node_modules'), { recursive: true, force: true })
+  await rm(staging, { recursive: true, force: true })
+  // 版本号仍然要能从归档外读到；真实包里由 launcher 侧 package.json 提供版本时不影响。
+  const pkgDir = path.join(appRoot, 'node_modules', '@deepseek-ai', 'dsh')
+  await mkdir(pkgDir, { recursive: true })
+  await writeFile(path.join(pkgDir, 'package.json'), JSON.stringify({ name: '@deepseek-ai/dsh', version: VERSION }))
+  return appRoot
+}
+
+test('resolveEngine engine.tar: 单文件归档也能装本机、可复用、usb 退化成 temp', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'udsh-engine-tar-'))
+  const hostRoot = path.join(root, 'host-engine')
+  try {
+    const appRoot = await createTarballApp(root)
+    const first = await withEnv({ UDSH_ENGINE_HOST_ROOT: hostRoot }, () => resolveEngine({ appRoot, mode: 'host' }))
+    assert.equal(first.mode, 'host')
+    assert.equal(first.engineRoot, path.join(hostRoot, VERSION))
+    const manifest = JSON.parse(await readFile(path.join(first.engineRoot, 'engine-manifest.json'), 'utf8'))
+    assert.equal(manifest.source, 'engine.tar')
+    assert.ok(await readFile(path.join(first.engineRoot, 'node_modules', '@deepseek-ai', 'dsh', 'lib', 'bin.js'), 'utf8').then(Boolean))
+
+    const second = await withEnv({ UDSH_ENGINE_HOST_ROOT: hostRoot }, () => resolveEngine({ appRoot, mode: 'host' }))
+    assert.equal(second.engineRoot, first.engineRoot)
+
+    const usb = await withEnv({ UDSH_ENGINE_HOST_ROOT: hostRoot }, () => resolveEngine({ appRoot, mode: 'usb' }))
+    assert.equal(usb.mode, 'temp', 'usb 模式在归档形态下应退化成 temp')
   } finally { await rm(root, { recursive: true, force: true }) }
 })

@@ -54,6 +54,11 @@ function engineBase() {
 }
 
 function dshVersion(appRoot) {
+  // 单文件归档形态：版本写在 engine.json（node_modules 在归档里，读不到）。
+  try {
+    const meta = JSON.parse(readFileSync(path.join(appRoot, 'engine.json'), 'utf8'))
+    if (meta?.version) return meta.version
+  } catch {}
   const pkg = JSON.parse(readFileSync(path.join(appRoot, 'node_modules', '@deepseek-ai', 'dsh', 'package.json'), 'utf8'))
   return pkg.version
 }
@@ -146,9 +151,15 @@ async function main() {
 
   if (url) {
     try {
-      const res = await fetch(url, { signal: AbortSignal.timeout(20000) })
-      const body = await res.text()
-      check('HTTP 首页可访问', res.ok && body.length > 0, `status=${res.status} bytes=${body.length}`)
+      // web 内核的就绪 URL 带一次性 token：先拿到 303 + Set-Cookie，再用 cookie 取首页。
+      const first = await fetch(url, { redirect: 'manual', signal: AbortSignal.timeout(20000) })
+      const cookie = (first.headers.getSetCookie?.() ?? []).map((c) => c.split(';')[0]).join('; ')
+      const home = await fetch(new URL('/', url), {
+        headers: cookie ? { cookie } : {},
+        signal: AbortSignal.timeout(20000),
+      })
+      const body = await home.text()
+      check('HTTP 首页可访问', home.ok && body.length > 0, `status=${first.status}→${home.status} bytes=${body.length}`)
     } catch (error) {
       check('HTTP 首页可访问', false, error.message)
     }
@@ -179,9 +190,9 @@ async function main() {
       console.log(`  引擎体积：${(dirSize(engineDir) / 1024 ** 2).toFixed(1)} MB`)
     }
     if (args.expect === 'reuse') {
-      check('第二次运行复用引擎（无安装日志）', /复用已安装引擎/.test(runner.getOutput()) && !/安装完成/.test(runner.getOutput()))
+      check('第二次运行复用引擎（无安装/解包）', /复用已安装引擎/.test(runner.getOutput()) && !/安装完成|解包完成/.test(runner.getOutput()))
     } else if (args.expect === 'install') {
-      check('首次运行执行了安装', /安装完成/.test(runner.getOutput()))
+      check('首次运行执行了安装/解包', /安装完成|解包完成/.test(runner.getOutput()))
     }
   }
 

@@ -22,13 +22,13 @@
 
 ## 下载哪个版本？
 
-| | **v0.2.1 WebUI（推荐）** | v0.2.0 Electron（桌面 App） |
+| | **v0.3.0 WebUI（推荐）** | v0.2.0 Electron（桌面 App） |
 |---|---|---|
 | 界面 | 浏览器界面（自动打开） | 桌面窗口（`U-DSH Portable.exe`） |
 | 系统 | **Windows x64 + macOS**（Apple Silicon / Intel） | 仅 Windows x64 |
 | U 盘格式 | **exFAT 或 NTFS**（exFAT 实测可用，一盘通吃 Windows + Mac） | 仅 NTFS |
 | 启动 | 双击「启动 U-DSH Web.bat」（Win）/「启动 U-DSH Web.command」（Mac） | 双击 `U-DSH Portable.exe` |
-| 下载 | `U-DSH-WebUI-Portable-0.2.1-win-mac.zip` | `U-DSH-DeepSeek-Harness-Portable-0.2.0-Windows-x64.zip` |
+| 下载 | `U-DSH-WebUI-Portable-0.3.0-win-mac.zip` | `U-DSH-DeepSeek-Harness-Portable-0.2.0-Windows-x64.zip` |
 
 **选 WebUI 版**：一个包 Windows / Mac 都能用，exFAT 格式 U 盘（Windows 和 Mac 都能读写的格式）直接跑。
 习惯 Windows + NTFS 桌面窗口的用户可以继续用 Electron 版。
@@ -57,12 +57,14 @@
 
 ## 快速开始
 
-**WebUI 版（v0.2.1，推荐）：**
+**WebUI 版（v0.3.0，推荐）：**
 
-1. 到 [Releases](../../releases/latest) 下载 `U-DSH-WebUI-Portable-0.2.1-win-mac.zip`
+1. 到 [Releases](../../releases/latest) 下载 `U-DSH-WebUI-Portable-0.3.0-win-mac.zip`
 2. 解压到 U 盘、移动硬盘或本地文件夹（**exFAT / NTFS 都可以**）
 3. Windows 双击「启动 U-DSH Web.bat」，macOS 双击「启动 U-DSH Web.command」
-4. 浏览器自动打开 DeepSeek Harness Web 界面；数据保存在本盘 `u-dsh/data/dsh-home`，随盘携带
+4. 第一次在**某台电脑**上启动：自动把引擎（Node + DSH 闭包，114.8 MB 压缩包）解到这台电脑，约 **8–10 秒**；之后同一台电脑启动是秒级，不再解包
+5. 浏览器自动打开 DeepSeek Harness Web 界面；数据保存在本盘 `u-dsh/data/dsh-home`，随盘携带
+6. 换到另一台电脑：再自动解一次（还是 8–10 秒），你的 Key / 会话 / 工作区**都还在盘里**
 
 **Electron 版（v0.2.0）：**
 
@@ -97,6 +99,24 @@ DSH 仍处于快速更新期。U-DSH 选择把可运行版本焊死在完整发�
 | `%LOCALAPPDATA%/U-DSH/` | Electron 缓存、日志 | 否 |
 
 引擎装哪由 `UDSH_ENGINE_MODE` 控制：`auto`（默认，装本机；移动硬盘 ≥128GB 则装盘上）、`host`、`drive`、`temp`（临时目录、退出清理）、`usb`（不安装直跑）。每次安装按版本隔离且原子落地，第二次直接复用。客户机一行 npm 都不跑、一个字节都不下载：启动时解析随包内核并在本机复制一次（包名/版本/入口/必需 peer 校验），完全离线。所有版本参数集中在 [`config/runtime-channel.json`](config/runtime-channel.json)；Node 压缩包的 SHA-256 与 DSH 根包 integrity 都在构建期核对。详见 [`docs/vendored-kernel.md`](docs/vendored-kernel.md)。
+
+### 为什么盘上只有一个大文件（`engine.tar.gz`）
+
+U 盘（尤其 exFAT）最常见的问题是**小文件太多**：簇大小常见 128 KB，一个 4 KB 的文件也占一格。
+把 1.2 万个文件的引擎闭包直接铺在盘上，实测在 59 GB exFAT U 盘上会膨胀到 **1.4 GB**、拷进去要 **40 分钟**，
+客户还得再从 U 盘 copy 一遍到本机 —— 两头都慢。
+
+现在发布的包把引擎打成**一个** `engine.tar.gz`，盘上总共只有二十来个文件：
+
+| | 旧的松散目录形态 | 现在的单文件归档 |
+|---|---|---|
+| 盘上文件数 | 12,057 | **21** |
+| 盘上占用 | 1.4 GB | **234 MB** |
+| 拷进 U 盘 | ~40 分钟 | **78 秒** |
+| 首次启动 | 直接从 U 盘 copy 12,057 个文件到本机 | 本机原地解包 **8–10 秒** |
+
+Node 运行时不从 U 盘执行，它和解出来的闭包一起躺在客户电脑的本机引擎目录里。
+这样做的目的只有一个：**快**；也让 U 盘只负责带数据。
 
 ## 设备钱包
 
@@ -142,7 +162,7 @@ npm run prepare:vendor   # 只在构建机跑：把 Node 运行时 + DSH 闭包�
 npm run dist:portable    # 有 prepare-vendor --check 门禁：没有闭包就打不出包
 ```
 
-生成物在 `dist/U-DSH-DeepSeek-Harness-Portable-<版本>-Windows-x64.zip`。需要网络的是构建机上的 vendor 这一步；打包后的应用完全离线可用（设备钱包相关功能除外）。Electron 版要求 U 盘 NTFS：DSH 每次启动要在 `data/dsh-home/profiles/node_modules` 下建 junction，exFAT/FAT32 不支持；WebUI 版（v0.2.1）实测 exFAT / NTFS 均可。
+生成物在 `dist/U-DSH-DeepSeek-Harness-Portable-<版本>-Windows-x64.zip`。需要网络的是构建机上的 vendor 这一步；打包后的应用完全离线可用（设备钱包相关功能除外）。Electron 版要求 U 盘 NTFS：DSH 每次启动要在 `data/dsh-home/profiles/node_modules` 下建 junction，exFAT/FAT32 不支持；WebUI 版（v0.3.0）实测 exFAT / NTFS 均可。
 
 ## 方便继续 fork
 
@@ -162,7 +182,7 @@ npm run dist:portable    # 有 prepare-vendor --check 门禁：没有闭包就�
 exFAT / FAT32 放不下这种链接，实测直接 `EISDIR` 失败。Electron 版启动前会真探一次，盘不对会直接
 告诉你换 NTFS，而不是抛一堆看不懂的报错。
 
-**WebUI 版（v0.2.1）exFAT / NTFS 都可以**（Windows exFAT U 盘实测可用）。exFAT 正是 Windows 和 Mac
+**WebUI 版（v0.3.0）exFAT / NTFS 都可以**（Windows exFAT U 盘实测可用）。exFAT 正是 Windows 和 Mac
 都能读写、一盘双用的格式。格式化前记得先备份盘上资料。
 </details>
 

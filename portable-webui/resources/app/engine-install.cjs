@@ -12,15 +12,25 @@
 //       usb   = 不安装，直接从 U 盘跑（最慢，零残留）
 //
 // 版本按 DSH 包版本隔离；升级 = 新目录，旧的不动，可回退。
+//
+// 两种随包形态都支持：
+//   engine.tar（推荐）—— 整个引擎（runtime/ + node_modules/ + package.json）打成**一个**归档文件。
+//     U 盘上只躺 1 个大文件：exFAT 常见 128KB 簇 + 一万多个小文件会让包在盘上膨胀到 1.4GB、
+//     首次拷贝几十分钟（实测）；单文件归档后拷贝是顺序读写，首次安装只在本机解包。
+//   松散目录（兼容旧发布包）—— runtime/ + node_modules/ 平铺在 appRoot 里。
 const {
   existsSync, mkdirSync, readFileSync, writeFileSync, rmSync, renameSync,
   cpSync, statSync, statfsSync, readdirSync, lstatSync,
 } = require('node:fs')
 const os = require('node:os')
 const path = require('node:path')
+const { execFileSync } = require('node:child_process')
 
 const PRODUCT = 'U-DSH'
 const MANIFEST = 'engine-manifest.json'
+const ENGINE_TAR = 'engine.tar'
+const ENGINE_TAR_GZ = 'engine.tar.gz'
+const ENGINE_JSON = 'engine.json'
 const MODES = new Set(['auto', 'host', 'drive', 'temp', 'usb'])
 
 function log(msg) { console.log('[U-DSH engine] ' + msg) }
@@ -34,11 +44,26 @@ function entryRel() { return path.join('node_modules', '@deepseek-ai', 'dsh', 'l
 
 function readJson(file) { try { return JSON.parse(readFileSync(file, 'utf8')) } catch { return null } }
 
-/** 读 appRoot 里随包的引擎版本（以 vendored DSH 包的 version 为准）。 */
+/**
+ * 读 appRoot 里随包的引擎版本。
+ * 单文件归档形态下 node_modules 在归档里面，读不到，所以打包时会在旁边写一份
+ * engine.json（{version, engine, nodeRel, entry}）；松散目录形态仍回退到读包。
+ */
 function readEngineVersion(appRoot) {
+  const meta = readJson(path.join(appRoot, ENGINE_JSON))
+  if (meta && meta.version) return meta.version
   const pkg = readJson(path.join(appRoot, 'node_modules', '@deepseek-ai', 'dsh', 'package.json'))
-  if (!pkg || !pkg.version) throw new Error('随包引擎不完整：缺 node_modules/@deepseek-ai/dsh/package.json')
+  if (!pkg || !pkg.version) throw new Error('随包引擎不完整：缺 engine.json 或 node_modules/@deepseek-ai/dsh/package.json')
   return pkg.version
+}
+
+/** 找到随包的引擎归档（.tar.gz 优先，其次 .tar）。 */
+function findTar(appRoot) {
+  for (const name of [ENGINE_TAR_GZ, ENGINE_TAR]) {
+    const candidate = path.join(appRoot, name)
+    if (existsSync(candidate)) return { path: candidate, name, gzip: name.endsWith('.gz') }
+  }
+  return null
 }
 
 function hostEngineBase() {
@@ -118,6 +143,45 @@ function registerTempCleanup(target) {
   }
 }
 
+function hasTar(appRoot) { return findTar(appRoot) !== null }
+function hasLoosePayload(appRoot) {
+  return existsSync(path.join(appRoot, 'runtime')) && existsSync(path.join(appRoot, 'node_modules'))
+}
+
+/** 用系统 tar 把随包引擎归档解到 staging，再原子落地。 */
+function extractEngineTar(appRoot, target, version, rel) {
+  const found = findTar(appRoot)
+  if (!found) throw new Error(`随包里找不到引擎归档（${ENGINE_TAR_GZ} / ${ENGINE_TAR}）`)
+  const archive = found.path
+  mkdirSync(path.dirname(target), { recursive: true })
+  const staging = target + '.installing-' + process.pid
+  rmSync(staging, { recursive: true, force: true })
+  mkdirSync(staging, { recursive: true })
+  const started = Date.now()
+  log(`解包 ${found.name}（${(statSync(archive).size / 1024 ** 2).toFixed(1)} MB）→ ${target}`)
+  // Windows 10 1803+ / macOS / Linux 都自带 bsdtar 或 GNU tar（两者都认 -xzf）。
+  execFileSync('tar', [found.gzip ? '-xzf' : '-xf', archive, '-C', staging], { stdio: ['ignore', 'ignore', 'pipe'], windowsHide: true })
+  // 归档里可以只放闭包（省掉 U 盘上再存一份 Node 的 110MB）；
+  // 缺 Node 运行时就把随包（盘上）那份拷进来——只有一个大文件，拷得很快。
+  if (!existsSync(path.join(staging, rel.node)) && existsSync(path.join(appRoot, 'runtime'))) {
+    log('把随包 Node 运行时拷进引擎目录')
+    cpSync(path.join(appRoot, 'runtime'), path.join(staging, 'runtime'), { recursive: true, dereference: true })
+  }
+  if (!existsSync(path.join(staging, rel.node)) || !existsSync(path.join(staging, rel.entry))) {
+    rmSync(staging, { recursive: true, force: true })
+    throw new Error(`随包 ${found.name} 解出来不完整：缺 Node 运行时或 DSH 入口`)
+  }
+  writeFileSync(path.join(staging, MANIFEST), JSON.stringify({
+    schemaVersion: 1, version, installedAt: new Date().toISOString(), product: PRODUCT, source: found.name,
+  }, null, 2) + '\n')
+  rmSync(target, { recursive: true, force: true })
+  try { renameSync(staging, target) } catch {
+    cpSync(staging, target, { recursive: true, dereference: true })
+    rmSync(staging, { recursive: true, force: true })
+  }
+  log(`解包完成：${target}（${((Date.now() - started) / 1000).toFixed(1)}s）`)
+}
+
 /**
  * 解析引擎位置；必要时把引擎装到本机/盘上/临时目录。
  * @returns {{mode:string, engineRoot:string, nodeExe:string, entry:string, dataRoot:string}}
@@ -127,13 +191,21 @@ function resolveEngine({ appRoot, mode, platform = process.platform, arch = proc
   const root = path.resolve(appRoot, '..', '..')
   const version = readEngineVersion(appRoot)
   const rel = { node: nodeRel(platform, arch), entry: entryRel() }
-  const chosen = pickMode(appRoot, mode || process.env.UDSH_ENGINE_MODE)
+  let chosen = pickMode(appRoot, mode || process.env.UDSH_ENGINE_MODE)
+  // usb = 不安装直接跑。单文件归档形态没法「直接跑」，退化成 temp（装到临时目录、退出清理），
+  // 仍然做到「不落地本机」。
+  if (chosen === 'usb' && !hasLoosePayload(appRoot)) {
+    warn('usb 模式需要松散目录形态；本包是 engine.tar，改成 temp（退出清理，零残留）')
+    chosen = 'temp'
+  }
   if (chosen === 'usb') {
     return { mode: chosen, engineRoot: appRoot, nodeExe: path.join(appRoot, rel.node), entry: path.join(appRoot, rel.entry), dataRoot: path.join(root, 'data', 'dsh-home') }
   }
   const target = targetRootFor(chosen, appRoot, version)
   if (manifestMatches(target, version, rel)) {
     log(`复用已安装引擎（${chosen}）：${target}`)
+  } else if (hasTar(appRoot)) {
+    extractEngineTar(appRoot, target, version, rel)
   } else {
     installEngine(appRoot, target, version, rel)
   }
@@ -141,4 +213,4 @@ function resolveEngine({ appRoot, mode, platform = process.platform, arch = proc
   return { mode: chosen, engineRoot: target, nodeExe: path.join(target, rel.node), entry: path.join(target, rel.entry), dataRoot: path.join(root, 'data', 'dsh-home') }
 }
 
-module.exports = { resolveEngine, pickMode, hostEngineBase, nodeRel, entryRel, MANIFEST }
+module.exports = { resolveEngine, pickMode, hostEngineBase, nodeRel, entryRel, MANIFEST, ENGINE_TAR, ENGINE_TAR_GZ, ENGINE_JSON }

@@ -394,11 +394,19 @@ async function prepareHarness() {
   assertChild(vendorDir, staging)
   await mkdir(staging, { recursive: true })
   try {
+    // WebUI 便携包要离线起 web 内核：DSH 的 `--profile web` 需要从安装里解析到
+    // @deepseek-ai/dsh-web-app 这个 profile bundle，只装 @deepseek-ai/dsh 是不够的
+    // （缺它启动会打印 "cannot resolve profile bundle ... dsh-web-app" 然后不带 UI 起来）。
+    // Electron 桌面版走自己的 profile，不需要这 181 个包，所以用环境变量按需打开。
+    const webUi = process.env.UDSH_VENDOR_WEB_UI === '1'
+    const dependencies = { [channel.dsh.package]: version }
+    if (webUi) dependencies['@deepseek-ai/dsh-web-app'] = version
+    if (webUi) log('同时装 @deepseek-ai/dsh-web-app（WebUI 便携包需要）')
     await writeFile(path.join(staging, 'package.json'), `${JSON.stringify({
       name: 'u-dsh-vendored-kernel',
       version: '0.0.0',
       private: true,
-      dependencies: { [channel.dsh.package]: version },
+      dependencies,
     }, null, 2)}\n`)
     await installHarness(staging, version, publishedAt)
     // 校验：包身份/版本、bin 入口不越界、根包 integrity 与官方元数据一致、peer 收敛。
