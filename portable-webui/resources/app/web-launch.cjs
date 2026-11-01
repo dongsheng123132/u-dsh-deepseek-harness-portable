@@ -1,50 +1,27 @@
 // U-DSH Web 便携启动器（跨平台）
-// 用目录内 node 启动 @deepseek-ai/dsh web 内核，DSH_HOME 指向盘内 data/，自动打开浏览器。
-// 用法: <node> web-launch.js
+// 引擎（Node 运行时 + DSH 闭包）默认装到本机硬盘，DSH_HOME 指向 U 盘 data/；
+// 这样「大块头在本机、数据随盘走」，换电脑首次自动装一次，之后本机高速启动。
+// 用法: <node> web-launch.cjs
+// 环境变量:
+//   UDSH_ENGINE_MODE=auto|host|drive|temp|usb   引擎位置（默认 auto）
+//   UDSH_HDD_THRESHOLD_GB=64                    auto 时判定「移动硬盘」的容量阈值
 'use strict'
 const { spawn } = require('node:child_process')
-const { existsSync, mkdirSync } = require('node:fs')
-const path = require('node:path')
-
-const ROOT = __dirname // resources/app（u-dsh 应用根）
-const RUNTIME = path.join(ROOT, 'runtime')
-const NODE_MODULES = path.join(ROOT, 'node_modules')
-const DATA_DIR = path.join(ROOT, '..', '..', 'data', 'dsh-home') // app/portable-apps/u-dsh/data/dsh-home
-
-function pickNode() {
-  const platform = process.platform
-  const arch = process.arch
-  if (platform === 'win32') return path.join(RUNTIME, 'node-win-x64', 'node.exe')
-  if (platform === 'darwin') {
-    const dir = arch === 'arm64' ? 'node-mac-arm64' : 'node-mac-x64'
-    return path.join(RUNTIME, dir, 'bin', 'node')
-  }
-  return null
-}
-
-function pickDshEntry() {
-  const candidate = path.join(NODE_MODULES, '@deepseek-ai', 'dsh', 'lib', 'bin.js')
-  return existsSync(candidate) ? candidate : null
-}
+const { mkdirSync } = require('node:fs')
+const { resolveEngine } = require('./engine-install.cjs')
 
 function main() {
-  const nodeExe = pickNode()
-  if (!nodeExe || !existsSync(nodeExe)) {
-    console.error('[U-DSH] 未找到配套 Node 运行时：' + nodeExe)
-    process.exit(1)
-  }
-  const entry = pickDshEntry()
-  if (!entry) {
-    console.error('[U-DSH] 未找到 DeepSeek Harness 内核（node_modules/@deepseek-ai/dsh）')
-    process.exit(1)
-  }
-  try { mkdirSync(DATA_DIR, { recursive: true }) } catch {}
+  // 解析（必要时安装）引擎，并拿到数据目录（永远在 U 盘上）。
+  const engine = resolveEngine({ appRoot: __dirname })
+  console.log('[U-DSH] 引擎模式：' + engine.mode + ' → ' + engine.engineRoot)
+  console.log('[U-DSH] 数据目录（随盘）：' + engine.dataRoot)
+  try { mkdirSync(engine.dataRoot, { recursive: true }) } catch {}
 
-  const args = [entry, '--profile', 'web', '--host', '127.0.0.1', '--port', '0', '--no-open']
-  const env = Object.assign({}, process.env, { DSH_HOME: DATA_DIR })
+  const args = [engine.entry, '--profile', 'web', '--host', '127.0.0.1', '--port', '0', '--no-open']
+  const env = Object.assign({}, process.env, { DSH_HOME: engine.dataRoot })
 
   console.log('[U-DSH] 启动 DeepSeek Harness Web 内核…')
-  const child = spawn(nodeExe, args, { env, stdio: ['ignore', 'pipe', 'pipe'] })
+  const child = spawn(engine.nodeExe, args, { env, stdio: ['ignore', 'pipe', 'pipe'] })
 
   let output = ''
   const READY = /^dsh web: (\S+)\b/m
