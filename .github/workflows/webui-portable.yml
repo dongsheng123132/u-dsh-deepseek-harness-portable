@@ -1,0 +1,106 @@
+name: Build & verify WebUI portable
+
+# 在真 Windows runner 上：装完整闭包（prepare:vendor + web profile bundle）→ 用
+# scripts/build-webui-package.mjs 打出单文件归档形态的便携包 → 跑「引擎装本机 / 数据留盘」
+# 真机验证 → 产出可发布的 zip。
+# 这是 WebUI 便携包唯一的可复现构建路径（Mac 上装不出正确的 win32 原生依赖）。
+on:
+  # 分支上 push 也能跑：workflow_dispatch 只认默认分支上的工作流文件，
+  # 发版前需要在特性分支上先产出/验证包。
+  push:
+    branches: ['feat/**']
+  workflow_dispatch:
+    inputs:
+      engine_mode:
+        description: '引擎模式（验证用）'
+        required: false
+        default: host
+        type: choice
+        options: [host, drive, temp, usb, auto]
+      upload_artifact:
+        description: '上传便携包 zip 产物'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+env:
+  UDSH_VENDOR_WEB_UI: '1'
+
+jobs:
+  webui-portable:
+    runs-on: windows-2022
+    env:
+      UDSH_ENGINE_MODE: ${{ inputs.engine_mode || 'host' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Unit tests
+        run: npm ci && npm test
+
+      - name: Prepare vendored kernel (Node runtime + full DSH closure)
+        run: npm run prepare:vendor
+        timeout-minutes: 30
+
+      - name: Vendor gate
+        run: npm run vendor:check
+
+      - name: Build portable package (engine.tar.gz form)
+        run: >
+          node scripts/build-webui-package.mjs
+          --out dist/u-dsh
+          --harness vendor/harness
+          --runtime node-win-x64=vendor/runtime/win32-x64
+          --node-version 24.19.0
+          --zip
+
+      - name: Verify engine install — first run (install to host, data stays on drive)
+        shell: pwsh
+        run: node scripts/verify-engine-install.mjs --app dist/u-dsh --mode $env:UDSH_ENGINE_MODE --expect-install --timeout-ms 300000 --json "$env:RUNNER_TEMP\report-install.json"
+
+      - name: Verify engine install — second run (reuse, no reinstall)
+        shell: pwsh
+        run: node scripts/verify-engine-install.mjs --app dist/u-dsh --mode $env:UDSH_ENGINE_MODE --expect-reuse --timeout-ms 300000 --json "$env:RUNNER_TEMP\report-reuse.json"
+
+      - name: Verify temp mode leaves nothing behind
+        if: ${{ env.UDSH_ENGINE_MODE == 'host' || env.UDSH_ENGINE_MODE == 'auto' }}
+        shell: pwsh
+        run: node scripts/verify-engine-install.mjs --app dist/u-dsh --mode temp --timeout-ms 300000 --json "$env:RUNNER_TEMP\report-temp.json"
+
+      - name: Show engine manifest + data dir
+        if: always()
+        shell: pwsh
+        run: |
+          $engineBase = Join-Path $env:LOCALAPPDATA 'U-DSH\engine'
+          if (Test-Path $engineBase) {
+            Get-ChildItem $engineBase | ForEach-Object {
+              Write-Host "engine: $($_.FullName)"
+              $m = Join-Path $_.FullName 'engine-manifest.json'
+              if (Test-Path $m) { Get-Content $m }
+            }
+          } else { Write-Host 'no host engine dir' }
+          Get-ChildItem 'dist/u-dsh/data/dsh-home' -Recurse -Depth 2 -ErrorAction SilentlyContinue | Select-Object -First 30 FullName
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine-install-reports
+          path: |
+            ${{ runner.temp }}/report-*.json
+          if-no-files-found: warn
+
+      - name: Upload portable package
+        if: ${{ inputs.upload_artifact != false }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: webui-portable-zip
+          path: dist/U-DSH-WebUI-Portable-*.zip
+          if-no-files-found: error

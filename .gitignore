@@ -21,3 +21,7 @@ assets/windows-hidden-console.exe
 /U-DSH-DeepSeek-Harness-Portable-*.zip
 /*.part-new-*
 /坚果年货礼盒.png
+
+# min-kernel（可选，由 prepare-min-kernel.mjs 生成）
+vendor/min-harness/
+vendor/.min-harness-staging-*/
