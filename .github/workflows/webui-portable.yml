@@ -1,0 +1,136 @@
+name: Build & verify WebUI portable
+
+# 在真 Windows runner 上：装完整闭包（prepare:vendor）→ 拼 WebUI 便携包 →
+# 跑「引擎装本机 / 数据留盘」真机验证 → 产出可发布的 zip。
+# 这是 WebUI 便携包唯一的可复现构建路径（Mac 上没法正确产出 win32 闭包）。
+on:
+  workflow_dispatch:
+    inputs:
+      engine_mode:
+        description: '引擎模式（验证用）'
+        required: false
+        default: host
+        type: choice
+        options: [host, drive, temp, usb, auto]
+      upload_artifact:
+        description: '上传便携包 zip 产物'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  webui-portable:
+    runs-on: windows-2022
+    env:
+      UDSH_ENGINE_MODE: ${{ inputs.engine_mode }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Unit tests
+        run: npm ci && npm test
+
+      - name: Prepare vendored kernel (Node runtime + full DSH closure)
+        run: npm run prepare:vendor
+        timeout-minutes: 30
+
+      - name: Vendor gate
+        run: npm run vendor:check
+
+      - name: Assemble portable root
+        shell: pwsh
+        run: |
+          $root = Join-Path $env:RUNNER_TEMP 'u-dsh'
+          $app = Join-Path $root 'resources\app'
+          Remove-Item $root -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force $app | Out-Null
+
+          Copy-Item 'portable-webui\resources\app\web-launch.cjs' $app
+          Copy-Item 'portable-webui\resources\app\engine-install.cjs' $app
+          Copy-Item 'portable-webui\启动 U-DSH Web.bat' $root
+          Copy-Item 'portable-webui\启动 U-DSH Web.command' $root
+          Copy-Item 'portable-webui\README.md' $root
+
+          # 内核闭包 + Node 运行时（都来自 prepare:vendor 产物）
+          Copy-Item 'vendor\harness\node_modules' (Join-Path $app 'node_modules') -Recurse
+          Copy-Item 'vendor\harness\package.json' (Join-Path $app 'package.json')
+          New-Item -ItemType Directory -Force (Join-Path $app 'runtime') | Out-Null
+          Copy-Item 'vendor\runtime\win32-x64' (Join-Path $app 'runtime\node-win-x64') -Recurse
+
+          New-Item -ItemType Directory -Force (Join-Path $root 'data\dsh-home') | Out-Null
+          "assembled: $root"
+          Get-ChildItem $root | Select-Object Name
+
+      - name: Verify engine install — first run (install to host, data stays on drive)
+        shell: pwsh
+        run: |
+          $root = Join-Path $env:RUNNER_TEMP 'u-dsh'
+          node scripts\verify-engine-install.mjs --app $root --mode $env:UDSH_ENGINE_MODE --expect-install --json "$env:RUNNER_TEMP\report-install.json"
+
+      - name: Verify engine install — second run (reuse, no reinstall)
+        shell: pwsh
+        run: |
+          $root = Join-Path $env:RUNNER_TEMP 'u-dsh'
+          node scripts\verify-engine-install.mjs --app $root --mode $env:UDSH_ENGINE_MODE --expect-reuse --json "$env:RUNNER_TEMP\report-reuse.json"
+
+      - name: Verify temp mode leaves nothing behind
+        if: ${{ inputs.engine_mode == 'host' || inputs.engine_mode == 'auto' }}
+        shell: pwsh
+        run: |
+          $root = Join-Path $env:RUNNER_TEMP 'u-dsh'
+          node scripts\verify-engine-install.mjs --app $root --mode temp --json "$env:RUNNER_TEMP\report-temp.json"
+
+      - name: Show engine manifest + caches
+        if: always()
+        shell: pwsh
+        run: |
+          $engineBase = Join-Path $env:LOCALAPPDATA 'U-DSH\engine'
+          if (Test-Path $engineBase) {
+            Get-ChildItem $engineBase | ForEach-Object {
+              Write-Host "engine: $($_.FullName)"
+              $m = Join-Path $_.FullName 'engine-manifest.json'
+              if (Test-Path $m) { Get-Content $m }
+            }
+          } else { Write-Host 'no host engine dir' }
+          $data = Join-Path $env:RUNNER_TEMP 'u-dsh\data\dsh-home'
+          Write-Host "data dir: $data"
+          Get-ChildItem $data -Recurse -Depth 2 -ErrorAction SilentlyContinue | Select-Object -First 30 FullName
+
+      - name: Package portable zip
+        if: ${{ inputs.upload_artifact }}
+        shell: pwsh
+        run: |
+          $root = Join-Path $env:RUNNER_TEMP 'u-dsh'
+          $pkg = Join-Path $env:RUNNER_TEMP 'u-dsh-package'
+          # 打包时剔除运行时产生的数据目录内容，只留空骨架
+          Copy-Item $root $pkg -Recurse
+          Remove-Item (Join-Path $pkg 'data') -Recurse -Force -ErrorAction SilentlyContinue
+          New-Item -ItemType Directory -Force (Join-Path $pkg 'data\dsh-home') | Out-Null
+          $version = (Get-Content package.json | ConvertFrom-Json).version
+          $zip = Join-Path $env:RUNNER_TEMP "U-DSH-WebUI-Portable-$version-win-mac.zip"
+          Compress-Archive -Path (Join-Path $pkg '*') -DestinationPath $zip -CompressionLevel Optimal
+          Get-Item $zip | Select-Object Name, @{n='MB';e={[math]::Round($_.Length/1MB,1)}}
+
+      - name: Upload reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: engine-install-reports
+          path: |
+            ${{ runner.temp }}/report-*.json
+          if-no-files-found: warn
+
+      - name: Upload portable package
+        if: ${{ inputs.upload_artifact }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: webui-portable-zip
+          path: ${{ runner.temp }}/U-DSH-WebUI-Portable-*.zip
+          if-no-files-found: error
