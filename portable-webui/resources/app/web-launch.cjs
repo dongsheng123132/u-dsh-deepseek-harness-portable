@@ -7,8 +7,37 @@
 //   UDSH_HDD_THRESHOLD_GB=64                    auto 时判定「移动硬盘」的容量阈值
 'use strict'
 const { spawn } = require('node:child_process')
-const { mkdirSync } = require('node:fs')
+const { mkdirSync, readFileSync, writeFileSync, rmSync, statSync } = require('node:fs')
+const os = require('node:os')
+const path = require('node:path')
 const { resolveEngine } = require('./engine-install.cjs')
+
+/**
+ * 同一份 U 盘数据被两台电脑同时用，会话/配置会互相覆盖。
+ * Windows 上拔盘前不弹出更是常态，所以启动时只做**告警**、不阻断：
+ * 锁文件写 host+pid，跨主机且 12 小时内 → 明确提示风险。
+ */
+function checkConcurrentUse(dataRoot) {
+  const lockPath = path.join(dataRoot, '.udsh-instance.lock')
+  const host = os.hostname()
+  let previous = null
+  try {
+    const age = Date.now() - statSync(lockPath).mtimeMs
+    if (age < 12 * 60 * 60 * 1000) previous = JSON.parse(readFileSync(lockPath, 'utf8'))
+  } catch { /* 没锁或读不了都当没有 */ }
+  if (previous && previous.host && previous.host !== host) {
+    console.warn(`[U-DSH] ⚠ 这份数据最近在另一台电脑（${previous.host}）上使用过。`)
+    console.warn('[U-DSH]   同一支 U 盘在多台电脑同时使用会让会话/配置互相覆盖；如非本人操作，建议先备份 data/dsh-home。')
+  }
+  try {
+    writeFileSync(lockPath, JSON.stringify({ host, pid: process.pid, startedAt: new Date().toISOString() }, null, 2) + '\n')
+  } catch { /* 只读盘就算了 */ }
+  const release = () => { try { rmSync(lockPath, { force: true }) } catch {} }
+  process.once('exit', release)
+  for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP']) {
+    process.once(sig, () => { release(); process.exit(0) })
+  }
+}
 
 function main() {
   // 解析（必要时安装）引擎，并拿到数据目录（永远在 U 盘上）。
@@ -16,6 +45,7 @@ function main() {
   console.log('[U-DSH] 引擎模式：' + engine.mode + ' → ' + engine.engineRoot)
   console.log('[U-DSH] 数据目录（随盘）：' + engine.dataRoot)
   try { mkdirSync(engine.dataRoot, { recursive: true }) } catch {}
+  checkConcurrentUse(engine.dataRoot)
 
   const args = [engine.entry, '--profile', 'web', '--host', '127.0.0.1', '--port', '0', '--no-open']
   const env = Object.assign({}, process.env, { DSH_HOME: engine.dataRoot })

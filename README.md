@@ -40,17 +40,33 @@ users who prefer a desktop window on Windows/NTFS.
 | | U-DSH Portable | Other DSH desktop / portable builds |
 |---|---|---|
 | Install | Unzip, double-click — nothing to install | Installer, or a DIY Node + npm setup |
-| API key | **Credit included**, no signup required | Register at platform.deepseek.com → top up → copy & paste a key |
-| Portability | Sessions/config/credentials live in the folder — every PC feels like yours | Data scattered across each PC's `%USERPROFILE%` |
+| API key | Electron build: **credit included**, no signup (Xiapan Cloud device wallet). WebUI build: set any key in DSH settings | Register at platform.deepseek.com → top up → copy & paste a key |
+| Portability | Sessions/config/credentials live in the folder; move between compatible PCs (don't run two PCs on one stick at once) | Data scattered across each PC's `%USERPROFILE%` |
 | Offline | Kernel ships inside the package; first launch needs no network | Usually downloads a runtime or kernel first |
 | System footprint | No registry writes, no env changes; delete the folder = clean uninstall | Regular installs write the registry and leave caches |
 
-**What makes it different: it comes with credit. No API key signup required.**
+**What makes it different: the Electron build comes with credit — no API key signup.**
 
 Every other DSH portable/desktop build asks you to register at platform.deepseek.com, top up, copy an
-API key and paste it back — the steepest drop-off in the whole funnel. U-DSH ships the **Xiapan Cloud
-device wallet**: on first launch it issues a key for this device and wires it up automatically, so you
-can **just start chatting**. Top up with one click, or swap in your own key any time.
+API key and paste it back — the steepest drop-off in the whole funnel. The **Electron desktop build**
+ships the **Xiapan Cloud device wallet**: on first launch it issues a key for this device and wires it
+up automatically, so you can just start chatting. Top up with one click, or swap in your own key.
+
+**The WebUI portable build (the download recommended below) does not include the device wallet yet** —
+start the kernel and set your own key in DSH settings (DeepSeek official or any OpenAI-compatible
+endpoint). Porting the wallet to the WebUI build is in progress.
+
+### What "easy on the USB stick" actually means
+
+The engine never runs from the stick: on first launch it is installed to the host machine
+(`%LOCALAPPDATA%\U-DSH\engine\<version>` / `~/Library/Caches/U-DSH/engine/<version>`), and only user
+data stays on the stick. Measured: while the kernel runs, its executable and dependencies are all on
+the host; the stick has 17 open files, all under `data/dsh-home`; an idle 90-second run writes **224 KB**.
+
+So it is **not zero writes**. The stick still takes data writes, and exFAT has no journaling — pulling
+the stick mid-write can corrupt session files. Back up regularly with
+`node scripts/backup-dsh-home.mjs --root <package root> --to <host dir>`, eject safely, and never run
+the same stick on two PCs at once (the launcher warns if it detects that).
 
 ## Features
 

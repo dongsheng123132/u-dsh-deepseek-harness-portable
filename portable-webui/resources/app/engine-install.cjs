@@ -305,6 +305,8 @@ function resolveEngine({ appRoot, mode, platform = process.platform, arch = proc
   if (manifestMatches(target, version, rel)) {
     log(`复用已安装引擎（${chosen}）：${target}`)
   } else {
+    log('这台电脑还没有这套引擎：首次使用会先装到本机（约 450–500 MB，通常 10–60 秒）')
+    log('你的数据（Key/会话/工作区）仍在 U 盘上，不会写到本机')
     withInstallLock(target, () => manifestMatches(target, version, rel), () => {
       if (hasTar(appRoot)) extractEngineTar(appRoot, target, version, rel)
       else installEngine(appRoot, target, version, rel)
