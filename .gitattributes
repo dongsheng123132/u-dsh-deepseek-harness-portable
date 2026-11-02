@@ -5,8 +5,9 @@
 # 用户根本跑不起来；反过来 *.bat / *.ps1 必须是 CRLF，否则 cmd.exe 与 Windows PowerShell 5
 # 在某些解析路径上会出错。规则写死在这里，就不再依赖每台开发机的本地 git 配置。
 #
-# 注意：本文件只管「存进仓库/checkout 出来」的换行；打包 zip 时的执行位（external_attr）
-# 由 scripts/build-webui-package.mjs 负责，二者不可互相替代。
+# 注意：本文件只管「存进仓库/checkout 出来」的换行；打包 zip 时的条目名分隔符、
+# 执行位（external_attr）和最终写进包的换行，由 scripts/lib/zip-archive.mjs
+# （经 scripts/build-webui-package.mjs 调用）二次保证，二者不可互相替代。
 
 # 兜底：git 自动判定文本，统一 LF 入库、LF 落地。
 * text=auto eol=lf

@@ -63,6 +63,15 @@ jobs:
           --node-version 24.19.0
           --zip
 
+      - name: Verify zip packaging (POSIX-safe entries)
+        # 打包器写完后自己也会体检一次；这里再独立跑一遍 CLI —— 用同一份产物、
+        # 同一个脚本，确保 release 资产「能解压但用不了」这种毛病不会再漏到用户手上。
+        shell: pwsh
+        run: |
+          $zip = Get-ChildItem 'dist/U-DSH-WebUI-Portable-*.zip' | Select-Object -First 1
+          if (-not $zip) { throw '没有找到打包产物，检查 build-webui-package.mjs 的 --zip' }
+          node scripts/verify-zip.mjs $zip.FullName
+
       - name: Verify engine install — first run (install to host, data stays on drive)
         shell: pwsh
         run: node scripts/verify-engine-install.mjs --app dist/u-dsh --mode $env:UDSH_ENGINE_MODE --expect-install --timeout-ms 300000 --json "$env:RUNNER_TEMP\report-install.json"
