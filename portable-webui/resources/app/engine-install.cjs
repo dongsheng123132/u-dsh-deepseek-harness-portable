@@ -134,6 +134,27 @@ function installEngine(appRoot, target, version, rel) {
   log(`安装完成：${target}（${((Date.now() - started) / 1000).toFixed(1)}s）`)
 }
 
+/**
+ * 扫掉上一次跑崩/被强杀留下的临时引擎。
+ * Windows 上 SIGTERM 是不可捕获的强杀，`process.on('exit')` 根本不会跑，
+ * 所以「退出即清理」在 Windows 只能靠**下次启动补扫**兜底。
+ */
+function sweepStaleTempEngines(maxAgeMs = 2 * 60 * 60 * 1000) {
+  const tmp = os.tmpdir()
+  let entries = []
+  try { entries = readdirSync(tmp) } catch { return }
+  const now = Date.now()
+  for (const name of entries) {
+    if (!name.startsWith('u-dsh-engine-')) continue
+    const full = path.join(tmp, name)
+    try {
+      if (now - statSync(full).mtimeMs < maxAgeMs) continue
+      rmSync(full, { recursive: true, force: true })
+      log(`清理上次遗留的临时引擎：${full}`)
+    } catch { /* 正被别的进程用着，下次再说 */ }
+  }
+}
+
 function registerTempCleanup(target) {
   let cleaned = false
   const cleanup = () => { if (cleaned) return; cleaned = true; try { rmSync(target, { recursive: true, force: true }) } catch {} }
@@ -191,6 +212,7 @@ function resolveEngine({ appRoot, mode, platform = process.platform, arch = proc
   const root = path.resolve(appRoot, '..', '..')
   const version = readEngineVersion(appRoot)
   const rel = { node: nodeRel(platform, arch), entry: entryRel() }
+  sweepStaleTempEngines()
   let chosen = pickMode(appRoot, mode || process.env.UDSH_ENGINE_MODE)
   // usb = 不安装直接跑。单文件归档形态没法「直接跑」，退化成 temp（装到临时目录、退出清理），
   // 仍然做到「不落地本机」。
@@ -213,4 +235,4 @@ function resolveEngine({ appRoot, mode, platform = process.platform, arch = proc
   return { mode: chosen, engineRoot: target, nodeExe: path.join(target, rel.node), entry: path.join(target, rel.entry), dataRoot: path.join(root, 'data', 'dsh-home') }
 }
 
-module.exports = { resolveEngine, pickMode, hostEngineBase, nodeRel, entryRel, MANIFEST, ENGINE_TAR, ENGINE_TAR_GZ, ENGINE_JSON }
+module.exports = { resolveEngine, pickMode, hostEngineBase, nodeRel, entryRel, MANIFEST, ENGINE_TAR, ENGINE_TAR_GZ, ENGINE_JSON, sweepStaleTempEngines }

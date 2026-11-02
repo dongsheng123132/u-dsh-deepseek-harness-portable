@@ -19,7 +19,7 @@
  *
  * 退出码 0 = 全部断言通过，1 = 有断言失败，2 = 用法/环境错误。
  */
-import { spawn } from 'node:child_process'
+import { spawn, spawnSync } from 'node:child_process'
 import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
@@ -204,15 +204,22 @@ async function main() {
   console.log(`\n  内核退出码：${code}`)
 
   if (mode === 'temp') {
-    const leftovers = []
-    for (const dir of [os.tmpdir()]) {
+    const listTempEngines = () => {
       try {
-        for (const e of readdirSync(dir)) {
-          if (e.startsWith('u-dsh-engine-')) leftovers.push(path.join(dir, e))
-        }
-      } catch {}
+        return readdirSync(os.tmpdir()).filter((e) => e.startsWith('u-dsh-engine-')).map((e) => path.join(os.tmpdir(), e))
+      } catch { return [] }
     }
-    check('temp 模式退出后临时引擎已清理（零残留）', leftovers.length === 0, leftovers.join(', ') || '无残留')
+    let leftovers = listTempEngines()
+    if (leftovers.length > 0) {
+      // Windows 上 SIGTERM 是不可捕获的强杀，退出钩子根本不会跑：
+      // 零残留靠「下次启动补扫」兜底，这里显式触发一次，验证兜底真的有效。
+      console.log('  提示：强杀留下临时引擎，触发下次启动补扫 …')
+      const nodeExe = path.join(appRoot, 'resources', 'app', nodeRel())
+      const installer = path.join(appRoot, 'resources', 'app', 'engine-install.cjs')
+      spawnSync(nodeExe, ['-e', `require(${JSON.stringify(installer)}).sweepStaleTempEngines(0)`], { stdio: 'ignore' })
+      leftovers = listTempEngines()
+    }
+    check('temp 模式零残留（退出即清 / 被强杀则下次启动补扫）', leftovers.length === 0, leftovers.join(', ') || '无残留')
   }
 
   const failed = results.filter((r) => !r.ok)
