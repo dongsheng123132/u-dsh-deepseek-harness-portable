@@ -5,89 +5,98 @@ window.__ModuleLoader__.load({
 		var exports = module.exports;
 		Object.defineProperty(exports, Symbol.toStringTag, { value: "Module" });
 
-		const jsx_runtime = require("react/jsx-runtime");
+		const jsx = require("react/jsx-runtime");
+		const react = require("react");
 
-		// 便携启动器把钱包面板固定起在这些端口（见 wallet-panel.cjs 的 PANEL_PORTS）
-		const PANEL_PORTS = [43110, 43111, 43112, 43113, 43114];
+		// 便携启动器把钱包面板固定起在这个端口（见 wallet-panel.cjs 的 PANEL_PORTS）
+		const PANEL_PORT = 43110;
+		const PANEL_URL = `http://127.0.0.1:${PANEL_PORT}/`;
 
-		/**
-		 * 打开钱包面板。优先用探测过的端口；探测失败就挨个试（面板没起时浏览器会显示连不上，
-		 * 但至少不让点按无反应——终端里同时有提示）。
-		 */
-		function openPanel() {
-			const probe = (port) =>
-				new Promise((resolve) => {
-					const timer = setTimeout(() => resolve(false), 800);
-					fetch(`http://127.0.0.1:${port}/api/status`, { mode: "cors" })
-						.then((res) => {
-							clearTimeout(timer);
-							resolve(res.ok);
-						})
-						.catch(() => {
-							clearTimeout(timer);
-							resolve(false);
-						});
-				});
+		const styles = `
+			.udsh-wallet-btn {
+				display: inline-flex; align-items: center; gap: 6px;
+				height: 26px; padding: 0 10px; margin: 0;
+				border: 1px solid rgba(127,127,127,0.28); border-radius: 13px;
+				background: transparent; color: inherit; font: inherit; font-size: 12px;
+				cursor: pointer; opacity: 0.92; white-space: nowrap;
+			}
+			.udsh-wallet-btn:hover { background: rgba(127,127,127,0.12); opacity: 1; }
+			.udsh-wallet-btn[data-empty="true"] { border-color: rgba(214,148,0,0.6); color: #c08a00; }
+			.udsh-wallet-btn .udsh-wallet-sign { font-weight: 600; }
+		`;
 
-			(async () => {
-				for (const port of PANEL_PORTS) {
-					if (await probe(port)) {
-						window.open(`http://127.0.0.1:${port}/`, "_blank", "noopener");
-						return;
-					}
-				}
-				// 都没探测到：把第一个地址打开，用户至少能看到"连接被拒绝"而不是什么都没发生
-				window.open(`http://127.0.0.1:${PANEL_PORTS[0]}/`, "_blank", "noopener");
-			})();
+		function ensureStyles() {
+			if (typeof document === "undefined") return;
+			if (document.querySelector('style[data-plugin-css="dsh-client-ui-xiapan-wallet"]')) return;
+			const tag = document.createElement("style");
+			tag.dataset.plugin = "dsh-client-ui-xiapan-wallet";
+			tag.dataset.pluginCss = "dsh-client-ui-xiapan-wallet";
+			tag.textContent = styles;
+			document.head.appendChild(tag);
 		}
 
 		/**
-		 * 虾盘云钱包入口。静态渲染、不依赖任何异步状态：
-		 * 组件在渲染期只读常量，点击时才联网，避免把 Web 客户端的 boot 拖下水
-		 * （实测：组件里做 setState/fetch 会导致 dsh-client-ui-conversation 启动失败、整页白屏）。
+		 * 左下角钱包入口（sidebar.footer.action 插槽）。
+		 * 契约照抄 dsh-workspace-terminal：插槽传 { wide } 决定是否显示文字。
 		 */
-		function XiapanWalletEntry() {
-			return jsx_runtime.jsx("button", {
+		/** 余额（元）读本地钱包面板；面板没起/断网就显示 null，按钮照常可点。 */
+		function useBalance() {
+			const [available, setAvailable] = react.useState(null);
+			react.useEffect(() => {
+				let alive = true;
+				const read = () => {
+					fetch(`${PANEL_URL}api/status?balance=1`, { mode: "cors" })
+						.then((res) => (res.ok ? res.json() : null))
+						.then((data) => {
+							if (!alive || !data?.balance) return;
+							if (typeof data.balance.available === "number") setAvailable(data.balance.available);
+						})
+						.catch(() => {});
+				};
+				read();
+				const timer = setInterval(read, 60000);
+				return () => {
+					alive = false;
+					clearInterval(timer);
+				};
+			}, []);
+			return available;
+		}
+
+		/**
+		 * 左下角钱包入口（sidebar.footer.action 插槽）。
+		 * 契约照抄 dsh-workspace-terminal：插槽传 { wide } 决定是否显示文字。
+		 */
+		function WalletAction(props) {
+			const wide = props?.wide !== false;
+			const available = useBalance();
+			const yuan = available == null ? null : available / 500000;
+			const empty = available != null && available <= 1;
+			const label = yuan == null ? "虾盘云钱包" : `虾盘云 ¥${yuan.toFixed(2)}`;
+			const open = () => {
+				window.open(PANEL_URL, "_blank", "noopener");
+			};
+			const children = [jsx.jsx("span", { key: "sign", className: "udsh-wallet-sign", children: "¥" })];
+			if (wide) children.push(jsx.jsx("span", { key: "label", children: label }));
+			return jsx.jsx("button", {
 				type: "button",
-				onClick: openPanel,
-				title: "虾盘云设备钱包：看余额 / 一键充值 / 复制密钥",
-				style: {
-					display: "inline-flex",
-					alignItems: "center",
-					gap: "6px",
-					height: "26px",
-					padding: "0 10px",
-					borderRadius: "13px",
-					border: "1px solid rgba(127,127,127,0.28)",
-					background: "transparent",
-					color: "inherit",
-					font: "inherit",
-					fontSize: "12px",
-					cursor: "pointer",
-					opacity: 0.9,
-				},
-				children: [
-					jsx_runtime.jsx("span", {
-						key: "dot",
-						style: {
-							width: "7px",
-							height: "7px",
-							borderRadius: "50%",
-							background: "#2fa36b",
-							display: "inline-block",
-						},
-					}),
-					jsx_runtime.jsx("span", { key: "text", children: "虾盘云 · 余额/充值" }),
-				],
+				className: "udsh-wallet-btn",
+				title: empty
+					? "余额为 0：点这里打开虾盘云钱包充值"
+					: "虾盘云设备钱包：看余额 / 一键充值 / 复制密钥",
+				"data-udsh-wallet": true,
+				"data-empty": empty ? "true" : "false",
+				onClick: open,
+				children,
 			});
 		}
 
-		/** Required service: the UI slot registry. */
 		const inject = ["slots"];
 
 		function apply(ctx) {
-			ctx.slots.inject("conversation.composer.bar", () =>
-				ctx.slots.register({ name: "conversation.composer.bar", id: "xiapan-wallet" }, XiapanWalletEntry),
+			ensureStyles();
+			ctx.slots.inject("sidebar.footer.action", () =>
+				ctx.slots.register({ name: "sidebar.footer.action", id: "xiapan-wallet", order: 25 }, WalletAction),
 			);
 		}
 

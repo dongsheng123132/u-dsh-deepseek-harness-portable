@@ -162,11 +162,13 @@ async function main() {
 
   // 2.5) 把「虾盘云钱包」客户端插件装进闭包，并在 dsh-web-app 的依赖里登记，
   //      否则 DSH 的 web 启动清单不会带上它（实测：不登记 → boot manifest 里没有该模块）。
-  // 插件默认不打包：插槽契约没有公开文档，实测注册进 conversation 系插槽会把
-  // dsh-client-ui-conversation 拖挂（整页 Failed to load plugins）。
-  // 用 UDSH_WALLET_PLUGIN=1 才装进包，方便继续调试，不影响正式发布。
+  // 钱包插件默认打包。踩过的坑：
+  //   - 注册进 conversation 系插槽（composer.bar / session.header）会把 dsh-client-ui-conversation
+  //     拖挂，整页 Failed to load plugins；
+  //   - 用 sidebar.footer.action（左下角）才安全，契约照抄 dsh-workspace-terminal 插件。
+  // 需要临时关掉：UDSH_NO_WALLET_PLUGIN=1。
   const pluginSrc = path.join(root, 'portable-webui', 'plugin')
-  if (process.env.UDSH_WALLET_PLUGIN === '1' && existsSync(pluginSrc)) {
+  if (process.env.UDSH_NO_WALLET_PLUGIN !== '1' && existsSync(pluginSrc)) {
     const pluginName = '@u-dsh/dsh-client-ui-xiapan-wallet'
     const pluginTarget = path.join(staging, 'node_modules', ...pluginName.split('/'))
     cpSync(pluginSrc, pluginTarget, { recursive: true })
