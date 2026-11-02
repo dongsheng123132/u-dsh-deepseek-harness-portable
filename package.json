@@ -13,6 +13,7 @@
   "scripts": {
     "start": "electron .",
     "test": "npm run action-parity:check-generated && node --test test/*.test.js",
+    "verify:zip": "node scripts/verify-zip.mjs",
     "action-parity:generate": "node scripts/generate-action-parity.mjs",
     "action-parity:check-generated": "node scripts/generate-action-parity.mjs --check",
     "action-parity:verify": "node node_modules/action-parity/bin/action-parity.mjs verify generated/action-parity.json --plan action-parity.verify.json --json",

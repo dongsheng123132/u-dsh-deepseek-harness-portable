@@ -29,6 +29,7 @@ import { createHash } from 'node:crypto'
 import { chmodSync, cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { createZipFromDirectory, verifyZipFile } from './lib/zip-archive.mjs'
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 
@@ -189,22 +190,27 @@ async function main() {
     const zipPath = path.join(path.dirname(out), `U-DSH-WebUI-Portable-${version2}-${platforms}.zip`)
     rmSync(zipPath, { force: true })
     log(`压 zip：${zipPath}`)
-    // 中文启动器名必须写成 UTF-8 条目（带 0x800 标志），否则 Windows 解压后是乱码。
-    //  - macOS/Linux：bsdtar -a 写 UTF-8
-    //  - Windows：自带的 tar 不能写 zip，Compress-Archive 又按 OEM 码页写名字，
-    //    改用 .NET 的 ZipFile（对非 ASCII 名字会置 UTF-8 标志）
-    if (process.platform === 'win32') {
-      const src = out.replace(/'/g, "''")
-      const dst = zipPath.replace(/'/g, "''")
-      execFileSync('powershell', [
-        '-NoProfile', '-NonInteractive', '-Command',
-        `Add-Type -AssemblyName System.IO.Compression.FileSystem -ErrorAction SilentlyContinue; ` +
-        `[System.IO.Compression.ZipFile]::CreateFromDirectory('${src}', '${dst}', [System.IO.Compression.CompressionLevel]::Optimal, $true)`,
-      ], { stdio: 'inherit' })
-    } else {
-      execFileSync('tar', ['-a', '-cf', zipPath, path.basename(out)], { cwd: path.dirname(out), stdio: 'inherit' })
+    // 一律走 scripts/lib/zip-archive.mjs：Win/mac/Linux 同一段代码，产物字节级一致。
+    //
+    // 这里曾经按平台分叉，两条路都留了坑：
+    //  - Windows 用 .NET `ZipFile.CreateFromDirectory`：条目名是反斜杠、external_attr 恒 0
+    //    （`create_system=0`/FAT → 解压后 .command 全变 0644，macOS 上双击报权限不足）；
+    //  - macOS 用 bsdtar `tar -a`：名字和执行位对，但换行原样搬 —— Windows 检出带 CRLF 时
+    //    `.command` 里就是 `#!/bin/bash\r`，macOS 报 bad interpreter。
+    // 现在由写入器统一保证：正斜杠条目名、POSIX 权限位写进 external_attr 高位、
+    // POSIX 脚本 LF / Windows 脚本 CRLF、目录条目结尾带 `/`。
+    const written = createZipFromDirectory({ sourceDir: out, zipPath, includeBaseDirectory: true, log })
+    log(`zip: ${mb(written.bytes)}（可执行条目 ${written.executableCount}，换行已规整 ${written.convertedCrlfCount}）`)
+
+    // 打完立刻自检：宁可在 CI 里红，也不要再把一个「能解压不能用」的包发出去。
+    const report = verifyZipFile(zipPath)
+    if (!report.ok) {
+      for (const problem of report.problems.slice(0, 20)) {
+        console.error(`build-webui: zip 自检失败 [${problem.code}] ${problem.entry ?? '<整个包>'} —— ${problem.message}`)
+      }
+      throw new Error(`zip 自检未通过（${report.problems.length} 项），产物已留在 ${zipPath} 供排查`)
     }
-    log(`zip: ${mb(statSync(zipPath).size)}`)
+    log(`zip 自检通过：${report.summary.entryCount} 条目 / 可执行 ${report.summary.executableCount}`)
   }
 }
 
