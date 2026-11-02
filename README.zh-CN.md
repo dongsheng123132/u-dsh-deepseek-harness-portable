@@ -22,13 +22,13 @@
 
 ## 下载哪个版本？
 
-| | **v0.3.0 WebUI（推荐）** | v0.2.0 Electron（桌面 App） |
+| | **v0.4.1 WebUI（推荐）** | v0.2.0 Electron（桌面 App） |
 |---|---|---|
 | 界面 | 浏览器界面（自动打开） | 桌面窗口（`U-DSH Portable.exe`） |
-| 系统 | **Windows x64 + macOS**（Apple Silicon / Intel） | 仅 Windows x64 |
+| 系统 | **Windows x64 + macOS arm64**（Apple Silicon） | 仅 Windows x64 |
 | U 盘格式 | **exFAT 或 NTFS**（exFAT 实测可用，一盘通吃 Windows + Mac） | 仅 NTFS |
 | 启动 | 双击「启动 U-DSH Web.bat」（Win）/「启动 U-DSH Web.command」（Mac） | 双击 `U-DSH Portable.exe` |
-| 下载 | `U-DSH-WebUI-Portable-0.3.0-mac.zip` / `-win.zip` | `U-DSH-DeepSeek-Harness-Portable-0.2.0-Windows-x64.zip` |
+| 下载 | `U-DSH-WebUI-Portable-0.4.1-mac.zip` / `-win.zip`（[最新发布](../../releases/latest)） | `U-DSH-DeepSeek-Harness-Portable-0.2.0-Windows-x64.zip`（[v0.2.0 发布](../../releases/tag/v0.2.0)） |
 
 **选 WebUI 版**：一个包 Windows / Mac 都能用，exFAT 格式 U 盘（Windows 和 Mac 都能读写的格式）直接跑。
 习惯 Windows + NTFS 桌面窗口的用户可以继续用 Electron 版。
@@ -59,9 +59,9 @@
 
 ## 快速开始
 
-**WebUI 版（v0.3.0，推荐）：**
+**WebUI 版（v0.4.1，推荐）：**
 
-1. 到 [Releases](../../releases/latest) 下载对应系统的包：`U-DSH-WebUI-Portable-0.3.0-mac.zip`（macOS）或 `-win.zip`（Windows）
+1. 到 [Releases](../../releases/latest) 下载对应系统的包：`U-DSH-WebUI-Portable-0.4.1-mac.zip`（macOS）或 `-win.zip`（Windows）
 2. 解压到 U 盘、移动硬盘或本地文件夹（**exFAT / NTFS 都可以**）
 3. Windows 双击「启动 U-DSH Web.bat」，macOS 双击「启动 U-DSH Web.command」
 4. 第一次在**某台电脑**上启动：自动把引擎（Node + DSH 闭包，114.8 MB 压缩包）解到这台电脑，约 **8–10 秒**；之后同一台电脑启动是秒级，不再解包
@@ -70,7 +70,7 @@
 
 **Electron 版（v0.2.0）：**
 
-1. 到 [Releases](../../releases/latest) 下载 `U-DSH-DeepSeek-Harness-Portable-*-Windows-x64.zip`
+1. 到 [v0.2.0 发布页](../../releases/tag/v0.2.0) 下载 `U-DSH-DeepSeek-Harness-Portable-0.2.0-Windows-x64.zip`（这个包不在后续版本里，`releases/latest` 上没有它）
 2. 解压到 U 盘、移动硬盘或本地文件夹（**U 盘必须是 NTFS 格式**，原因见[常见问题](#常见问题)）
 3. 双击 `U-DSH Portable.exe`，等界面出来即可开始对话
 
@@ -79,8 +79,9 @@
 
 ## 支持范围
 
-**WebUI 版（v0.2.1）：Windows x64 + macOS（Apple Silicon / Intel）双平台**，一个包通吃。
-**Electron 版（v0.2.0）：仅 Windows x64。** Linux 暂不支持（构建会被门禁拦住，不会打出缺内核的坏包）。
+**WebUI 版（v0.4.1）：Windows x64 + macOS arm64（Apple Silicon）双平台**，一个包通吃。
+**Electron 版（v0.2.0）：仅 Windows x64。** Intel Mac 暂不支持：macOS 包里只有 arm64 的 Node 运行时，
+Intel 机器跑不了 arm64 二进制。Linux 暂不支持（构建会被门禁拦住，不会打出缺内核的坏包）。
 
 它不是 DeepSeek 官方产品，也不修改 DSH Web UI、不复制 DSH 的业务实现 ——
 复用官方 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness)
@@ -181,7 +182,7 @@ npm run prepare:vendor   # 只在构建机跑：把 Node 运行时 + DSH 闭包�
 npm run dist:portable    # 有 prepare-vendor --check 门禁：没有闭包就打不出包
 ```
 
-生成物在 `dist/U-DSH-DeepSeek-Harness-Portable-<版本>-Windows-x64.zip`。需要网络的是构建机上的 vendor 这一步；打包后的应用完全离线可用（设备钱包相关功能除外）。Electron 版要求 U 盘 NTFS：DSH 每次启动要在 `data/dsh-home/profiles/node_modules` 下建 junction，exFAT/FAT32 不支持；WebUI 版（v0.3.0）实测 exFAT / NTFS 均可。
+生成物在 `dist/U-DSH-DeepSeek-Harness-Portable-<版本>-Windows-x64.zip`。需要网络的是构建机上的 vendor 这一步；打包后的应用完全离线可用（设备钱包相关功能除外）。Electron 版要求 U 盘 NTFS：DSH 每次启动要在 `data/dsh-home/profiles/node_modules` 下建 junction，exFAT/FAT32 不支持；WebUI 版（v0.4.1）实测 exFAT / NTFS 均可。
 
 ## 方便继续 fork
 
@@ -201,7 +202,7 @@ npm run dist:portable    # 有 prepare-vendor --check 门禁：没有闭包就�
 exFAT / FAT32 放不下这种链接，实测直接 `EISDIR` 失败。Electron 版启动前会真探一次，盘不对会直接
 告诉你换 NTFS，而不是抛一堆看不懂的报错。
 
-**WebUI 版（v0.3.0）exFAT / NTFS 都可以**（Windows exFAT U 盘实测可用）。exFAT 正是 Windows 和 Mac
+**WebUI 版（v0.4.1）exFAT / NTFS 都可以**（Windows exFAT U 盘实测可用）。exFAT 正是 Windows 和 Mac
 都能读写、一盘双用的格式。格式化前记得先备份盘上资料。
 </details>
 

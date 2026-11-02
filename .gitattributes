@@ -1,0 +1,59 @@
+# 换行符与二进制归属的唯一真相源。
+#
+# 为什么必须有这个文件：Windows 侧 core.autocrlf=true 时，checkout 会把文本文件写成 CRLF。
+# 发布包里的 *.command 一旦带 CRLF，macOS 上双击就报 `bad interpreter: /bin/bash^M`，
+# 用户根本跑不起来；反过来 *.bat / *.ps1 必须是 CRLF，否则 cmd.exe 与 Windows PowerShell 5
+# 在某些解析路径上会出错。规则写死在这里，就不再依赖每台开发机的本地 git 配置。
+#
+# 注意：本文件只管「存进仓库/checkout 出来」的换行；打包 zip 时的执行位（external_attr）
+# 由 scripts/build-webui-package.mjs 负责，二者不可互相替代。
+
+# 兜底：git 自动判定文本，统一 LF 入库、LF 落地。
+* text=auto eol=lf
+
+# POSIX shell 脚本必须 LF —— CRLF 会让 shebang 失效。
+*.sh            text eol=lf
+*.command       text eol=lf
+*.bash          text eol=lf
+*.zsh           text eol=lf
+
+# 源码 / 配置：全平台 LF。
+*.js            text eol=lf
+*.mjs           text eol=lf
+*.cjs           text eol=lf
+*.jsx           text eol=lf
+*.ts            text eol=lf
+*.json          text eol=lf
+*.json5         text eol=lf
+*.yml           text eol=lf
+*.yaml          text eol=lf
+*.md            text eol=lf
+*.css           text eol=lf
+*.html          text eol=lf
+.gitignore      text eol=lf
+.gitattributes  text eol=lf
+
+# Windows 批处理与 PowerShell 必须 CRLF。
+*.bat           text eol=crlf
+*.cmd           text eol=crlf
+*.ps1           text eol=crlf
+*.psm1          text eol=crlf
+
+# 二进制：禁止任何换行/编码转换（否则 exe/dll/图片会损坏）。
+# `binary` 等价于 `-text -diff`：text 一旦 unset，上面兜底那条的 eol=lf 对二进制就不再生效，
+# 所以 `git check-attr eol -- assets/icon.png` 仍会回显 "eol: lf" —— 判据看 `text: unset`。
+*.exe           binary
+*.dll           binary
+*.node          binary
+*.ico           binary
+*.icns          binary
+*.png           binary
+*.jpg           binary
+*.jpeg          binary
+*.gif           binary
+*.webp          binary
+*.zip           binary
+*.gz            binary
+*.tgz           binary
+*.7z            binary
+*.pdf           binary

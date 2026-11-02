@@ -3,7 +3,19 @@ import test from 'node:test'
 import path from 'node:path'
 import { resolvePortablePaths } from '../src/portable-paths.js'
 
-test('portable paths keep durable data on the USB root and runtime cache on the host', () => {
+// 这条用例断言的是 **win32 的路径语义**：src/portable-paths.js 用宿主机的
+// `node:path` 解析，于是 macOS / Linux 上 `path.resolve('I:\\U-DSH', ...)` 会按 posix
+// 规则加上 cwd 前缀，Windows 风格路径不可能对得上。
+//
+// 这不是「藏失败」：Windows CI（ci.yml 的 windows-latest）仍然跑这条用例、仍然守着它的语义。
+// 这里显式 skip 并打印原因，macOS job 才能作为真正的回归闸门上线。
+// 另一条路是让源码在 platform==='win32' 时改用 path.win32 —— 那要动产品路径逻辑，不在本次范围。
+const skipOnNonWindows =
+  process.platform === 'win32'
+    ? false
+    : `win32-only assertion: host path module is posix on ${process.platform} (covered by the Windows CI job)`
+
+test('portable paths keep durable data on the USB root and runtime cache on the host', { skip: skipOnNonWindows }, () => {
   const paths = resolvePortablePaths({
     env: {
       UDSH_PORTABLE_ROOT: 'I:\\U-DSH',
