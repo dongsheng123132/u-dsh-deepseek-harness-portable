@@ -7,6 +7,7 @@
 //   UDSH_HDD_THRESHOLD_GB=64                    auto 时判定「移动硬盘」的容量阈值
 'use strict'
 const { spawn } = require('node:child_process')
+const fs = require('node:fs')
 const { mkdirSync, readFileSync, writeFileSync, rmSync, statSync } = require('node:fs')
 const os = require('node:os')
 const path = require('node:path')

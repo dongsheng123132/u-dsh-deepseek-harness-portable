@@ -1,0 +1,19 @@
+{
+  "name": "@u-dsh/dsh-client-ui-xiapan-wallet",
+  "version": "0.1.0",
+  "description": "虾盘云设备钱包：在 DSH 里直接看余额、一键充值、复制密钥",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": { "default": "./lib/index.js" },
+    "./client": { "default": "./lib/client.js" },
+    "./package.json": "./package.json"
+  },
+  "dsh": {
+    "client": {
+      "inject": ["@deepseek-ai/dsh-client-ui-renderer", "@deepseek-ai/dsh-client-ui-conversation", "@deepseek-ai/dsh-client-locale"],
+      "platform": "web"
+    }
+  },
+  "files": ["lib/index.js", "lib/client.js", "package.json"]
+}

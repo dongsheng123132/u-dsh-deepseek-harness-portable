@@ -333,7 +333,7 @@
       "id": "org.uclaw.udsh",
       "name": "U-DSH Portable",
       "source": "https://github.com/dongsheng123132/u-dsh-deepseek-harness-portable",
-      "version": "0.4.2"
+      "version": "0.4.3"
     },
     "format": "action-parity.cli-help/v1",
     "invocation": "u-dsh <action-id> [--flag value] --json"
@@ -826,7 +826,7 @@
       "id": "org.uclaw.udsh",
       "name": "U-DSH Portable",
       "source": "https://github.com/dongsheng123132/u-dsh-deepseek-harness-portable",
-      "version": "0.4.2"
+      "version": "0.4.3"
     },
     "generated_from": {
       "generator": "action-parity-sdk/0.7.0",

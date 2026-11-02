@@ -168,9 +168,17 @@ refresh(true);
 </script>
 </body></html>`
 
+const PANEL_PORTS = [43110, 43111, 43112, 43113, 43114]
+const CORS = {
+  // DSH 界面在另一个端口，插件要跨源读余额/充值链接
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+}
+
 function send(res, code, payload, type = 'application/json; charset=utf-8') {
   const body = typeof payload === 'string' ? payload : JSON.stringify(payload)
-  res.writeHead(code, { 'Content-Type': type, 'Cache-Control': 'no-store' })
+  res.writeHead(code, { 'Content-Type': type, 'Cache-Control': 'no-store', ...CORS })
   res.end(body)
 }
 
@@ -190,6 +198,7 @@ async function startWalletPanel({ root: rootDir = root, engineRoot: engineDir = 
 
   const server = http.createServer(async (req, res) => {
     const url = new URL(req.url, 'http://127.0.0.1')
+    if (req.method === 'OPTIONS') { res.writeHead(204, CORS); return res.end() }
     try {
       if (req.method === 'GET' && (url.pathname === '/' || url.pathname === '/index.html')) {
         return send(res, 200, PAGE, 'text/html; charset=utf-8')
@@ -220,7 +229,19 @@ async function startWalletPanel({ root: rootDir = root, engineRoot: engineDir = 
     }
   })
 
-  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve))
+  // 优先用固定端口：DSH 里的钱包插件要按固定地址取数据（跨源 + 可预测）
+  const listen = (port) => new Promise((resolve, reject) => {
+    const onError = (error) => { server.off('listening', onListening); reject(error) }
+    const onListening = () => { server.off('error', onError); resolve() }
+    server.once('error', onError)
+    server.once('listening', onListening)
+    server.listen(port, '127.0.0.1')
+  })
+  let bound = false
+  for (const port of PANEL_PORTS) {
+    try { await listen(port); bound = true; break } catch { /* 端口被占，试下一个 */ }
+  }
+  if (!bound) await listen(0)
   const { port } = server.address()
   const url = `http://127.0.0.1:${port}/`
   console.log(`[U-DSH 钱包] 面板地址：${url}`)

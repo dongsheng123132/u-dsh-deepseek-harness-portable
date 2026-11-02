@@ -26,7 +26,7 @@
  */
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { chmodSync, cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { appendFileSync, chmodSync, cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createZipFromDirectory, verifyZipFile } from './lib/zip-archive.mjs'
@@ -158,6 +158,39 @@ async function main() {
     cpSync(dir, target, { recursive: true, dereference: true })
     pruneRuntime(target)
     log(`运行时 ${name}: ${mb(directorySize(target))}`)
+  }
+
+  // 2.5) 把「虾盘云钱包」客户端插件装进闭包，并在 dsh-web-app 的依赖里登记，
+  //      否则 DSH 的 web 启动清单不会带上它（实测：不登记 → boot manifest 里没有该模块）。
+  // 插件默认不打包：插槽契约没有公开文档，实测注册进 conversation 系插槽会把
+  // dsh-client-ui-conversation 拖挂（整页 Failed to load plugins）。
+  // 用 UDSH_WALLET_PLUGIN=1 才装进包，方便继续调试，不影响正式发布。
+  const pluginSrc = path.join(root, 'portable-webui', 'plugin')
+  if (process.env.UDSH_WALLET_PLUGIN === '1' && existsSync(pluginSrc)) {
+    const pluginName = '@u-dsh/dsh-client-ui-xiapan-wallet'
+    const pluginTarget = path.join(staging, 'node_modules', ...pluginName.split('/'))
+    cpSync(pluginSrc, pluginTarget, { recursive: true })
+    const webAppPkg = path.join(staging, 'node_modules', '@deepseek-ai', 'dsh-web-app', 'package.json')
+    if (existsSync(webAppPkg)) {
+      const manifest = JSON.parse(readFileSync(webAppPkg, 'utf8'))
+      manifest.dependencies = { ...(manifest.dependencies ?? {}), [pluginName]: '0.1.0' }
+      writeFileSync(webAppPkg, `${JSON.stringify(manifest, null, 2)}\n`)
+
+      // 在 bundle 自己的 patch 文件里追加一行（缩进 4 空格 → 追加到文件末尾那条 insert 列表里）。
+      // 注意：不能写进用户的 profile patch —— 顶层多一条 `- insert:` 会顶掉 bundle 的插入列表，
+      // 实测表现为 dsh-client-ui-conversation 等 8 个插件 pending/failed、界面白屏报 Failed to load plugins。
+      const patchFile = path.join(staging, 'node_modules', '@deepseek-ai', 'dsh-web-app', 'cordis.patch.yml')
+      if (existsSync(patchFile)) {
+        const text = readFileSync(patchFile, 'utf8')
+        if (!text.includes('xiapan-wallet')) {
+          appendFileSync(patchFile, `\n    # U-DSH：虾盘云设备钱包（余额 / 一键充值），挂在 composer 工具条\n    - id: xiapan-wallet\n      name: '${pluginName}'\n`)
+        }
+        log(`已登记钱包插件到 dsh-web-app 的 patch 层：${pluginName}`)
+      }
+      log(`已装入钱包插件：${pluginName}`)
+    } else {
+      log('警告：闭包里没有 dsh-web-app，钱包插件未登记')
+    }
   }
 
   // 3) 闭包 → engine.tar.gz
