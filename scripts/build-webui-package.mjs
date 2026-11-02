@@ -178,10 +178,21 @@ async function main() {
     const zipPath = path.join(path.dirname(out), `U-DSH-WebUI-Portable-${version2}-${platforms}.zip`)
     rmSync(zipPath, { force: true })
     log(`压 zip：${zipPath}`)
-    // 两个平台都用 bsdtar 的 -a（按扩展名选 zip）：
-    // Windows 的 Compress-Archive 会把「启动 U-DSH Web.bat」这类中文名写成 OEM 码页，
-    // 解压后变乱码；bsdtar 写 UTF-8 条目名，Windows 10+/macOS 自带。
-    execFileSync('tar', ['-a', '-cf', zipPath, path.basename(out)], { cwd: path.dirname(out), stdio: 'inherit' })
+    // 中文启动器名必须写成 UTF-8 条目（带 0x800 标志），否则 Windows 解压后是乱码。
+    //  - macOS/Linux：bsdtar -a 写 UTF-8
+    //  - Windows：自带的 tar 不能写 zip，Compress-Archive 又按 OEM 码页写名字，
+    //    改用 .NET 的 ZipFile（对非 ASCII 名字会置 UTF-8 标志）
+    if (process.platform === 'win32') {
+      const src = out.replace(/'/g, "''")
+      const dst = zipPath.replace(/'/g, "''")
+      execFileSync('powershell', [
+        '-NoProfile', '-NonInteractive', '-Command',
+        `Add-Type -AssemblyName System.IO.Compression.FileSystem -ErrorAction SilentlyContinue; ` +
+        `[System.IO.Compression.ZipFile]::CreateFromDirectory('${src}', '${dst}', [System.IO.Compression.CompressionLevel]::Optimal, $true)`,
+      ], { stdio: 'inherit' })
+    } else {
+      execFileSync('tar', ['-a', '-cf', zipPath, path.basename(out)], { cwd: path.dirname(out), stdio: 'inherit' })
+    }
     log(`zip: ${mb(statSync(zipPath).size)}`)
   }
 }
