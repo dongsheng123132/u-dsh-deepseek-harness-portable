@@ -81,9 +81,12 @@ const PAGE = `<!doctype html>
     </div>
     <div style="margin-top:14px"><span class="balance" id="balance">—</span>
       <span class="muted" id="balanceHint"></span></div>
+    <div id="emptyHint" class="warn" style="display:none">
+      余额还是 0：现在去 DSH 里发消息会失败。先充 ¥1（≈50 万 tokens，够用很久）再聊。
+    </div>
     <div class="row" style="margin-top:14px">
       <button class="primary" onclick="recharge()">一键充值</button>
-      <span class="muted">充值在浏览器里完成，回来点「刷新余额」即可</span>
+      <span class="muted">¥1 ≈ 50 万 tokens（以充值页显示为准）｜充完回来点「刷新余额」</span>
     </div>
   </div>
 
@@ -125,11 +128,13 @@ async function refresh(withBalance = false) {
     const data = await api('/api/status' + (withBalance ? '?balance=1' : ''));
     state = data;
     $('key').textContent = data.available ? (data.apiKeyMasked || '（已配置）') : '还没领到（联网后自动获取）';
-    $('balance').textContent = data.balance && data.balance.available != null ? ('¥' + (data.balance.available / 500000).toFixed(2)) : '—';
+    const available = data.balance && data.balance.available != null ? Number(data.balance.available) : null;
+    $('balance').textContent = available == null ? '—' : ('¥' + (available / 500000).toFixed(2));
     $('balanceHint').textContent = data.balance
       ? (data.balance.error ? ('余额查询失败：' + data.balance.error)
-         : ('可用 ' + Number(data.balance.available).toLocaleString() + ' tokens' + (data.balance.available > 0 ? '' : '（还没充值）')))
+         : (available > 1 ? ('可用额度（' + available.toLocaleString() + ' tokens）') : '还没充值'))
       : '';
+    $('emptyHint').style.display = (available != null && available <= 1) ? 'block' : 'none';
   } catch (error) { say('读取状态失败：' + error.message, 'err'); }
 }
 async function copyKey() {
