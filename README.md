@@ -29,7 +29,7 @@
 | OS | **Windows x64 + macOS** (Apple Silicon / Intel) | Windows x64 only |
 | USB filesystem | **exFAT or NTFS** (exFAT verified — works on the same stick for Windows and Mac) | NTFS only |
 | Launch | Double-click `启动 U-DSH Web.bat` (Win) / `启动 U-DSH Web.command` (Mac) | Double-click `U-DSH Portable.exe` |
-| Download | `U-DSH-WebUI-Portable-0.3.0-win-mac.zip` | `U-DSH-DeepSeek-Harness-Portable-0.2.0-Windows-x64.zip` |
+| Download | `U-DSH-WebUI-Portable-0.3.0-mac.zip` / `-win.zip` | `U-DSH-DeepSeek-Harness-Portable-0.2.0-Windows-x64.zip` |
 
 **Pick the WebUI build** if you want one download that runs on both Windows and Mac and works from an
 exFAT-formatted USB drive (the format both systems can read/write). The Electron build is kept for
@@ -68,7 +68,7 @@ can **just start chatting**. Top up with one click, or swap in your own key any 
 
 **WebUI build (v0.3.0, recommended):**
 
-1. Grab `U-DSH-WebUI-Portable-0.3.0-win-mac.zip` from [Releases](../../releases/latest)
+1. Grab `U-DSH-WebUI-Portable-0.3.0-mac.zip` (macOS) or `-win.zip` (Windows) from [Releases](../../releases/latest)
 2. Unzip to a USB stick, external drive or local folder (**exFAT or NTFS both work**)
 3. Windows: double-click `启动 U-DSH Web.bat` · macOS: double-click `启动 U-DSH Web.command`
 4. Your browser opens the DeepSeek Harness web UI; data lives in `u-dsh/data/dsh-home` on the drive

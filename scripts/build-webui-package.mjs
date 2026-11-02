@@ -63,13 +63,21 @@ function directorySize(p) {
 
 const mb = (bytes) => `${(bytes / 1024 ** 2).toFixed(1)} MB`
 
-/** 运行时里只有 bin/node(c.exe) 是必需的；include/、npm、share/ 全都可以不要。 */
+/**
+ * 运行时里只有 node 本体是必需的：
+ *   include/、share/、npm 自带的 node_modules 全都可以不要。
+ * 注意两种布局：Linux/macOS 是 lib/node_modules，Windows 的 zip 是根下 node_modules/。
+ */
 function pruneRuntime(dir) {
-  for (const junk of ['include', 'share', 'CHANGELOG.md', 'README.md']) {
+  for (const junk of [
+    'include', 'share', 'CHANGELOG.md', 'README.md',
+    'node_modules', path.join('lib', 'node_modules'),
+    'corepack', 'corepack.cmd', 'npm', 'npm.cmd', 'npm.ps1', 'npx', 'npx.cmd', 'npx.ps1',
+    'nodevars.bat', 'install_tools.bat',
+    path.join('bin', 'npm'), path.join('bin', 'npx'), path.join('bin', 'corepack'),
+  ]) {
     rmSync(path.join(dir, junk), { recursive: true, force: true })
   }
-  const npm = path.join(dir, 'lib', 'node_modules')
-  if (existsSync(npm)) rmSync(npm, { recursive: true, force: true })
 }
 
 async function downloadNode(version, target, outDir) {
@@ -170,15 +178,10 @@ async function main() {
     const zipPath = path.join(path.dirname(out), `U-DSH-WebUI-Portable-${version2}-${platforms}.zip`)
     rmSync(zipPath, { force: true })
     log(`压 zip：${zipPath}`)
-    // Windows 没有 zip.exe：用 PowerShell 的 Compress-Archive（CI 的 runner 上一定有）。
-    if (process.platform === 'win32') {
-      execFileSync('powershell', [
-        '-NoProfile', '-NonInteractive', '-Command',
-        `Compress-Archive -Path '${path.join(out, '*').replace(/'/g, "''")}' -DestinationPath '${zipPath.replace(/'/g, "''")}' -CompressionLevel Optimal -Force`,
-      ], { stdio: 'inherit' })
-    } else {
-      execFileSync('zip', ['-q', '-r', '-X', zipPath, path.basename(out)], { cwd: path.dirname(out), stdio: 'inherit' })
-    }
+    // 两个平台都用 bsdtar 的 -a（按扩展名选 zip）：
+    // Windows 的 Compress-Archive 会把「启动 U-DSH Web.bat」这类中文名写成 OEM 码页，
+    // 解压后变乱码；bsdtar 写 UTF-8 条目名，Windows 10+/macOS 自带。
+    execFileSync('tar', ['-a', '-cf', zipPath, path.basename(out)], { cwd: path.dirname(out), stdio: 'inherit' })
     log(`zip: ${mb(statSync(zipPath).size)}`)
   }
 }

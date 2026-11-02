@@ -28,7 +28,7 @@
 | 系统 | **Windows x64 + macOS**（Apple Silicon / Intel） | 仅 Windows x64 |
 | U 盘格式 | **exFAT 或 NTFS**（exFAT 实测可用，一盘通吃 Windows + Mac） | 仅 NTFS |
 | 启动 | 双击「启动 U-DSH Web.bat」（Win）/「启动 U-DSH Web.command」（Mac） | 双击 `U-DSH Portable.exe` |
-| 下载 | `U-DSH-WebUI-Portable-0.3.0-win-mac.zip` | `U-DSH-DeepSeek-Harness-Portable-0.2.0-Windows-x64.zip` |
+| 下载 | `U-DSH-WebUI-Portable-0.3.0-mac.zip` / `-win.zip` | `U-DSH-DeepSeek-Harness-Portable-0.2.0-Windows-x64.zip` |
 
 **选 WebUI 版**：一个包 Windows / Mac 都能用，exFAT 格式 U 盘（Windows 和 Mac 都能读写的格式）直接跑。
 习惯 Windows + NTFS 桌面窗口的用户可以继续用 Electron 版。
@@ -59,7 +59,7 @@
 
 **WebUI 版（v0.3.0，推荐）：**
 
-1. 到 [Releases](../../releases/latest) 下载 `U-DSH-WebUI-Portable-0.3.0-win-mac.zip`
+1. 到 [Releases](../../releases/latest) 下载对应系统的包：`U-DSH-WebUI-Portable-0.3.0-mac.zip`（macOS）或 `-win.zip`（Windows）
 2. 解压到 U 盘、移动硬盘或本地文件夹（**exFAT / NTFS 都可以**）
 3. Windows 双击「启动 U-DSH Web.bat」，macOS 双击「启动 U-DSH Web.command」
 4. 第一次在**某台电脑**上启动：自动把引擎（Node + DSH 闭包，114.8 MB 压缩包）解到这台电脑，约 **8–10 秒**；之后同一台电脑启动是秒级，不再解包
