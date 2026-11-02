@@ -82,9 +82,25 @@ export function createDshConfigManager({
   const settingsPath = path.join(dshHome, 'settings.yaml')
 
   async function writeCredential(apiKey) {
+    // DSH 0.2.x 的 .credentials.yaml 是 {version, refs:{<REF>: <secret>}, records:{}}；
+    // 写成顶层 key 会被 dsh-credentials-local 判为 "unknown top-level key" 并拒绝启动
+    // （WebUI 便携版实测过这个崩溃）。老包可能是平铺顶层，按文件自身形状写。
+    const hadFile = (await readTextIfExists(credentialsPath)) !== undefined
     const credentials = await readYamlMapping(credentialsPath)
-    if (apiKey) credentials[XIAPAN_CREDENTIAL_REF] = apiKey
-    else delete credentials[XIAPAN_CREDENTIAL_REF]
+    const usesRefs = !hadFile
+      || Object.keys(credentials).length === 0
+      || credentials.version !== undefined
+      || (credentials.refs && typeof credentials.refs === 'object')
+    if (usesRefs) {
+      credentials.version = credentials.version ?? 1
+      if (!credentials.refs || typeof credentials.refs !== 'object') credentials.refs = {}
+      if (!credentials.records || typeof credentials.records !== 'object') credentials.records = {}
+      if (apiKey) credentials.refs[XIAPAN_CREDENTIAL_REF] = apiKey
+      else delete credentials.refs[XIAPAN_CREDENTIAL_REF]
+    } else {
+      if (apiKey) credentials[XIAPAN_CREDENTIAL_REF] = apiKey
+      else delete credentials[XIAPAN_CREDENTIAL_REF]
+    }
     await writeYamlMapping(credentialsPath, credentials)
   }
 

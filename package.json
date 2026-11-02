@@ -1,6 +1,6 @@
 {
   "name": "u-dsh",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "U-DSH Portable — DeepSeek Harness USB portable edition for Windows with Xiapan Cloud device wallet.",
   "type": "module",
   "main": "src/main.js",
@@ -33,7 +33,10 @@
     "dist:mac:x64": "node scripts/guard-unsupported-target.mjs mac",
     "dist:win": "npm run prepare:windows && npm run vendor:check && electron-builder --win nsis zip --x64 --publish never",
     "dist:linux": "node scripts/guard-unsupported-target.mjs linux",
-    "dist:sfx": "node scripts/build-sfx.mjs"
+    "dist:sfx": "node scripts/build-sfx.mjs",
+    "engine:list": "node scripts/clear-engine.mjs",
+    "engine:clear": "node scripts/clear-engine.mjs --all --yes",
+    "wallet:backup": "node scripts/backup-dsh-home.mjs"
   },
   "dependencies": {
     "action-parity-sdk": "file:vendor/action-parity-sdk",
