@@ -25,6 +25,7 @@ const {
 const os = require('node:os')
 const path = require('node:path')
 const { execFileSync } = require('node:child_process')
+const crypto = require('node:crypto')
 
 const PRODUCT = 'U-DSH'
 const MANIFEST = 'engine-manifest.json'
@@ -55,6 +56,69 @@ function readEngineVersion(appRoot) {
   const pkg = readJson(path.join(appRoot, 'node_modules', '@deepseek-ai', 'dsh', 'package.json'))
   if (!pkg || !pkg.version) throw new Error('随包引擎不完整：缺 engine.json 或 node_modules/@deepseek-ai/dsh/package.json')
   return pkg.version
+}
+
+/** 流式计算归档的 SHA-256（U 盘/传输损坏是我们实测遇到过的问题）。 */
+function sha256File(file) {
+  const hash = crypto.createHash('sha256')
+  const fd = require('node:fs').openSync(file, 'r')
+  try {
+    const buf = Buffer.allocUnsafe(4 * 1024 * 1024)
+    for (;;) {
+      const n = require('node:fs').readSync(fd, buf, 0, buf.length, null)
+      if (n <= 0) break
+      hash.update(buf.subarray(0, n))
+    }
+  } finally { require('node:fs').closeSync(fd) }
+  return hash.digest('hex')
+}
+
+/** 解包前先确认目标盘放得下（归档解压后约 450MB），不然客户会看到一堆 EIO/ENOSPC。 */
+function ensureFreeSpace(dir, needBytes) {
+  try {
+    const s = statfsSync(dir)
+    const free = Number(s.bavail ?? s.bfree ?? 0) * Number(s.bsize ?? 0)
+    if (free > 0 && free < needBytes) {
+      throw new Error(`本机磁盘空间不够：${dir} 只剩 ${(free / 1024 ** 2).toFixed(0)} MB，安装引擎需要约 ${(needBytes / 1024 ** 2).toFixed(0)} MB`)
+    }
+  } catch (error) {
+    if (error.message.startsWith('本机磁盘空间不够')) throw error
+    /* statfs 不可用就算了，不阻断 */
+  }
+}
+
+function sleepSync(ms) {
+  try { Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms) } catch { /* 极端环境不支持就空转 */ }
+}
+
+/**
+ * 同一台机器同时双击两次 / 插两支盘时的互斥。
+ * 锁就是一个同名目录：抢到的人装，没抢到的人等；等的时候一旦发现已经装好就直接复用。
+ * 锁目录 mtime 超过 10 分钟视为僵死（进程被杀/断电留下的），清掉重试。
+ */
+function withInstallLock(target, isReady, install) {
+  const lock = target + '.lock'
+  const deadline = Date.now() + 180_000
+  for (;;) {
+    try {
+      mkdirSync(lock, { recursive: true })
+      break
+    } catch (error) {
+      if (error.code !== 'EEXIST') throw error
+      if (isReady()) { log('别的进程已经装好了，直接复用'); return }
+      if (Date.now() > deadline) {
+        warn('等别的安装超过 3 分钟，清掉锁强行继续')
+        try { rmSync(lock, { recursive: true, force: true }) } catch {}
+        continue
+      }
+      sleepSync(300)
+    }
+  }
+  try {
+    return install()
+  } finally {
+    try { rmSync(lock, { recursive: true, force: true }) } catch {}
+  }
 }
 
 /** 找到随包的引擎归档（.tar.gz 优先，其次 .tar）。 */
@@ -175,6 +239,20 @@ function extractEngineTar(appRoot, target, version, rel) {
   if (!found) throw new Error(`随包里找不到引擎归档（${ENGINE_TAR_GZ} / ${ENGINE_TAR}）`)
   const archive = found.path
   mkdirSync(path.dirname(target), { recursive: true })
+
+  // 先校验归档完整性：U 盘掉数据/拷贝中断是真实发生过的，坏包必须当场说清楚，
+  // 不能解到一半才报奇怪的错。
+  const meta = readJson(path.join(appRoot, ENGINE_JSON))
+  if (meta?.sha256) {
+    const started = Date.now()
+    log('校验引擎归档完整性（SHA-256）…')
+    const actual = sha256File(archive)
+    if (actual !== meta.sha256) {
+      throw new Error(`随包引擎归档已损坏（U 盘掉数据或拷贝不完整）：${found.name}\n  期望 ${meta.sha256}\n  实际 ${actual}\n  请把 U 盘上的 u-dsh 目录重新完整拷贝一遍`)
+    }
+    log(`完整性校验通过（${((Date.now() - started) / 1000).toFixed(1)}s）`)
+  }
+  ensureFreeSpace(path.dirname(target), 700 * 1024 ** 2)
   const staging = target + '.installing-' + process.pid
   rmSync(staging, { recursive: true, force: true })
   mkdirSync(staging, { recursive: true })
@@ -226,10 +304,11 @@ function resolveEngine({ appRoot, mode, platform = process.platform, arch = proc
   const target = targetRootFor(chosen, appRoot, version)
   if (manifestMatches(target, version, rel)) {
     log(`复用已安装引擎（${chosen}）：${target}`)
-  } else if (hasTar(appRoot)) {
-    extractEngineTar(appRoot, target, version, rel)
   } else {
-    installEngine(appRoot, target, version, rel)
+    withInstallLock(target, () => manifestMatches(target, version, rel), () => {
+      if (hasTar(appRoot)) extractEngineTar(appRoot, target, version, rel)
+      else installEngine(appRoot, target, version, rel)
+    })
   }
   if (chosen === 'temp') registerTempCleanup(target)
   return { mode: chosen, engineRoot: target, nodeExe: path.join(target, rel.node), entry: path.join(target, rel.entry), dataRoot: path.join(root, 'data', 'dsh-home') }

@@ -25,6 +25,7 @@
  *        [--zip]                        # 顺手压成发布 zip
  */
 import { execFileSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -163,7 +164,13 @@ async function main() {
   log(`engine.tar.gz: ${mb(statSync(tarPath).size)}`)
 
   // 4) engine.json + 空数据目录
-  writeFileSync(path.join(app, 'engine.json'), `${JSON.stringify({ schemaVersion: 1, version, engine: 'engine.tar.gz' }, null, 2)}\n`)
+  // 把归档的 SHA-256 写进 engine.json：客户机首次解包前先校验，
+  // U 盘掉数据/拷贝不完整能当场报「请重新拷贝」，而不是解到一半报诡异错误。
+  const sha256 = createHash('sha256').update(readFileSync(tarPath)).digest('hex')
+  writeFileSync(path.join(app, 'engine.json'), `${JSON.stringify({
+    schemaVersion: 1, version, engine: 'engine.tar.gz', sha256,
+  }, null, 2)}\n`)
+  log(`engine.json: version=${version} sha256=${sha256.slice(0, 16)}…`)
   mkdirSync(path.join(out, 'data', 'dsh-home'), { recursive: true })
 
   const total = directorySize(out)
