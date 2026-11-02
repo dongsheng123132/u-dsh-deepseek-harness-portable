@@ -170,7 +170,15 @@ async function main() {
     const zipPath = path.join(path.dirname(out), `U-DSH-WebUI-Portable-${version2}-${platforms}.zip`)
     rmSync(zipPath, { force: true })
     log(`压 zip：${zipPath}`)
-    execFileSync('zip', ['-q', '-r', '-X', zipPath, path.basename(out)], { cwd: path.dirname(out), stdio: 'inherit' })
+    // Windows 没有 zip.exe：用 PowerShell 的 Compress-Archive（CI 的 runner 上一定有）。
+    if (process.platform === 'win32') {
+      execFileSync('powershell', [
+        '-NoProfile', '-NonInteractive', '-Command',
+        `Compress-Archive -Path '${path.join(out, '*').replace(/'/g, "''")}' -DestinationPath '${zipPath.replace(/'/g, "''")}' -CompressionLevel Optimal -Force`,
+      ], { stdio: 'inherit' })
+    } else {
+      execFileSync('zip', ['-q', '-r', '-X', zipPath, path.basename(out)], { cwd: path.dirname(out), stdio: 'inherit' })
+    }
     log(`zip: ${mb(statSync(zipPath).size)}`)
   }
 }
