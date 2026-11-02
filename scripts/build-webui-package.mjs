@@ -26,7 +26,7 @@
  */
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
-import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { chmodSync, cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -116,12 +116,16 @@ async function main() {
   }
   const version = JSON.parse(readFileSync(path.join(args.harness, 'node_modules', '@deepseek-ai', 'dsh', 'package.json'), 'utf8')).version
 
-  // 1) 启动器 + JS
-  for (const name of ['web-launch.cjs', 'engine-install.cjs']) {
-    cpSync(path.join(root, 'portable-webui', 'resources', 'app', name), path.join(app, name))
+  // 1) 启动器 + JS（resources/app 下的 .cjs 全带上：启动器/引擎安装/设备钱包/钱包面板/充值）
+  const sourceApp = path.join(root, 'portable-webui', 'resources', 'app')
+  for (const name of readdirSync(sourceApp)) {
+    if (name.endsWith('.cjs')) cpSync(path.join(sourceApp, name), path.join(app, name))
   }
-  for (const name of ['启动 U-DSH Web.bat', '启动 U-DSH Web.command']) {
+  // 平台启动器：启动 / 钱包 / 充值（.bat 给 Windows，.command 给 macOS）
+  for (const name of readdirSync(path.join(root, 'portable-webui'))) {
+    if (!name.endsWith('.bat') && !name.endsWith('.command')) continue
     cpSync(path.join(root, 'portable-webui', name), path.join(out, name))
+    if (name.endsWith('.command')) chmodSync(path.join(out, name), 0o755)
   }
   cpSync(path.join(root, 'portable-webui', 'README.md'), path.join(out, 'README.md'))
 

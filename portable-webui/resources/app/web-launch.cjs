@@ -11,6 +11,7 @@ const { mkdirSync, readFileSync, writeFileSync, rmSync, statSync } = require('no
 const os = require('node:os')
 const path = require('node:path')
 const { resolveEngine } = require('./engine-install.cjs')
+const { createDeviceWallet } = require('./device-wallet.cjs')
 
 /**
  * 同一份 U 盘数据被两台电脑同时用，会话/配置会互相覆盖。
@@ -39,7 +40,7 @@ function checkConcurrentUse(dataRoot) {
   }
 }
 
-function main() {
+async function main() {
   // 解析（必要时安装）引擎，并拿到数据目录（永远在 U 盘上）。
   const engine = resolveEngine({ appRoot: __dirname })
   console.log('[U-DSH] 引擎模式：' + engine.mode + ' → ' + engine.engineRoot)
@@ -49,6 +50,41 @@ function main() {
 
   const args = [engine.entry, '--profile', 'web', '--host', '127.0.0.1', '--port', '0', '--no-open']
   const env = Object.assign({}, process.env, { DSH_HOME: engine.dataRoot })
+
+  // 设备钱包：给 DSH 自动配好模型。C1——失败/断网/只读盘都不能挡住启动。
+  const portableRoot = path.resolve(engine.dataRoot, '..', '..')
+  let wallet = null
+  try {
+    wallet = createDeviceWallet({ root: portableRoot, engineRoot: engine.engineRoot })
+    const ready = await wallet.ensure()
+    if (ready.apiKey) {
+      console.log(`[U-DSH] 设备钱包：${ready.walletId || '(未命名)'}　密钥 ${wallet.maskApiKey(ready.apiKey)}`)
+      console.log(ready.configured ? '[U-DSH] 已自动配置「虾盘云」为默认模型来源' : '[U-DSH] 钱包已就绪，但本次没能写入 DSH 配置（可稍后双击「钱包」重试）')
+      try {
+        const status = await wallet.status({ refreshBalance: true })
+        const available = status.balance?.available
+        if (available != null) {
+          console.log(`[U-DSH] 余额：${Number(available).toLocaleString()} tokens${available > 0 ? '' : '（还没充值）'}`)
+          if (available <= 1 && process.env.UDSH_NO_AUTO_RECHARGE !== '1') {
+            // 新领的钱包余额接近 0，直接发消息必然失败——与其让客户撞墙，
+            // 不如第一次就把充值页打开（只做一次，之后靠「钱包」面板自己刷新）。
+            console.log('[U-DSH] 新钱包还没充值：已帮你打开充值页，充完回到这里继续对话即可')
+            try {
+              const url = await wallet.rechargeUrl()
+              const opener = process.platform === 'win32'
+                ? spawn('cmd', ['/c', 'start', '', url], { stdio: 'ignore', detached: true }).unref()
+                : spawn('open', [url], { stdio: 'ignore' })
+              void opener
+            } catch { console.log('[U-DSH] 打不开充值页，双击「充值」也行') }
+          }
+        }
+      } catch { /* 余额查不到不影响启动 */ }
+    } else {
+      console.log('[U-DSH] 没领到设备钱包（可能没网）：DSH 照常启动，联网后下次启动会自动领取；也可以在「钱包」里填自己的 Key')
+    }
+  } catch (error) {
+    console.warn(`[U-DSH] 设备钱包跳过：${error.message}`)
+  }
 
   console.log('[U-DSH] 启动 DeepSeek Harness Web 内核…')
   const child = spawn(engine.nodeExe, args, { env, stdio: ['ignore', 'pipe', 'pipe'] })
@@ -97,4 +133,4 @@ function main() {
   }
 }
 
-main()
+main().catch((error) => { console.error(`[U-DSH] 启动失败：${error.message}`); process.exit(1) })

@@ -40,7 +40,7 @@ users who prefer a desktop window on Windows/NTFS.
 | | U-DSH Portable | Other DSH desktop / portable builds |
 |---|---|---|
 | Install | Unzip, double-click — nothing to install | Installer, or a DIY Node + npm setup |
-| API key | Electron build: **credit included**, no signup (Xiapan Cloud device wallet). WebUI build: set any key in DSH settings | Register at platform.deepseek.com → top up → copy & paste a key |
+| API key | **Credit included**, no signup (Xiapan Cloud device wallet) — both WebUI and Electron builds | Register at platform.deepseek.com → top up → copy & paste a key |
 | Portability | Sessions/config/credentials live in the folder; move between compatible PCs (don't run two PCs on one stick at once) | Data scattered across each PC's `%USERPROFILE%` |
 | Offline | Kernel ships inside the package; first launch needs no network | Usually downloads a runtime or kernel first |
 | System footprint | No registry writes, no env changes; delete the folder = clean uninstall | Regular installs write the registry and leave caches |
@@ -52,9 +52,9 @@ API key and paste it back — the steepest drop-off in the whole funnel. The **E
 ships the **Xiapan Cloud device wallet**: on first launch it issues a key for this device and wires it
 up automatically, so you can just start chatting. Top up with one click, or swap in your own key.
 
-**The WebUI portable build (the download recommended below) does not include the device wallet yet** —
-start the kernel and set your own key in DSH settings (DeepSeek official or any OpenAI-compatible
-endpoint). Porting the wallet to the WebUI build is in progress.
+**Since v0.4.0 the WebUI portable build ships the same device wallet**: the first launch claims a
+Xiapan Cloud key and wires up the models automatically, and opens the top-up page when the balance
+is zero. Double-click **钱包 (Wallet)** any time to check balance, rotate the key, or paste your own.
 
 ### What "easy on the USB stick" actually means
 
