@@ -52,6 +52,16 @@ test('pickMode: 显式模式优先', async () => {
   } finally { await rm(root, { recursive: true, force: true }) }
 })
 
+test('pickMode: auto 默认装本机（不按盘容量猜）', async () => {
+  const root = await mkdtemp(path.join(os.tmpdir(), 'udsh-engine-auto-'))
+  try {
+    const appRoot = await createApp(root)
+    // 回归：曾经按「盘 ≥128GB → drive」判断，导致大容量本地盘/U 盘把引擎塞回便携包
+    assert.equal(pickMode(appRoot, 'auto'), 'host')
+    assert.equal(pickMode(appRoot, undefined), 'host')
+  } finally { await rm(root, { recursive: true, force: true }) }
+})
+
 test('resolveEngine host: 首次安装到本机，数据留在盘上，第二次复用', async () => {
   const root = await mkdtemp(path.join(os.tmpdir(), 'udsh-engine-host-'))
   const hostRoot = path.join(root, 'host-engine')

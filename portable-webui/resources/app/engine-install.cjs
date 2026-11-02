@@ -150,10 +150,11 @@ function driveTotalBytes(p) {
 /** 选安装位置：显式 mode 优先；auto 时按「盘容量」判断是不是移动硬盘。 */
 function pickMode(appRoot, requested) {
   if (requested && MODES.has(requested) && requested !== 'auto') return requested
-  const thresholdGB = Number(process.env.UDSH_HDD_THRESHOLD_GB ?? 128)
-  const root = path.resolve(appRoot, '..', '..')
-  const total = driveTotalBytes(root)
-  if (thresholdGB > 0 && total >= thresholdGB * 1024 ** 3) return 'drive'
+  // 默认一律装到本机缓存（%LOCALAPPDATA% / ~/Library/Caches）：
+  // 产品承诺是「引擎装本机、数据留盘」，不能按盘容量猜——实测 477GB 的本地盘会被
+  // 旧逻辑判成 drive（引擎塞进便携包），256GB 的 U 盘同理，等于把 500MB 又写回盘上。
+  // 只有本机缓存不可写时，才回退到 drive（引擎放便携包内）。
+  if (process.env.UDSH_FORCE_DRIVE_ENGINE === '1') return 'drive'
   return 'host'
 }
 
