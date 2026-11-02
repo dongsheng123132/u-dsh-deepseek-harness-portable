@@ -28,6 +28,8 @@ permissions:
 
 env:
   UDSH_VENDOR_WEB_UI: '1'
+  # 用仓库里的锁文件装闭包（确定性）：registry 解析会随元数据漂移而失败
+  UDSH_VENDOR_LOCK: config/webui-closure
 
 jobs:
   webui-portable:

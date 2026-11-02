@@ -1,0 +1,9 @@
+{
+  "name": "u-dsh-webui-closure",
+  "version": "0.0.0",
+  "private": true,
+  "dependencies": {
+    "@deepseek-ai/dsh": "0.2.0-rc.2",
+    "@deepseek-ai/dsh-web-app": "0.2.0-rc.2"
+  }
+}

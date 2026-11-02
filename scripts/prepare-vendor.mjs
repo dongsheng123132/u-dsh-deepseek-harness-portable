@@ -18,7 +18,7 @@
  */
 import { spawn } from 'node:child_process'
 import { cpSync, existsSync, lstatSync, readdirSync, realpathSync, rmSync } from 'node:fs'
-import { mkdir, open, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises'
+import { cp, mkdir, open, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { missingRequiredPeers, sha256, validateDshAt } from '../src/harness-validate.js'
@@ -256,6 +256,45 @@ const SHARED_INSTALL_FLAGS = [
  * （--legacy-peer-deps、--before 时间窗、多轮 peer 收敛），只去掉了
  * --prefer-offline：构建机没必要，也怀疑是客户机装坏的诱因之一。
  */
+/**
+ * 锁文件模式：config/webui-closure/package.json + package-lock.json 是「WebUI 便携包要用的
+ * 闭包」的确定性解析结果（@deepseek-ai/dsh + @deepseek-ai/dsh-web-app 及其全部依赖，
+ * 含各平台原生包）。`npm ci` 不走 registry 版本解析，因此不会出现「某个内部包落在
+ * --before 时间窗之外」或「peer 补齐不收敛」这类随 registry 元数据漂移的问题。
+ * 设 UDSH_VENDOR_LOCK=<目录> 打开。
+ */
+function lockDir() {
+  const dir = process.env.UDSH_VENDOR_LOCK?.trim()
+  return dir ? path.resolve(root, dir) : null
+}
+
+async function installFromLock(staging, dir) {
+  const lockFile = path.join(dir, 'package-lock.json')
+  const pkgFile = path.join(dir, 'package.json')
+  if (!existsSync(lockFile) || !existsSync(pkgFile)) throw new Error(`锁文件目录不完整：${dir}`)
+  await cp(lockFile, path.join(staging, 'package-lock.json'))
+  await cp(pkgFile, path.join(staging, 'package.json'))
+  log(`npm ci（锁文件 ${path.relative(root, lockFile)}）`)
+  await runNpm(['ci', '--no-audit', '--no-fund', '--maxsockets=6', '--fetch-retries=2', '--fetch-timeout=60000'], staging)
+}
+
+/** 装完之后的统一收尾：解引用链接 → 剪枝 → 打补丁 → 复校 → 原子替换 vendor/harness。 */
+async function finishHarnessStaging(staging, officialIntegrity) {
+  const before = directorySize(staging)
+  materializeStagedLinks(staging)
+  pruneHarness(staging)
+  patchHarnessApiProxy(staging)
+  log(`闭包剪枝：${megabytes(before)} → ${megabytes(directorySize(staging))}`)
+  // 后处理之后再整体校验一遍，确保剪枝没有破坏闭包。
+  await validateDshAt(staging, channel.dsh.package, channel.dsh.version, null, officialIntegrity)
+  if (existsSync(harnessDir)) {
+    assertChild(vendorDir, harnessDir)
+    await rm(harnessDir, { recursive: true, force: true })
+  }
+  await rename(staging, harnessDir)
+  log(`DSH ${channel.dsh.version} 闭包就绪：${harnessDir}`)
+}
+
 async function installHarness(staging, version, publishedAt) {
   // npm 的 prerelease caret 会把 rc.7 的内部包解析到 rc.8；限制到该版本发布时间窗口。
   //
@@ -367,7 +406,10 @@ function pruneHarness(harnessRoot) {
 function patchHarnessApiProxy(harnessRoot) {
   const target = path.join(harnessRoot, 'node_modules', '@deepseek-ai', 'dsh-host-apiproxy', 'lib', 'index.js')
   if (!existsSync(target)) {
-    throw new Error(`闭包里找不到 dsh-host-apiproxy：${target}（上游依赖结构变了，请复核补丁是否还需要）`)
+    // 不同形态的闭包带的 DSH 面不一样：WebUI 闭包（dsh + dsh-web-app）里没有 apiproxy，
+    // 这条 Windows 打开路径的补丁只对 Electron 桌面版闭包有意义。缺就跳过，不阻断构建。
+    log('闭包里没有 dsh-host-apiproxy，跳过 Windows 打开路径补丁')
+    return
   }
   const changed = prepareApiProxy(target)
   log(`dsh-host-apiproxy Windows 打开路径补丁${changed ? '已施加' : '已存在'}`)
@@ -394,6 +436,13 @@ async function prepareHarness() {
   assertChild(vendorDir, staging)
   await mkdir(staging, { recursive: true })
   try {
+    const locked = lockDir()
+    if (locked) {
+      await installFromLock(staging, locked)
+      await validateDshAt(staging, channel.dsh.package, version, null)
+      await finishHarnessStaging(staging, null)
+      return
+    }
     // WebUI 便携包要离线起 web 内核：DSH 的 `--profile web` 需要从安装里解析到
     // @deepseek-ai/dsh-web-app 这个 profile bundle，只装 @deepseek-ai/dsh 是不够的
     // （缺它启动会打印 "cannot resolve profile bundle ... dsh-web-app" 然后不带 UI 起来）。
@@ -412,22 +461,7 @@ async function prepareHarness() {
     // 校验：包身份/版本、bin 入口不越界、根包 integrity 与官方元数据一致、peer 收敛。
     await validateDshAt(staging, channel.dsh.package, version, null, officialIntegrity)
 
-    const before = directorySize(staging)
-    materializeStagedLinks(staging)
-    pruneHarness(staging)
-    patchHarnessApiProxy(staging)
-    const after = directorySize(staging)
-    log(`闭包剪枝：${megabytes(before)} → ${megabytes(after)}`)
-
-    // 后处理之后再整体校验一遍，确保剪枝没有破坏闭包。
-    await validateDshAt(staging, channel.dsh.package, version, null, officialIntegrity)
-
-    if (existsSync(harnessDir)) {
-      assertChild(vendorDir, harnessDir)
-      await rm(harnessDir, { recursive: true, force: true })
-    }
-    await rename(staging, harnessDir)
-    log(`DSH ${version} 闭包就绪：${harnessDir}`)
+    await finishHarnessStaging(staging, officialIntegrity)
   } catch (error) {
     await rm(staging, { recursive: true, force: true })
     throw error
