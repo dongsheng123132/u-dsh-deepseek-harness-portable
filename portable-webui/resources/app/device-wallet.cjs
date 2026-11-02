@@ -47,7 +47,7 @@ function maskApiKey(apiKey) {
 function joinUrl(base, p) { return `${base.replace(/\/+$/, '')}/${p.replace(/^\/+/, '')}` }
 
 /** 原子写：写临时文件 → fsync → rename。exFAT 上没有 journaling，尽量别留半截文件。 */
-function writeFileAtomic(file, text) {
+function writeFileAtomic(file, text, { mode } = {}) {
   const dir = path.dirname(file)
   fs.mkdirSync(dir, { recursive: true })
   const tmp = `${file}.tmp-${process.pid}`
@@ -56,7 +56,9 @@ function writeFileAtomic(file, text) {
     fs.writeFileSync(fd, text)
     try { fs.fsyncSync(fd) } catch {}
   } finally { fs.closeSync(fd) }
+  if (mode !== undefined) { try { fs.chmodSync(tmp, mode) } catch {} }
   fs.renameSync(tmp, file)
+  if (mode !== undefined) { try { fs.chmodSync(file, mode) } catch {} }
 }
 
 function createFileStore(filename) {
@@ -152,8 +154,8 @@ function createApplyKey({ engineRoot, dshHome }) {
     if (typeof value !== 'object' || Array.isArray(value)) throw new Error(`${path.basename(file)} 必须是 YAML mapping`)
     return value
   }
-  function writeMapping(yaml, file, value) {
-    writeFileAtomic(file, yaml.stringify(value, { lineWidth: 0 }))
+  function writeMapping(yaml, file, value, { mode } = {}) {
+    writeFileAtomic(file, yaml.stringify(value, { lineWidth: 0 }), { mode })
   }
 
   async function discoverModels(apiBase, apiKey) {
@@ -182,10 +184,29 @@ function createApplyKey({ engineRoot, dshHome }) {
     const credentialsPath = path.join(dshHome, '.credentials.yaml')
     const settingsPath = path.join(dshHome, 'settings.yaml')
 
+    // DSH 0.2.x 的凭据文件是 {version, refs:{<REF>: <secret>}, records:{}}；
+    // 老格式才是顶层直接放 key。写错层级 DSH 会报
+    // "unknown top-level key" 并让 credentials 插件起不来（实测第二次启动直接退出）。
+    const hadFile = fs.existsSync(credentialsPath)
     const credentials = readMapping(yaml, credentialsPath)
-    if (apiKey) credentials[XIAPAN_CREDENTIAL_REF] = apiKey
-    else delete credentials[XIAPAN_CREDENTIAL_REF]
-    writeMapping(yaml, credentialsPath, credentials)
+    // 新建文件一律用现代 schema；已存在的文件按它自己的形状来（老包可能是平铺顶层 key）。
+    const usesRefs = !hadFile
+      || Object.keys(credentials).length === 0
+      || credentials.version !== undefined
+      || (credentials.refs && typeof credentials.refs === 'object')
+    if (usesRefs) {
+      credentials.version = credentials.version ?? 1
+      if (!credentials.refs || typeof credentials.refs !== 'object') credentials.refs = {}
+      if (!credentials.records || typeof credentials.records !== 'object') credentials.records = {}
+      if (apiKey) credentials.refs[XIAPAN_CREDENTIAL_REF] = apiKey
+      else delete credentials.refs[XIAPAN_CREDENTIAL_REF]
+    } else {
+      if (apiKey) credentials[XIAPAN_CREDENTIAL_REF] = apiKey
+      else delete credentials[XIAPAN_CREDENTIAL_REF]
+    }
+    // DSH 要求凭据文件只有属主可读（否则 credentials 插件拒绝启动）：
+    //   "is readable beyond its owner (mode 644); run chmod 600 ..."
+    writeMapping(yaml, credentialsPath, credentials, { mode: 0o600 })
 
     const settings = readMapping(yaml, settingsPath)
     if (!apiKey) {
