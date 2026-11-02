@@ -69,6 +69,9 @@ const PAGE = `<!doctype html>
 <body><div class="wrap">
   <h1>设备钱包</h1>
   <div class="sub">这是你的虾盘云钱包：<b>密钥就是钱包</b>，请自行备份（换电脑时用它找回余额）。</div>
+  <div class="card" style="background:#f0f7ff;border-color:#cfe3ff">
+    <b>三步开聊</b><span class="muted" style="margin-left:8px">① 点下面「一键充值」→ ② 在打开的页面付款，回来点「刷新余额」→ ③ 切回 DSH 对话</span>
+  </div>
 
   <div class="card">
     <h2>当前钱包</h2>
@@ -174,8 +177,9 @@ async function readBody(req) {
   try { return JSON.parse(text) } catch { return {} }
 }
 
-async function main() {
-  const wallet = createDeviceWallet({ root, engineRoot })
+/** 启动钱包面板 HTTP 服务；open=true 时打开浏览器（双击「钱包」用），false 时只起服务（启动器用）。 */
+async function startWalletPanel({ root: rootDir = root, engineRoot: engineDir = engineRoot, open = true } = {}) {
+  const wallet = createDeviceWallet({ root: rootDir, engineRoot: engineDir })
   // 面板打开时顺带把钱包收敛一次（没网就保持原状，不拦人）
   await wallet.ensure().catch(() => {})
 
@@ -211,18 +215,27 @@ async function main() {
     }
   })
 
-  server.listen(0, '127.0.0.1', () => {
-    const { port } = server.address()
-    const url = `http://127.0.0.1:${port}/`
-    console.log(`[U-DSH 钱包] 面板已启动：${url}`)
-    if (engineRoot.includes('__engine-not-installed__')) {
-      console.warn('[U-DSH 钱包] 还没装过引擎：先双击「启动 U-DSH Web」跑一次，钱包才能写进 DSH 配置')
-    }
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve))
+  const { port } = server.address()
+  const url = `http://127.0.0.1:${port}/`
+  console.log(`[U-DSH 钱包] 面板地址：${url}`)
+  if (engineDir.includes('__engine-not-installed__')) {
+    console.warn('[U-DSH 钱包] 还没装过引擎：先双击「启动 U-DSH Web」跑一次，钱包才能写进 DSH 配置')
+  }
+  if (open) {
     const opener = process.platform === 'win32'
       ? spawn('cmd', ['/c', 'start', '', url], { stdio: 'ignore', detached: true }).unref()
       : spawn('open', [url], { stdio: 'ignore' })
     void opener
-  })
+  }
+  return { url, server }
 }
 
-main().catch((error) => { console.error(`[U-DSH 钱包] 启动失败：${error.message}`); process.exit(1) })
+module.exports = { startWalletPanel }
+
+if (require.main === module) {
+  startWalletPanel({ open: true }).catch((error) => {
+    console.error(`[U-DSH 钱包] 启动失败：${error.message}`)
+    process.exit(1)
+  })
+}

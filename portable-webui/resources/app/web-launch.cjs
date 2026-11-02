@@ -64,18 +64,24 @@ async function main() {
         const status = await wallet.status({ refreshBalance: true })
         const available = status.balance?.available
         if (available != null) {
-          console.log(`[U-DSH] 余额：${Number(available).toLocaleString()} tokens${available > 0 ? '' : '（还没充值）'}`)
-          if (available <= 1 && process.env.UDSH_NO_AUTO_RECHARGE !== '1') {
-            // 新领的钱包余额接近 0，直接发消息必然失败——与其让客户撞墙，
-            // 不如第一次就把充值页打开（只做一次，之后靠「钱包」面板自己刷新）。
-            console.log('[U-DSH] 新钱包还没充值：已帮你打开充值页，充完回到这里继续对话即可')
-            try {
-              const url = await wallet.rechargeUrl()
-              const opener = process.platform === 'win32'
-                ? spawn('cmd', ['/c', 'start', '', url], { stdio: 'ignore', detached: true }).unref()
-                : spawn('open', [url], { stdio: 'ignore' })
-              void opener
-            } catch { console.log('[U-DSH] 打不开充值页，双击「充值」也行') }
+          // 余额按 ¥ 显示（虾盘云 1 元 = 50 万 token），客户看得懂
+          const yuan = (Number(available) / 500000).toFixed(2)
+          console.log(`[U-DSH] 余额：¥${yuan}（${Number(available).toLocaleString()} tokens）`)
+          if (available <= 1) {
+            console.log('[U-DSH] ─────────────────────────────────────────────')
+            console.log('[U-DSH]  钱包还没充值。要充值：双击 U 盘里的「充值」')
+            console.log('[U-DSH]  看余额 / 换 Key：双击「钱包」；充完回到 DSH 里直接对话')
+            console.log('[U-DSH] ─────────────────────────────────────────────')
+            // 想让它自动弹充值页，设 UDSH_AUTO_RECHARGE=1（默认不弹，免得客户以为被强推付款）
+            if (process.env.UDSH_AUTO_RECHARGE === '1') {
+              try {
+                const url = await wallet.rechargeUrl()
+                const opener = process.platform === 'win32'
+                  ? spawn('cmd', ['/c', 'start', '', url], { stdio: 'ignore', detached: true }).unref()
+                  : spawn('open', [url], { stdio: 'ignore' })
+                void opener
+              } catch { /* 打不开就算了，提示已经打过了 */ }
+            }
           }
         }
       } catch { /* 余额查不到不影响启动 */ }
@@ -84,6 +90,18 @@ async function main() {
     }
   } catch (error) {
     console.warn(`[U-DSH] 设备钱包跳过：${error.message}`)
+  }
+
+  // 钱包面板随启动器一起起来（不自动开浏览器），终端里给个可点链接：
+  // 客户想充值时点一下就开，不用去找 .bat/.command。
+  if (wallet) {
+    try {
+      const { startWalletPanel } = require('./wallet-panel.cjs')
+      const panel = await startWalletPanel({ root: portableRoot, engineRoot: engine.engineRoot, open: false })
+      console.log(`[U-DSH] 钱包面板：${panel.url} （余额 / 充值 / 换 Key，点开即用）`)
+    } catch (error) {
+      console.warn(`[U-DSH] 钱包面板没起来（不影响使用）：${error.message}`)
+    }
   }
 
   console.log('[U-DSH] 启动 DeepSeek Harness Web 内核…')

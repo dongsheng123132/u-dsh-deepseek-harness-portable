@@ -243,7 +243,22 @@ function createApplyKey({ engineRoot, dshHome }) {
     llm.providers = providers
     settings['llm-pi-ai'] = llm
     const preferred = process.env.UDSH_DEFAULT_MODEL?.trim()
-    const modelId = models.some((m) => m.id === preferred) ? preferred : models[0].id
+    // 默认别挑服务端返回的第一个（实测第一个是 MiniMax-M3，又慢又贵）：
+    // 优先 DeepSeek flash 系列，其次 deepseek 任意，最后才退回第一个「像聊天模型」的。
+    const PREFERRED = ['deepseek-v4-flash', 'deepseek-flash', 'deepseek-chat', 'deepseek-v4-pro', 'deepseek-reasoner']
+    const NOT_CHAT = /seedance|video|embedding|tts|asr|wan2|whisper|rerank/i
+    const pickDefault = () => {
+      if (preferred && models.some((m) => m.id === preferred)) return preferred
+      for (const id of PREFERRED) {
+        const hit = models.find((m) => m.id === id)
+        if (hit) return hit.id
+      }
+      const deepseek = models.find((m) => /deepseek/i.test(m.id) && !NOT_CHAT.test(m.id))
+      if (deepseek) return deepseek.id
+      const chat = models.find((m) => !NOT_CHAT.test(m.id))
+      return (chat ?? models[0]).id
+    }
+    const modelId = pickDefault()
     const currentDefault = settings['agent-default-model']
     if (!currentDefault || currentDefault.provider === XIAPAN_PROVIDER_ID) {
       settings['agent-default-model'] = { provider: XIAPAN_PROVIDER_ID, model: modelId }
