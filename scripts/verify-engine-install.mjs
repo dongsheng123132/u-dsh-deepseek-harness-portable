@@ -93,6 +93,7 @@ function runLauncher({ appRoot, mode, timeoutMs }) {
     cwd: runtimeRoot,
     env,
     stdio: ['ignore', 'pipe', 'pipe'],
+    detached: true,
   })
   let output = ''
   let url = null
@@ -118,8 +119,12 @@ function runLauncher({ appRoot, mode, timeoutMs }) {
       clearTimeout(timer)
       if (child.exitCode != null) return resolve(child.exitCode)
       child.once('exit', (code) => resolve(code))
-      child.kill('SIGTERM')
-      setTimeout(() => { if (child.exitCode == null) child.kill('SIGKILL') }, 15000).unref?.()
+      // 连同子进程组一起收掉：只杀启动器会留下孤儿内核（占端口/文件句柄）。
+      const killTree = (signal) => {
+        try { process.kill(-child.pid, signal) } catch { try { child.kill(signal) } catch {} }
+      }
+      killTree('SIGTERM')
+      setTimeout(() => { if (child.exitCode == null) killTree('SIGKILL') }, 15000).unref?.()
     }),
   }
 }

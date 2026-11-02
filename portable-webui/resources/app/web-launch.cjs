@@ -53,6 +53,18 @@ function main() {
     console.log('[U-DSH] 内核已退出 (' + code + ', ' + signal + ')')
     process.exit(code == null ? 0 : code)
   })
+
+  // 启动器退出时把内核一起带走：不然关掉终端窗口后内核会变成孤儿进程，
+  // 继续占着端口和文件句柄（实测残留过十几个）。Windows 上关闭 cmd 窗口属于强杀，
+  // 收不到信号，这点只能靠内核自身的空闲退出兜底；macOS/Linux 正常收尾。
+  const killChild = () => {
+    if (child.exitCode != null || child.signalCode != null) return
+    try { child.kill('SIGTERM') } catch {}
+  }
+  process.once('exit', killChild)
+  for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP']) {
+    process.once(sig, () => { killChild(); process.exit(0) })
+  }
 }
 
 main()
