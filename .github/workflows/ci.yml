@@ -22,3 +22,21 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm test
+
+  test-macos:
+    # 产品在 README 里宣称 macOS 支持（WebUI 便携包有 mac.zip），但此前几个 workflow
+    # 全是 windows-* runner —— macOS 侧一条 CI 都没有，坏了没人知道。
+    # 这里跑与 Windows job 完全相同的闸门（npm ci + npm test），不另行发明命令。
+    #
+    # 已知平台差异：test/portable-paths.test.js 里那条用例断言的是 win32 路径语义，
+    # 非 Windows 上源码用宿主 posix path 解析不可能对齐，已在该测试文件里显式 skip 并写明原因；
+    # Windows job 仍然覆盖它。除这处 skip 外，两个 job 的命令与 Node 版本保持一致。
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm test
