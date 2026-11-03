@@ -3,7 +3,8 @@ import { existsSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { sanitizeRuntimeEnv } from './env-sanitize.js'
 
-const READY_PATTERN = /^dsh web: (http:\/\/127\.0\.0\.1:\d+)\b/m
+// 必须带住 ?token=…：DSH 的一次性 token 在 query 里，丢掉就会 401（壳子窗口打不开 / smoke 失败）
+const READY_PATTERN = /^dsh web: (http:\/\/127\.0\.0\.1:\d+\/?\S*)/m
 
 export function unpackedPath(path) {
   return path.replace(/([/\\])app\.asar([/\\])/, '$1app.asar.unpacked$2')

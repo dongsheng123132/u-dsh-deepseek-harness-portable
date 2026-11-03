@@ -112,3 +112,10 @@ test('resolveWindowsHiddenConsoleLauncher points to the packaged launcher', () =
     true,
   )
 })
+
+test('extractReadyUrl 保留 ?token=（丢掉会让壳子窗口和 smoke 都 401）', () => {
+  assert.equal(
+    extractReadyUrl('dsh web: http://127.0.0.1:60882/?token=abc123\n'),
+    'http://127.0.0.1:60882/?token=abc123',
+  )
+})
