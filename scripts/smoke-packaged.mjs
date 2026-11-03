@@ -116,7 +116,7 @@ try {
       NODE_OPTIONS: '',
       DSH_HOME: paths.dshHome,
       DSH_TELEMETRY_DISABLED: '1',
-      DSH_DESKTOP: '1',
+      // 不要设 DSH_DESKTOP：桌面模式走壳子自带鉴权，ready URL 里的 token 不生效 → smoke 401
     },
   })
   try {
