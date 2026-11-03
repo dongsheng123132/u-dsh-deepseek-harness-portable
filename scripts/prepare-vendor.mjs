@@ -17,7 +17,7 @@
  *                                             # 不一致退出码 1（dist 链的门禁）
  */
 import { spawn } from 'node:child_process'
-import { cpSync, existsSync, lstatSync, readdirSync, realpathSync, rmSync } from 'node:fs'
+import { appendFileSync, cpSync, existsSync, lstatSync, readFileSync, readdirSync, realpathSync, rmSync, writeFileSync } from 'node:fs'
 import { cp, mkdir, open, readFile, readdir, rename, rm, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
