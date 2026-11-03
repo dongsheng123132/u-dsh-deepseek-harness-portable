@@ -101,7 +101,8 @@ try {
     throw new Error(`packaged CLI returned an invalid wallet status: ${cliResult.stdout}`)
   }
 
-  const kernel = createKernelManager({ paths, channel: loadRuntimeChannel(), vendorRoot })
+  const channel = loadRuntimeChannel()
+  const kernel = createKernelManager({ paths, channel, vendorRoot })
   const { target } = await kernel.ensure()
   process.stdout.write(`[kernel] vendored DSH ${target.version} @ ${target.entry}\n`)
 
@@ -133,7 +134,7 @@ try {
     if (!response.ok || !html.includes('__DSH_BOOT__')) {
       throw new Error(`official DSH Web UI smoke failed: HTTP ${response.status}（first=${first.status} cookie=${cookie ? 'yes' : 'no'}）`)
     }
-    await kernel.activate(target.version)
+    await kernel.activate(channel.dsh.version)
     const { default: manifest } = await import(new URL('../package.json', import.meta.url), { with: { type: 'json' } })
     const artifacts = [`U-DSH-DeepSeek-Harness-Portable-${manifest.version}-Windows-x64.zip`]
       .map((name) => path.join(root, 'dist', name))
