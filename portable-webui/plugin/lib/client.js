@@ -73,8 +73,16 @@ window.__ModuleLoader__.load({
 			const yuan = available == null ? null : available / 500000;
 			const empty = available != null && available <= 1;
 			const label = yuan == null ? "虾盘云钱包" : `虾盘云 ¥${yuan.toFixed(2)}`;
+			// 先探本地面板（WebUI 版有）；探不到说明是 Electron 壳子版 →
+			// 走 udsh://wallet 深链，主进程 setWindowOpenHandler 会拦下来开原生钱包窗口。
 			const open = () => {
-				window.open(PANEL_URL, "_blank", "noopener");
+				const fallback = () => window.open("udsh://wallet", "_blank");
+				fetch(`${PANEL_URL}api/status`, { mode: "cors" })
+					.then((res) => {
+						if (res.ok) window.open(PANEL_URL, "_blank", "noopener");
+						else fallback();
+					})
+					.catch(fallback);
 			};
 			const children = [jsx.jsx("span", { key: "sign", className: "udsh-wallet-sign", children: "¥" })];
 			if (wide) children.push(jsx.jsx("span", { key: "label", children: label }));
