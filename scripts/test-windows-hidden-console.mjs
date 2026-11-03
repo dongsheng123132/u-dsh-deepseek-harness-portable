@@ -1,4 +1,4 @@
-import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -22,14 +22,14 @@ const temporaryRoot = mkdtempSync(path.join(os.tmpdir(), 'dsh-hidden-console-'))
 const powershellScript = path.join(temporaryRoot, 'inspect-console.ps1')
 const aclWorkspace = path.join(temporaryRoot, 'acl-workspace')
 const aclTempRoot = path.join(temporaryRoot, 'acl-temp')
-const aclRunner = path.join(
-  root,
-  'node_modules',
-  '@deepseek-ai',
-  'dsh-sandbox-windows-acl',
-  'lib',
-  'runner.js',
-)
+// ACL 沙箱包不在仓库的 node_modules 里（它属于随包内核闭包，落在 vendor/harness）。
+// 找不到就跳过 ACL 子项——壳子版 CI 不该因为一个环境相关的辅助包而整条挂掉。
+const aclRunner = [
+  path.join(root, 'node_modules'),
+  path.join(root, 'vendor', 'harness', 'node_modules'),
+]
+  .map((base) => path.join(base, '@deepseek-ai', 'dsh-sandbox-windows-acl', 'lib', 'runner.js'))
+  .find((candidate) => existsSync(candidate))
 
 function readPeSubsystem(executablePath) {
   const bytes = readFileSync(executablePath)
@@ -128,17 +128,20 @@ const result = spawnSync(
 process.stdout.write((result.stdout ?? '') + (result.stderr ?? ''))
 process.exitCode = result.status ?? 1
 `
-  const aclResult = spawnSync(launcher, [nodeExecutable, '-e', aclScript], {
-    cwd: root,
-    encoding: 'utf8',
-    timeout: 60_000,
-  })
-  const aclOutput = `${aclResult.stdout ?? ''}${aclResult.stderr ?? ''}`.trim()
-  if (aclResult.error) throw aclResult.error
-  if (aclResult.status !== 0 || !aclOutput.includes('ACL_POWERSHELL_OK')) {
-    throw new Error(
-      `Windows ACL sandbox could not start PowerShell (status ${String(aclResult.status)}): ${aclOutput}`,
-    )
+  let aclOutput = 'SKIPPED (vendor/harness 里没有 dsh-sandbox-windows-acl)'
+  if (aclRunner) {
+    const aclResult = spawnSync(launcher, [nodeExecutable, '-e', aclScript], {
+      cwd: root,
+      encoding: 'utf8',
+      timeout: 60_000,
+    })
+    aclOutput = `${aclResult.stdout ?? ''}${aclResult.stderr ?? ''}`.trim()
+    if (aclResult.error) throw aclResult.error
+    if (aclResult.status !== 0 || !aclOutput.includes('ACL_POWERSHELL_OK')) {
+      throw new Error(
+        `Windows ACL sandbox could not start PowerShell (status ${String(aclResult.status)}): ${aclOutput}`,
+      )
+    }
   }
 
   console.log(
