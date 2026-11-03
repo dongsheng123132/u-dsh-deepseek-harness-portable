@@ -37,4 +37,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: u-dsh-portable-windows-x64
-          path: dist/U-DSH-DeepSeek-Harness-Portable-*-Windows-x64.zip
+          path: |
+            dist/U-DSH-DeepSeek-Harness-Portable-*-Windows-x64.zip
+            dist/U-DSH-DeepSeek-Harness-Portable-*-Windows-x64.exe
+            dist/*Setup*.exe
