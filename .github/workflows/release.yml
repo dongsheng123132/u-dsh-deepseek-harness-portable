@@ -30,6 +30,10 @@ jobs:
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
       - run: npm run smoke:packaged
+      # 安装器形态（官方那种体验）：一个 Setup.exe 装到本机，U 盘只放安装包
+      - run: npm run dist:win
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
       - uses: actions/upload-artifact@v4
         with:
           name: u-dsh-portable-windows-x64
