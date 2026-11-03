@@ -337,19 +337,52 @@ function createDeviceWallet({ root, engineRoot, fetch: fetchImpl } = {}) {
     }
   }
 
+  // 余额缓存 + 限流退避（服务端 429 实测）
+  let balanceCache = null
+  let balanceBackoff = null
+  const BALANCE_TTL = 30_000
+  const BALANCE_BACKOFF = 30_000
+
   // C4：并发首启去重
   function ensure() { return (inFlight ??= doEnsure().finally(() => { inFlight = null })) }
 
-  async function status({ refreshBalance = false } = {}) {
+  async function status({ refreshBalance = false, force = false } = {}) {
     const state = store.get()
     const result = { available: Boolean(state.apiKey), apiKey: state.apiKey, apiKeyMasked: maskApiKey(state.apiKey), walletId: state.walletId, pending: Boolean(state.pendingKey), pendingKind: state.pendingKind, balance: null, storeFile }
     if (refreshBalance && state.apiKey) {
-      try {
-        const { response, payload } = await http('pay', '/api/usage/token/', { apiKey: state.apiKey })
-        if (!response.ok) throw new Error(`HTTP ${response.status}`)
-        const usage = payload?.data && typeof payload.data === 'object' ? payload.data : payload
-        result.balance = { available: Number(usage.total_available), used: Number(usage.total_used), granted: Number(usage.total_granted) }
-      } catch (error) { result.balance = { error: error?.message || '余额查询失败' } }
+      const now = Date.now()
+      // 余额接口会限流（实测 429）。策略：30s 内直接给缓存，撞到 429 后 30s 内不再打服务端，
+      // 一律回退到「上次已知余额 + 过期标记」，绝不把错误当成余额显示。
+      const fresh = balanceCache && now - balanceCache.at < BALANCE_TTL
+      const backedOff = balanceBackoff && now < balanceBackoff.until
+      if (fresh && !force) {
+        result.balance = { ...balanceCache.value, cached: true, ageMs: now - balanceCache.at }
+      } else if (backedOff && !force) {
+        result.balance = balanceCache
+          ? { ...balanceCache.value, cached: true, stale: true, ageMs: now - balanceCache.at, note: balanceBackoff.reason }
+          : { error: balanceBackoff.reason, retryAfterMs: balanceBackoff.until - now }
+      } else {
+        try {
+          const { response, payload } = await http('pay', '/api/usage/token/', { apiKey: state.apiKey })
+          if (!response.ok) {
+            const reason = response.status === 429
+              ? '查询太频繁被服务端限流，稍后自动重试'
+              : `HTTP ${response.status}`
+            balanceBackoff = { until: now + BALANCE_BACKOFF, reason }
+            throw new Error(reason)
+          }
+          const usage = payload?.data && typeof payload.data === 'object' ? payload.data : payload
+          const value = { available: Number(usage.total_available), used: Number(usage.total_used), granted: Number(usage.total_granted) }
+          balanceCache = { at: now, value }
+          balanceBackoff = null
+          result.balance = { ...value }
+        } catch (error) {
+          const reason = error?.message || '余额查询失败'
+          result.balance = balanceCache
+            ? { ...balanceCache.value, cached: true, stale: true, ageMs: now - balanceCache.at, note: reason }
+            : { error: reason }
+        }
+      }
     }
     return result
   }

@@ -54,7 +54,7 @@ window.__ModuleLoader__.load({
 						.catch(() => {});
 				};
 				read();
-				const timer = setInterval(read, 60000);
+				const timer = setInterval(read, 120000);
 				return () => {
 					alive = false;
 					clearInterval(timer);

@@ -77,7 +77,7 @@ const PAGE = `<!doctype html>
     <h2>当前钱包</h2>
     <div class="row"><span class="key" id="key">读取中…</span>
       <button onclick="copyKey()">复制密钥</button>
-      <button onclick="refresh(true)">刷新余额</button>
+      <button onclick="refresh(true, true)">刷新余额</button>
     </div>
     <div style="margin-top:14px"><span class="balance" id="balance">—</span>
       <span class="muted" id="balanceHint"></span></div>
@@ -123,17 +123,23 @@ async function api(pathname, body) {
   if (!res.ok || data.error) throw new Error(data.error || ('HTTP ' + res.status));
   return data;
 }
-async function refresh(withBalance = false) {
+async function refresh(withBalance = false, force = false) {
   try {
-    const data = await api('/api/status' + (withBalance ? '?balance=1' : ''));
+    const q = withBalance ? (force ? '?balance=1&force=1' : '?balance=1') : '';
+    const data = await api('/api/status' + q);
     state = data;
     $('key').textContent = data.available ? (data.apiKeyMasked || '（已配置）') : '还没领到（联网后自动获取）';
     const available = data.balance && data.balance.available != null ? Number(data.balance.available) : null;
     $('balance').textContent = available == null ? '—' : ('¥' + (available / 500000).toFixed(2));
-    $('balanceHint').textContent = data.balance
-      ? (data.balance.error ? ('余额查询失败：' + data.balance.error)
-         : (available > 1 ? ('可用额度（' + available.toLocaleString() + ' tokens）') : '还没充值'))
-      : '';
+    const b = data.balance || null;
+    const ageText = b && b.ageMs ? ('（' + Math.round(b.ageMs / 1000) + ' 秒前）') : '';
+    $('balanceHint').textContent = !b
+      ? ''
+      : b.error
+        ? ('余额暂时查不到：' + b.error)
+        : available > 1
+          ? ('可用额度（' + available.toLocaleString() + ' tokens）' + (b.stale ? ' · 缓存值' + ageText : ''))
+          : ('还没充值' + (b.stale ? ' · 缓存值' + ageText : ''));
     $('emptyHint').style.display = (available != null && available <= 1) ? 'block' : 'none';
   } catch (error) { say('读取状态失败：' + error.message, 'err'); }
 }
@@ -204,7 +210,10 @@ async function startWalletPanel({ root: rootDir = root, engineRoot: engineDir = 
         return send(res, 200, PAGE, 'text/html; charset=utf-8')
       }
       if (req.method === 'GET' && url.pathname === '/api/status') {
-        return send(res, 200, await wallet.status({ refreshBalance: url.searchParams.get('balance') === '1' }))
+        return send(res, 200, await wallet.status({
+          refreshBalance: url.searchParams.get('balance') === '1',
+          force: url.searchParams.get('force') === '1',
+        }))
       }
       if (req.method === 'GET' && url.pathname === '/api/key') {
         const status = await wallet.status()
