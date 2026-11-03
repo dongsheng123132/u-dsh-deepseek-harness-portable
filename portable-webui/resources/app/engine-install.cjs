@@ -3,13 +3,13 @@
 // 数据（DSH_HOME）永远留在 U 盘的 data/。
 //
 // 设计目标（用户要的「大块头放本地硬盘，数据放 U 盘，来回切换」）：
-//   - 默认 auto：U 盘（容量小）→ 引擎装本机，换电脑首次自动装一次，之后本机高速启动；
-//                移动硬盘（容量大，速度够）→ 引擎装盘上，保持自包含。
+//   - 默认 auto：一律装本机缓存（%LOCALAPPDATA% / Library/Caches），换电脑首次自动装一次，
+//                之后本机高速启动。v0.4.5 起不再按盘容量猜（477GB 本地盘曾被误判成 drive）。
 //   - 显式 host / drive / temp / usb 可覆盖：
 //       host  = 装本机（%LOCALAPPDATA% / Library/Caches）
-//       drive = 装盘上（<盘根>/engine/<版本>）
+//       drive = 装盘上（<盘根>/engine/<版本>）；auto 下可用 UDSH_FORCE_DRIVE_ENGINE=1 强制
 //       temp  = 拷到系统临时目录，退出尽力清理（对安装敏感的客户）
-//       usb   = 不安装，直接从 U 盘跑（最慢，零残留）
+//       usb   = 不安装，直接从 U 盘跑（最慢，零残留）；单归档形态会退化成 temp
 //
 // 版本按 DSH 包版本隔离；升级 = 新目录，旧的不动，可回退。
 //
@@ -147,7 +147,7 @@ function driveTotalBytes(p) {
   } catch { return 0 }
 }
 
-/** 选安装位置：显式 mode 优先；auto 时按「盘容量」判断是不是移动硬盘。 */
+/** 选安装位置：显式 mode 优先；auto 一律装本机（v0.4.5 起不再按盘容量猜）。 */
 function pickMode(appRoot, requested) {
   if (requested && MODES.has(requested) && requested !== 'auto') return requested
   // 默认一律装到本机缓存（%LOCALAPPDATA% / ~/Library/Caches）：

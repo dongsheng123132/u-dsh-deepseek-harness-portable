@@ -101,7 +101,7 @@ DSH 仍处于快速更新期。U-DSH 选择把可运行版本焊死在完整发�
 | `%LOCALAPPDATA%/U-DSH/engine/<dsh版本>/`（Win）或 `~/Library/Caches/U-DSH/engine/<dsh版本>/`（Mac） | 已安装的 Node 运行时 + DSH 闭包 | 否 |
 | `%LOCALAPPDATA%/U-DSH/` | Electron 缓存、日志 | 否 |
 
-引擎装哪由 `UDSH_ENGINE_MODE` 控制：`auto`（默认，装本机；移动硬盘 ≥128GB 则装盘上）、`host`、`drive`、`temp`（临时目录、退出清理）、`usb`（不安装直跑）。每次安装按版本隔离且原子落地，第二次直接复用。客户机一行 npm 都不跑、一个字节都不下载：启动时解析随包内核并在本机复制一次（包名/版本/入口/必需 peer 校验），完全离线。所有版本参数集中在 [`config/runtime-channel.json`](config/runtime-channel.json)；Node 压缩包的 SHA-256 与 DSH 根包 integrity 都在构建期核对。详见 [`docs/vendored-kernel.md`](docs/vendored-kernel.md)。
+引擎装哪由 `UDSH_ENGINE_MODE` 控制：`auto`（默认，一律装本机缓存，不按盘容量猜）、`host`、`drive`、`temp`（临时目录、退出清理）、`usb`（不安装直跑；单归档包会退化成 temp）。每次安装按版本隔离且原子落地，第二次直接复用。客户机一行 npm 都不跑、一个字节都不下载：启动时解析随包内核并在本机复制一次（包名/版本/入口/必需 peer 校验），完全离线。所有版本参数集中在 [`config/runtime-channel.json`](config/runtime-channel.json)；Node 压缩包的 SHA-256 与 DSH 根包 integrity 都在构建期核对。详见 [`docs/vendored-kernel.md`](docs/vendored-kernel.md)。
 
 ### 为什么盘上只有一个大文件（`engine.tar.gz`）
 

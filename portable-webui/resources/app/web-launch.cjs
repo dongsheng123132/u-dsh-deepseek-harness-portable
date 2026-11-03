@@ -3,8 +3,8 @@
 // 这样「大块头在本机、数据随盘走」，换电脑首次自动装一次，之后本机高速启动。
 // 用法: <node> web-launch.cjs
 // 环境变量:
-//   UDSH_ENGINE_MODE=auto|host|drive|temp|usb   引擎位置（默认 auto）
-//   UDSH_HDD_THRESHOLD_GB=64                    auto 时判定「移动硬盘」的容量阈值
+//   UDSH_ENGINE_MODE=auto|host|drive|temp|usb   引擎位置（默认 auto = 一律装本机）
+//   UDSH_FORCE_DRIVE_ENGINE=1                   auto 时强制把引擎装到盘上
 'use strict'
 const { spawn } = require('node:child_process')
 const fs = require('node:fs')

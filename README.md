@@ -129,11 +129,11 @@ the USB drive:
 
 Where the engine goes is configurable via `UDSH_ENGINE_MODE`:
 
-- `auto` (default) — install to the host; a portable HDD/SSD (≥128 GB, `UDSH_HDD_THRESHOLD_GB`) keeps it on the drive instead.
+- `auto` (default) — always install to the host (`%LOCALAPPDATA%` / `Library/Caches`); it never guesses from drive capacity. Use `drive` (or `UDSH_FORCE_DRIVE_ENGINE=1`) to keep the engine on the stick.
 - `host` — always install to the host (`%LOCALAPPDATA%` / `Library/Caches`).
 - `drive` — install to `<drive>/engine/<dsh-version>` (portable HDD/SSD).
 - `temp` — copy to the system temp dir and remove on exit (install-sensitive machines).
-- `usb` — run straight from the USB stick (slowest, zero install).
+- `usb` — run straight from the USB stick (slowest, zero install); with the single-archive package it falls back to `temp`.
 
 Every install is version-isolated and atomic (`engine/<dsh-version>/`; reuses on the second launch).
 End-user machines never run npm and never download a byte: startup resolves the bundled kernel and
