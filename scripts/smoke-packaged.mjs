@@ -121,10 +121,17 @@ try {
   })
   try {
     const url = await service.ready
-    const response = await fetch(url)
+    // DSH 的 ready URL 带一次性 token：直接 fetch 会 303 到 / 并下发会话 cookie。
+    // Node 的 fetch 不会自动保存 cookie，所以要手动接住 set-cookie 再请求首页（否则 401）。
+    const first = await fetch(url, { redirect: 'manual' })
+    const setCookie = first.headers.get('set-cookie') ?? ''
+    const cookie = setCookie.split(';')[0]
+    const target = new URL(url)
+    const homeUrl = new URL('/', target).toString()
+    const response = await fetch(homeUrl, { headers: cookie ? { cookie } : {} })
     const html = await response.text()
     if (!response.ok || !html.includes('__DSH_BOOT__')) {
-      throw new Error(`official DSH Web UI smoke failed: HTTP ${response.status}`)
+      throw new Error(`official DSH Web UI smoke failed: HTTP ${response.status}（first=${first.status} cookie=${cookie ? 'yes' : 'no'}）`)
     }
     await kernel.activate(target.version)
     const { default: manifest } = await import(new URL('../package.json', import.meta.url), { with: { type: 'json' } })
