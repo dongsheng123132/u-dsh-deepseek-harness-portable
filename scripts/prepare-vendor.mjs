@@ -279,6 +279,32 @@ async function installFromLock(staging, dir) {
 }
 
 /** 装完之后的统一收尾：解引用链接 → 剪枝 → 打补丁 → 复校 → 原子替换 vendor/harness。 */
+
+/// 把「虾盘云设备钱包」客户端插件装进闭包（WebUI 版和 Electron 壳子版共用同一份闭包）。
+/// 必须写进 dsh-web-app 自己的 cordis.patch.yml 的 insert 列表里；写进用户 profile 顶层
+/// 会把 bundle 的插入列表顶掉，实测整页 Failed to load plugins。
+function installWalletPlugin() {
+  const pluginSrc = path.join(root, "portable-webui", "plugin")
+  if (!existsSync(pluginSrc)) return
+  const pluginName = '@u-dsh/dsh-client-ui-xiapan-wallet'
+  const target = path.join(harnessDir, 'node_modules', ...pluginName.split('/'))
+  cpSync(pluginSrc, target, { recursive: true })
+  const webAppPkg = path.join(harnessDir, 'node_modules', '@deepseek-ai', 'dsh-web-app', 'package.json')
+  if (existsSync(webAppPkg)) {
+    const manifest = JSON.parse(readFileSync(webAppPkg, 'utf8'))
+    manifest.dependencies = { ...(manifest.dependencies ?? {}), [pluginName]: '0.1.0' }
+    writeFileSync(webAppPkg, `${JSON.stringify(manifest, null, 2)}\n`)
+  }
+  const patchFile = path.join(harnessDir, 'node_modules', '@deepseek-ai', 'dsh-web-app', 'cordis.patch.yml')
+  if (existsSync(patchFile)) {
+    const text = readFileSync(patchFile, 'utf8')
+    if (!text.includes('xiapan-wallet')) {
+      appendFileSync(patchFile, `\n    # U-DSH：虾盘云设备钱包（余额 / 一键充值），挂在左下角\n    - id: xiapan-wallet\n      name: '${pluginName}'\n`)
+    }
+  }
+  log(`已装入钱包插件：${pluginName}`)
+}
+
 async function finishHarnessStaging(staging, officialIntegrity) {
   const before = directorySize(staging)
   materializeStagedLinks(staging)
@@ -292,6 +318,7 @@ async function finishHarnessStaging(staging, officialIntegrity) {
     await rm(harnessDir, { recursive: true, force: true })
   }
   await rename(staging, harnessDir)
+  installWalletPlugin()
   log(`DSH ${channel.dsh.version} 闭包就绪：${harnessDir}`)
 }
 

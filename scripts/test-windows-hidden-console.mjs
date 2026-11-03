@@ -3,10 +3,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { spawnSync } from 'node:child_process'
-import {
-  resolveWindowsHiddenConsoleLauncher,
-  resolveWindowsNodeExecutable,
-} from '../src/dsh-service.js'
+import { resolveWindowsHiddenConsoleLauncher } from '../src/dsh-service.js'
 
 if (process.platform !== 'win32') {
   console.log('windows hidden-console test: skipped on non-Windows')
@@ -16,8 +13,10 @@ if (process.platform !== 'win32') {
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const launcher = process.env.WINDOWS_HIDDEN_CONSOLE_LAUNCHER
   ?? resolveWindowsHiddenConsoleLauncher()
-const nodeExecutable = process.env.WINDOWS_DSH_NODE
-  ?? resolveWindowsNodeExecutable()
+// 这个脚本以前 import 的 resolveWindowsNodeExecutable 在 src/dsh-service.js 里已不存在
+// （重构成 resolveWindowsHiddenConsoleLauncher / resolveWindowsPickerPatch 后遗留），
+// 直接让 CI 报 ERR_MODULE_NOT_FOUND。这里改为「显式指定 / 当前 node」。
+const nodeExecutable = process.env.WINDOWS_DSH_NODE ?? process.execPath
 const visibleLauncher = path.join(os.tmpdir(), 'deepseek-harness-visible-console.exe')
 const temporaryRoot = mkdtempSync(path.join(os.tmpdir(), 'dsh-hidden-console-'))
 const powershellScript = path.join(temporaryRoot, 'inspect-console.ps1')

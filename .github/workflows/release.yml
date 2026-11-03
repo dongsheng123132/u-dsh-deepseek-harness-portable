@@ -19,6 +19,7 @@ jobs:
       - run: npm test
       - run: npm run action-parity:check-generated
       - run: npm run action-parity:verify
+      - run: npm run prepare:vendor
       - run: npm run prepare:windows
       - run: npm run test:win-console
       - run: npm run dist:portable
