@@ -20,6 +20,10 @@ jobs:
       - run: npm run action-parity:check-generated
       - run: npm run action-parity:verify
       - run: npm run prepare:vendor
+        env:
+          # 和 WebUI 流水线保持一致：用仓库里提交的确定性闭包锁，避免 npm 时间窗导致 peer 不收敛
+          UDSH_VENDOR_LOCK: config/webui-closure
+          UDSH_VENDOR_WEB_UI: '1'
       - run: npm run prepare:windows
       - run: npm run test:win-console
       - run: npm run dist:portable
