@@ -26,7 +26,8 @@ test('portable paths keep durable data on the USB root and runtime cache on the 
   })
 
   assert.equal(paths.dshHome, path.join('I:\\U-DSH', 'data', 'dsh-home'))
-  assert.equal(paths.walletFile, path.join('I:\\U-DSH', 'data', 'u-dsh-state', 'device-wallet.json'))
+  // 钱包锚定「盘」：没有既有钱包时，新建在盘根统一锚点 <盘>/.xiapan/（跨目录/跨产品复用）
+  assert.equal(paths.walletFile, path.join('I:\\', '.xiapan', 'device-wallet.json'))
   assert.equal(paths.electronDataDir, path.join('C:\\Users\\test\\AppData\\Local\\U-DSH', 'electron'))
   assert.equal(paths.activeKernelFile, path.join('C:\\Users\\test\\AppData\\Local\\U-DSH', 'kernel', 'active.json'))
   // 内核已随包 vendor：不再有下载/版本/npm 缓存目录。

@@ -33,7 +33,11 @@ function volumeRoot(target) {
     return match ? match[0] : undefined
   }
   const parsed = path.parse(resolved)
-  return parsed.root || undefined
+  const root = parsed.root || undefined
+  // 系统盘不建锚点（C:\ 根可能不可写，且不是"客户那支盘"）
+  const systemDrive = process.env.SystemDrive?.trim().toUpperCase()
+  if (root && systemDrive && root.slice(0, 2).toUpperCase() === systemDrive.slice(0, 2)) return undefined
+  return root
 }
 
 
