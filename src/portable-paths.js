@@ -1,6 +1,7 @@
 import { mkdirSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
+import { locateWalletFile, rememberWalletFile } from './wallet-locate.js'
 
 const PRODUCT_DIR = 'U-DSH'
 
@@ -43,7 +44,12 @@ export function resolvePortablePaths({
     dataDir,
     dshHome: path.join(dataDir, 'dsh-home'),
     stateDir,
-    walletFile: path.join(stateDir, 'device-wallet.json'),
+    // 钱包锚定「盘」：换目录/换版本/装在本机再插回 U 盘，都认得出同一个钱包
+    walletFile: (() => {
+      const located = locateWalletFile({ dataDir, stateHint: path.join(stateDir, 'last-wallet.txt') })
+      rememberWalletFile(path.join(stateDir, 'last-wallet.txt'), located.file)
+      return located.file
+    })(),
     hostRoot,
     electronDataDir: path.join(hostRoot, 'electron'),
     logsDir: path.join(hostRoot, 'logs'),
