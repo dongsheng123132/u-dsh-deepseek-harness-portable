@@ -14,6 +14,7 @@
 const fs = require('node:fs')
 const os = require('node:os')
 const path = require('node:path')
+const { locateWalletFile, rememberWalletFile } = require('./wallet-locate.cjs')
 
 const OVERSEA_API_BASE = 'https://api.u-claw.org/v1'
 const CHINA_API_BASE = 'https://api.u-claw.org.cn/v1'
@@ -59,6 +60,13 @@ function writeFileAtomic(file, text, { mode } = {}) {
   if (mode !== undefined) { try { fs.chmodSync(tmp, mode) } catch {} }
   fs.renameSync(tmp, file)
   if (mode !== undefined) { try { fs.chmodSync(file, mode) } catch {} }
+}
+
+
+/** 宿主侧"上次用的钱包路径"指针（只存路径，不存凭证；换目录后靠它找回） */
+function hostPointerFile() {
+  const base = process.env.LOCALAPPDATA || process.env.XDG_CACHE_HOME || path.join(os.homedir(), '.cache')
+  return path.join(base, 'U-DSH', 'last-wallet.txt')
 }
 
 function createFileStore(filename) {
@@ -274,8 +282,20 @@ function createApplyKey({ engineRoot, dshHome }) {
  */
 function createDeviceWallet({ root, engineRoot, fetch: fetchImpl } = {}) {
   if (fetchImpl) globalThis.fetch = fetchImpl
-  const storeFile = path.join(root, 'data', 'u-dsh-state', 'device-wallet.json')
+  // 钱包锚定「盘」不锚定「目录」：换目录/重装/换版本都要认得出同一支盘上的老钱包
+  // （实测一台机器上曾攒出 4 个钱包，客户充的钱在第 3 个里，看起来像"没到账"）。
+  const located = locateWalletFile({
+    dataDir: path.join(root, 'data'),
+    stateHint: process.env.UDSH_WALLET_POINTER?.trim() || hostPointerFile(),
+  })
+  const storeFile = located.file
+  if (located.existing) {
+    console.log(`[U-DSH wallet] 沿用已有钱包文件（来源：${located.source}）：${storeFile}`)
+  } else {
+    console.log(`[U-DSH wallet] 没有找到已有钱包，将新建在：${storeFile}（来源：${located.source}）`)
+  }
   const store = createFileStore(storeFile)
+  rememberWalletFile(process.env.UDSH_WALLET_POINTER?.trim() || hostPointerFile(), storeFile)
   const dshHome = path.join(root, 'data', 'dsh-home')
   const applyKeyRaw = createApplyKey({ engineRoot, dshHome })
   let endpointsPromise = null
