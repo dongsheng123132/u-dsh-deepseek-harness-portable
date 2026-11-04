@@ -1,6 +1,6 @@
 {
   "name": "u-dsh",
-  "version": "0.4.7",
+  "version": "0.4.8",
   "description": "U-DSH Portable — DeepSeek Harness USB portable edition for Windows with Xiapan Cloud device wallet.",
   "type": "module",
   "main": "src/main.js",
